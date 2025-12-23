@@ -1,0 +1,95 @@
+.table-wrapper {
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  --idle: transparent;
+  --hover: var(--background-raised-grey-hover);
+  --active: var(--background-raised-grey-active);
+  background-color: var(--background-raised-grey);
+  filter: drop-shadow(var(--raised-shadow));
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.875rem !important;
+  line-height: 1.5rem !important;
+}
+
+/* Fixed table layout for consistent column widths */
+table[style*="table-layout: fixed"] {
+  table-layout: fixed;
+}
+
+table[style*="table-layout: fixed"] th,
+table[style*="table-layout: fixed"] td {
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+th {
+  text-align: left;
+}
+thead {
+  border-top: 1px solid var(--background-contrast-raised-grey);
+}
+
+tbody > tr:hover {
+  background-color: var(--background-contrast-raised-grey);
+}
+
+:where(th) {
+  border-top: 0px solid var(--background-contrast-raised-grey);
+  padding: 0.5rem;
+}
+:where(td) {
+  border-top: 1px solid var(--background-contrast-raised-grey);
+  padding: 0.5rem;
+}
+
+:where(tbody):last-child {
+  border-bottom: 1px solid var(--background-contrast-raised-grey);
+}
+
+:where(th, td):not(:first-child):not(:last-child) {
+  padding: 0.75rem 1rem;
+}
+
+/* :where(th, td):last-child {
+    text-align: right;
+} */
+
+.selected-row {
+  background-color: var(--background-contrast-blue-cumulus);
+  border-left: 4px solid var(--background-action-high-blue-cumulus);
+  margin-top: 1px;
+
+  &:hover {
+    background-color: var(--background-contrast-blue-france) !important;
+  }
+}
+
+.unselected-row {
+  border-left: 4px solid transparent;
+}
+
+a[href].table-link {
+  width: fit-content;
+  background-size: 0 0;
+  margin-bottom: 0;
+  &:hover {
+    background-size:
+      var(--underline-hover-width) calc(var(--underline-thickness) * 2),
+      var(--underline-idle-width) var(--underline-thickness);
+  }
+}
+
+/* Text truncation utilities */
+.clamp-1 {
+  display: -webkit-box;
+  -webkit-line-clamp: 1;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  word-break: break-word;
+}

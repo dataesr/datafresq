@@ -1,0 +1,112 @@
+/* Remove vertical centering pseudo-elements */
+.fr-modal.atw-modal::before {
+  content: none;
+}
+.fr-modal.atw-modal::after {
+  content: none;
+}
+
+/* Position modal: horizontally centered, top offset */
+.fr-modal.atw-modal {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  padding-top: 1.5rem;
+}
+
+/* Scrollbar styling for webkit browsers */
+.atw-modal div::-webkit-scrollbar {
+  width: 8px;
+}
+
+.atw-modal div::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.atw-modal div::-webkit-scrollbar-thumb {
+  background: var(--border-default-grey);
+  border-radius: 4px;
+}
+
+.atw-modal div::-webkit-scrollbar-thumb:hover {
+  background: var(--text-mention-grey);
+}
+.awt-wrapper {
+  width: min(100vw, 40rem);
+  background-color: var(--background-overlap-grey);
+  padding: 0;
+  position: relative;
+  margin-top: 2.5rem;
+}
+.awt-workspace-btn {
+  display: flex;
+  align-items: start;
+  flex-direction: column;
+  width: 100%;
+  position: relative;
+}
+.awt-workspace-btn[aria-selected="true"] {
+  background-color: var(--active-tint);
+}
+.awt-workspace-btn[aria-selected="true"]::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: calc(0.25rem - 2px);
+  width: 4px;
+  height: 100%;
+  background-color: var(--border-default-blue-france);
+}
+
+.awt-input {
+  box-shadow: 0 1px 0 0 var(--border-default-grey);
+  background-color: var(--background-contrast-grey);
+}
+
+.awt-input-clear-btn {
+  position: absolute;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 32px;
+  height: 32px;
+  margin: auto;
+  top: 0.25rem;
+  bottom: 0.25rem;
+  right: 0.5rem;
+  appearance: none !important;
+  -webkit-appearance: none !important;
+  -moz-appearance: none !important;
+  &:hover {
+    background: transparent !important;
+  }
+  &:active {
+    background: transparent !important;
+  }
+}
+
+.atw-close-btn {
+  --icon-size: 1rem;
+  content: "";
+  display: inline-block;
+  height: var(--icon-size);
+  -webkit-mask-image: url("data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCIgd2lkdGg9IjI0IiBoZWlnaHQ9IjI0Ij48cGF0aCBkPSJtMTIgMTAuNiA0Ljk1LTQuOTYgMS40IDEuNEwxMy40MiAxMmw0Ljk2IDQuOTUtMS40IDEuNEwxMiAxMy40MmwtNC45NSA0Ljk2LTEuNC0xLjRMMTAuNTggMTIgNS42MyA3LjA1bDEuNC0xLjR6Ii8+PC9zdmc+");
+  mask-image: url("data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCIgd2lkdGg9IjI0IiBoZWlnaHQ9IjI0Ij48cGF0aCBkPSJtMTIgMTAuNiA0Ljk1LTQuOTYgMS40IDEuNEwxMy40MiAxMmw0Ljk2IDQuOTUtMS40IDEuNEwxMiAxMy40MmwtNC45NSA0Ljk2LTEuNC0xLjRMMTAuNTggMTIgNS42MyA3LjA1bDEuNC0xLjR6Ii8+PC9zdmc+");
+  -webkit-mask-size: 100% 100%;
+  mask-size: 100% 100%;
+  vertical-align: calc((0.75em - var(--icon-size)) * 0.5);
+  width: var(--icon-size);
+  background-color: currentColor;
+  flex: none;
+  margin-left: 0.5rem;
+  margin-right: -0.125rem;
+}
+
+.atw-create-btn {
+  font-size: 0.875rem;
+  line-height: 2rem;
+}
+
+.atw-create-btn span::before {
+  --icon-size: 1.25rem;
+}

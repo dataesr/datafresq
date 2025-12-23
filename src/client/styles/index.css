@@ -1,0 +1,202 @@
+/* @use './animations.scss'; */
+/* @use './icons.scss'; */
+/* @use './x-dsfr.scss'; */
+@import "./table.css";
+@import "./layout.css";
+@import "./dsfr-extensions/index.css";
+
+html {
+  scroll-behavior: smooth;
+  scroll-padding-top: 2rem;
+}
+
+.fr-text-black-white--grey {
+  fill: var(--text-black-white-grey);
+}
+
+.signup-step {
+  opacity: 0;
+  transform: translateX(40px);
+  animation: slideIn 0.3s ease-out forwards;
+}
+
+.xfr-simple-card-list {
+  list-style: none;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+
+  LI {
+    border: 1px solid var(--border-default-grey);
+    padding: 0.5rem;
+    border-radius: 0.25rem;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+  }
+}
+
+.fr-badge[class^="fr-icon-"]::before {
+  content: "" !important;
+}
+
+.fr-sidemenu__btn[class^="fr-icon-"]::before,
+.fr-sidemenu__link.fr-side-icon[class*="fr-icon-"]::before {
+  content: "" !important;
+  font-weight: 700;
+  --icon-size: 1rem;
+  margin-right: 0.5rem;
+  width: var(--icon-size);
+  position: relative;
+  left: 0;
+  top: 0;
+}
+
+.fr-password__show-hide-checkbox {
+  position: absolute;
+  bottom: 0.25rem;
+  margin: auto;
+  right: 0.25rem;
+  top: 0.25rem;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  appearance: none !important;
+  -webkit-appearance: none !important;
+  -moz-appearance: none !important;
+}
+
+button.fr-link {
+  background-image: var(--underline-img), var(--underline-img);
+  background-position:
+    var(--underline-x) 100%,
+    var(--underline-x) calc(100% - var(--underline-thickness));
+  background-repeat: no-repeat, no-repeat;
+  background-size:
+    var(--underline-hover-width) calc(var(--underline-thickness) * 2),
+    var(--underline-idle-width) var(--underline-thickness);
+  transition: background-size 0s;
+  background-color: transparent;
+  &:hover {
+    background-color: transparent !important;
+    --underline-hover-width: var(--underline-max-width);
+  }
+}
+
+.fr-link--disabled {
+  color: var(--text-disabled-grey) !important;
+  pointer-events: none !important;
+  cursor: not-allowed !important;
+}
+.text-nowrap {
+  white-space: nowrap;
+  text-wrap: nowrap;
+}
+
+.xfr-nav--horizontal {
+  .fr-nav__list {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    overflow-x: scroll;
+    .fr-nav__item {
+      align-items: flex-start;
+      position: static;
+      .fr-nav__link {
+        font-weight: 400;
+        height: 100%;
+        margin: 0;
+        width: auto;
+        font-size: 0.875rem;
+        line-height: 1.5rem;
+        min-height: 2.5rem;
+        text-wrap: nowrap;
+      }
+      .fr-nav__link::before {
+        bottom: 0;
+        height: 2px;
+        left: 0;
+        margin-top: 0;
+        position: absolute;
+        top: auto;
+        width: 100%;
+      }
+    }
+  }
+}
+
+.fr-input.xfr-input-otp {
+  width: 2.5rem !important;
+  height: 2.5rem !important;
+  border-radius: 0.25rem !important;
+  text-align: center !important;
+  font-weight: 500 !important;
+  font-size: 1.25rem !important;
+  box-shadow: none !important;
+  padding: 0.5rem 0.5rem !important;
+}
+
+.fr-translate .fr-translate__btn--user::before {
+  --icon-size: 1.25rem !important;
+  -webkit-mask-image: url("@gouvfr/dsfr/dist/icons/user/account-circle-fill.svg");
+  mask-image: url("@gouvfr/dsfr/dist/icons/user/account-circle-fill.svg");
+}
+
+.fr-nav__link.fr-nav__link--user {
+  box-shadow: 0 -2px 0 -1px var(--border-default-grey) !important;
+  justify-content: flex-start;
+}
+
+.btns-group--no-margins .fr-btn {
+  margin-bottom: 0 !important;
+}
+
+.fr-nav__link.fr-nav__link--sidebar {
+  box-shadow: none !important;
+  justify-content: flex-start;
+}
+
+.fr-nav__link.fr-nav__link--sidebar {
+  box-shadow: none !important;
+  padding: 0 1rem !important;
+  position: relative;
+}
+
+.fr-nav__link.fr-nav__link--sidebar::before {
+  content: "";
+  position: absolute;
+  width: 0.5rem;
+  height: 100%;
+  left: 0;
+  background-color: var(--border-action-high-blue-france);
+}
+
+.clamp-1 {
+  display: -webkit-box;
+  -webkit-line-clamp: 1;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.clamp-2 {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.clamp-3 {
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+.clamp-4 {
+  display: -webkit-box;
+  -webkit-line-clamp: 4;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}

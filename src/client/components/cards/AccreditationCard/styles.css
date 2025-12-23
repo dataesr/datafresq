@@ -1,0 +1,97 @@
+.accreditation-card {
+  background: var(--background-contrast-blue-france);
+  border: 2px solid var(--border-default-blue-france);
+}
+
+.accreditation-dates {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  gap: 2rem;
+  align-items: center;
+  margin-bottom: 1.5rem;
+}
+
+.accreditation-date {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.accreditation-date__label {
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  color: var(--text-mention-grey);
+  font-weight: 700;
+  letter-spacing: 0.05em;
+}
+
+.accreditation-date__value {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--text-title-blue-france);
+}
+
+.accreditation-timeline {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  flex: 1;
+}
+
+.accreditation-timeline__track {
+  height: 8px;
+  background: rgba(0, 0, 0, 0.1);
+  border-radius: 4px;
+  overflow: hidden;
+  position: relative;
+}
+
+.accreditation-timeline__progress {
+  height: 100%;
+  background: var(--background-action-high-blue-france);
+  border-radius: 4px;
+  transition: width 0.3s ease;
+  position: relative;
+}
+
+.accreditation-timeline__progress::after {
+  content: "";
+  position: absolute;
+  right: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 12px;
+  height: 12px;
+  background: var(--background-action-high-blue-france);
+  border: 2px solid var(--background-contrast-blue-france);
+  border-radius: 50%;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.accreditation-timeline__label {
+  font-size: 0.75rem;
+  color: var(--text-mention-grey);
+  text-align: center;
+}
+
+.accreditation-details {
+  padding-top: 1.5rem;
+  border-top: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+@media (max-width: 768px) {
+  .accreditation-dates {
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+  }
+
+  .accreditation-date {
+    flex-direction: row;
+    justify-content: space-between;
+  }
+
+  .accreditation-timeline {
+    order: 3;
+  }
+}

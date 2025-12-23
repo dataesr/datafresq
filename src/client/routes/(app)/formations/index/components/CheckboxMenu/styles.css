@@ -1,0 +1,49 @@
+/* ============================================================================
+   CheckboxMenu - Multi-select dropdown with checkboxes
+   ============================================================================ */
+
+/* Active state for button when items are selected */
+.checkbox-menu-btn--active {
+  background-color: var(--background-action-low-blue-france);
+}
+
+/* Reset fr-nav__link padding for checkbox items */
+.checkbox-menu-item.fr-nav__link {
+  padding: 0;
+}
+
+/* Checkbox group fills the nav link with proper padding */
+.checkbox-menu-item .fr-checkbox-group {
+  width: 100%;
+  margin: 0;
+  padding: 0.5rem 1rem;
+}
+
+/* Hover state on the whole row */
+.checkbox-menu-item.fr-nav__link:hover {
+  background-color: var(--background-default-grey-hover);
+}
+
+/* Label content layout */
+.checkbox-menu-label-content {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  gap: 0.5rem;
+}
+
+/* Text truncation for long labels */
+.checkbox-menu-label-text {
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  min-width: 0;
+}
+
+/* Make label fully clickable */
+.checkbox-menu-item .fr-label {
+  flex: 1;
+  cursor: pointer;
+}

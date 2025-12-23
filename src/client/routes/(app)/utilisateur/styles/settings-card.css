@@ -1,0 +1,48 @@
+.settings-card-list {
+  display: flex;
+  flex-direction: column;
+  gap: 3rem;
+  padding-bottom: 3rem;
+}
+.settings-card {
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  --idle: transparent;
+  --hover: var(--background-raised-grey-hover);
+  --active: var(--background-raised-grey-active);
+  background-color: var(--background-raised-grey);
+  filter: drop-shadow(var(--raised-shadow));
+}
+
+.settings-card__main {
+  display: grid;
+  gap: 1.5rem;
+  padding: 1.5rem;
+  grid-template-columns: repeat(auto-fit, minmax(360px, 1fr));
+  align-items: start;
+  @media (max-width: 575px) {
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  }
+}
+
+.settings-card__main--vertical {
+  grid-template-columns: 1fr;
+}
+
+.settings-card__header {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+}
+
+.settings-card__footer {
+  width: 100%;
+  display: flex;
+  justify-content: flex-end;
+  --idle: transparent;
+  --hover: var(--background-contrast-grey-hover) !important;
+  --active: var(--background-contrast-grey-active) !important;
+  background-color: var(--background-contrast-grey) !important;
+  padding: 1rem 1.5rem;
+}

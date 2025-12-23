@@ -1,0 +1,68 @@
+/* Override DSFR accordion for card-like appearance */
+.fr-accordion {
+  border: 1px solid var(--border-default-grey);
+  border-radius: 0.5rem;
+  padding: 1rem;
+  transition: border-color 0.2s ease;
+}
+
+.fr-accordion:hover {
+  border-color: var(--border-default-blue-france);
+}
+
+/* Remove DSFR default accordion button styles */
+.fr-accordion__title {
+  margin: 0;
+}
+
+.fr-accordion__btn {
+  width: 100%;
+  text-align: left;
+  padding: 0;
+  background: none;
+  box-shadow: none;
+}
+
+.fr-accordion__btn:hover {
+  background: none; /* Remove DSFR hover background */
+}
+
+/* Custom header layout */
+.parcours-header {
+  width: 100%;
+}
+
+/* Steps list with connecting line */
+.parcours-steps {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.parcours-step {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.5rem 0 0.5rem 1rem;
+  position: relative;
+}
+
+/* Connecting line between badges */
+.parcours-step::before {
+  content: "";
+  position: absolute;
+  left: 1.125rem;
+  top: 0;
+  height: 100%;
+  width: 2px;
+  background: var(--border-default-grey);
+}
+
+.parcours-step:first-child::before {
+  top: 50%;
+  height: 50%;
+}
+
+.parcours-step[data-is-last="true"]::before {
+  height: 50%;
+}

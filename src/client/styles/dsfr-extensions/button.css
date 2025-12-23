@@ -1,0 +1,784 @@
+/* ========================================
+   DSFR Button Color Extensions - Complete
+   ======================================== */
+
+/* ========================================
+   PRIMARY BUTTONS (default)
+   ======================================== */
+
+/* Green variants - Primary */
+.fr-btn--green-tilleul-verveine.fr-btn {
+  --hover: var(--background-action-high-green-tilleul-verveine-hover);
+  --active: var(--background-action-high-green-tilleul-verveine-active);
+  background-color: var(--background-action-high-green-tilleul-verveine);
+  color: var(--text-inverted-green-tilleul-verveine);
+}
+.fr-btn--green-tilleul-verveine.fr-btn:hover {
+  background-color: var(--hover);
+}
+.fr-btn--green-tilleul-verveine.fr-btn:active {
+  background-color: var(--active);
+}
+
+.fr-btn--green-bourgeon.fr-btn {
+  --hover: var(--background-action-high-green-bourgeon-hover);
+  --active: var(--background-action-high-green-bourgeon-active);
+  background-color: var(--background-action-high-green-bourgeon);
+  color: var(--text-inverted-green-bourgeon);
+}
+.fr-btn--green-bourgeon.fr-btn:hover {
+  background-color: var(--hover);
+}
+.fr-btn--green-bourgeon.fr-btn:active {
+  background-color: var(--active);
+}
+
+.fr-btn--green-emeraude.fr-btn {
+  --hover: var(--background-action-high-green-emeraude-hover);
+  --active: var(--background-action-high-green-emeraude-active);
+  background-color: var(--background-action-high-green-emeraude);
+  color: var(--text-inverted-green-emeraude);
+}
+.fr-btn--green-emeraude.fr-btn:hover {
+  background-color: var(--hover);
+}
+.fr-btn--green-emeraude.fr-btn:active {
+  background-color: var(--active);
+}
+
+.fr-btn--green-menthe.fr-btn {
+  --hover: var(--background-action-high-green-menthe-hover);
+  --active: var(--background-action-high-green-menthe-active);
+  background-color: var(--background-action-high-green-menthe);
+  color: var(--text-inverted-green-menthe);
+}
+.fr-btn--green-menthe.fr-btn:hover {
+  background-color: var(--hover);
+}
+.fr-btn--green-menthe.fr-btn:active {
+  background-color: var(--active);
+}
+
+.fr-btn--green-archipel.fr-btn {
+  --hover: var(--background-action-high-green-archipel-hover);
+  --active: var(--background-action-high-green-archipel-active);
+  background-color: var(--background-action-high-green-archipel);
+  color: var(--text-inverted-green-archipel);
+}
+.fr-btn--green-archipel.fr-btn:hover {
+  background-color: var(--hover);
+}
+.fr-btn--green-archipel.fr-btn:active {
+  background-color: var(--active);
+}
+
+/* Blue variants - Primary */
+.fr-btn--blue-ecume.fr-btn {
+  --hover: var(--background-action-high-blue-ecume-hover);
+  --active: var(--background-action-high-blue-ecume-active);
+  background-color: var(--background-action-high-blue-ecume);
+  color: var(--text-inverted-blue-ecume);
+}
+.fr-btn--blue-ecume.fr-btn:hover {
+  background-color: var(--hover);
+}
+.fr-btn--blue-ecume.fr-btn:active {
+  background-color: var(--active);
+}
+
+.fr-btn--blue-cumulus.fr-btn {
+  --hover: var(--background-action-high-blue-cumulus-hover);
+  --active: var(--background-action-high-blue-cumulus-active);
+  background-color: var(--background-action-high-blue-cumulus);
+  color: var(--text-inverted-blue-cumulus);
+}
+.fr-btn--blue-cumulus.fr-btn:hover {
+  background-color: var(--hover);
+}
+.fr-btn--blue-cumulus.fr-btn:active {
+  background-color: var(--active);
+}
+
+/* Purple variant - Primary */
+.fr-btn--purple-glycine.fr-btn {
+  --hover: var(--background-action-high-purple-glycine-hover);
+  --active: var(--background-action-high-purple-glycine-active);
+  background-color: var(--background-action-high-purple-glycine);
+  color: var(--text-inverted-purple-glycine);
+}
+.fr-btn--purple-glycine.fr-btn:hover {
+  background-color: var(--hover);
+}
+.fr-btn--purple-glycine.fr-btn:active {
+  background-color: var(--active);
+}
+
+/* Pink variants - Primary */
+.fr-btn--pink-macaron.fr-btn {
+  --hover: var(--background-action-high-pink-macaron-hover);
+  --active: var(--background-action-high-pink-macaron-active);
+  background-color: var(--background-action-high-pink-macaron);
+  color: var(--text-inverted-pink-macaron);
+}
+.fr-btn--pink-macaron.fr-btn:hover {
+  background-color: var(--hover);
+}
+.fr-btn--pink-macaron.fr-btn:active {
+  background-color: var(--active);
+}
+
+.fr-btn--pink-tuile.fr-btn {
+  --hover: var(--background-action-high-pink-tuile-hover);
+  --active: var(--background-action-high-pink-tuile-active);
+  background-color: var(--background-action-high-pink-tuile);
+  color: var(--text-inverted-pink-tuile);
+}
+.fr-btn--pink-tuile.fr-btn:hover {
+  background-color: var(--hover);
+}
+.fr-btn--pink-tuile.fr-btn:active {
+  background-color: var(--active);
+}
+
+/* Yellow variants - Primary */
+.fr-btn--yellow-tournesol.fr-btn {
+  --hover: var(--background-action-high-yellow-tournesol-hover);
+  --active: var(--background-action-high-yellow-tournesol-active);
+  background-color: var(--background-action-high-yellow-tournesol);
+  color: var(--text-inverted-yellow-tournesol);
+}
+.fr-btn--yellow-tournesol.fr-btn:hover {
+  background-color: var(--hover);
+}
+.fr-btn--yellow-tournesol.fr-btn:active {
+  background-color: var(--active);
+}
+
+.fr-btn--yellow-moutarde.fr-btn {
+  --hover: var(--background-action-high-yellow-moutarde-hover);
+  --active: var(--background-action-high-yellow-moutarde-active);
+  background-color: var(--background-action-high-yellow-moutarde);
+  color: var(--text-inverted-yellow-moutarde);
+}
+.fr-btn--yellow-moutarde.fr-btn:hover {
+  background-color: var(--hover);
+}
+.fr-btn--yellow-moutarde.fr-btn:active {
+  background-color: var(--active);
+}
+
+/* Orange variant - Primary */
+.fr-btn--orange-terre-battue.fr-btn {
+  --hover: var(--background-action-high-orange-terre-battue-hover);
+  --active: var(--background-action-high-orange-terre-battue-active);
+  background-color: var(--background-action-high-orange-terre-battue);
+  color: var(--text-inverted-orange-terre-battue);
+}
+.fr-btn--orange-terre-battue.fr-btn:hover {
+  background-color: var(--hover);
+}
+.fr-btn--orange-terre-battue.fr-btn:active {
+  background-color: var(--active);
+}
+
+/* Brown variants - Primary */
+.fr-btn--brown-cafe-creme.fr-btn {
+  --hover: var(--background-action-high-brown-cafe-creme-hover);
+  --active: var(--background-action-high-brown-cafe-creme-active);
+  background-color: var(--background-action-high-brown-cafe-creme);
+  color: var(--text-inverted-brown-cafe-creme);
+}
+.fr-btn--brown-cafe-creme.fr-btn:hover {
+  background-color: var(--hover);
+}
+.fr-btn--brown-cafe-creme.fr-btn:active {
+  background-color: var(--active);
+}
+
+.fr-btn--brown-caramel.fr-btn {
+  --hover: var(--background-action-high-brown-caramel-hover);
+  --active: var(--background-action-high-brown-caramel-active);
+  background-color: var(--background-action-high-brown-caramel);
+  color: var(--text-inverted-brown-caramel);
+}
+.fr-btn--brown-caramel.fr-btn:hover {
+  background-color: var(--hover);
+}
+.fr-btn--brown-caramel.fr-btn:active {
+  background-color: var(--active);
+}
+
+.fr-btn--brown-opera.fr-btn {
+  --hover: var(--background-action-high-brown-opera-hover);
+  --active: var(--background-action-high-brown-opera-active);
+  background-color: var(--background-action-high-brown-opera);
+  color: var(--text-inverted-brown-opera);
+}
+.fr-btn--brown-opera.fr-btn:hover {
+  background-color: var(--hover);
+}
+.fr-btn--brown-opera.fr-btn:active {
+  background-color: var(--active);
+}
+
+/* Beige variant - Primary */
+.fr-btn--beige-gris-galet.fr-btn {
+  --hover: var(--background-action-high-beige-gris-galet-hover);
+  --active: var(--background-action-high-beige-gris-galet-active);
+  background-color: var(--background-action-high-beige-gris-galet);
+  color: var(--text-inverted-beige-gris-galet);
+}
+.fr-btn--beige-gris-galet.fr-btn:hover {
+  background-color: var(--hover);
+}
+.fr-btn--beige-gris-galet.fr-btn:active {
+  background-color: var(--active);
+}
+
+/* Semantic variants - Primary */
+.fr-btn--success.fr-btn {
+  --hover: var(--background-action-high-success-hover);
+  --active: var(--background-action-high-success-active);
+  background-color: var(--background-action-high-success);
+  color: var(--text-inverted-success);
+}
+.fr-btn--success.fr-btn:hover {
+  background-color: var(--hover);
+}
+.fr-btn--success.fr-btn:active {
+  background-color: var(--active);
+}
+
+.fr-btn--warning.fr-btn {
+  --hover: var(--background-action-high-warning-hover);
+  --active: var(--background-action-high-warning-active);
+  background-color: var(--background-action-high-warning);
+  color: var(--text-inverted-warning);
+}
+.fr-btn--warning.fr-btn:hover {
+  background-color: var(--hover);
+}
+.fr-btn--warning.fr-btn:active {
+  background-color: var(--active);
+}
+
+.fr-btn--info.fr-btn {
+  --hover: var(--background-action-high-info-hover);
+  --active: var(--background-action-high-info-active);
+  background-color: var(--background-action-high-info);
+  color: var(--text-inverted-info);
+}
+.fr-btn--info.fr-btn:hover {
+  background-color: var(--hover);
+}
+.fr-btn--info.fr-btn:active {
+  background-color: var(--active);
+}
+
+.fr-btn--error.fr-btn {
+  --hover: var(--background-action-high-error-hover);
+  --active: var(--background-action-high-error-active);
+  background-color: var(--background-action-high-error);
+  color: var(--text-inverted-error);
+}
+.fr-btn--error.fr-btn:hover {
+  background-color: var(--hover);
+}
+.fr-btn--error.fr-btn:active {
+  background-color: var(--active);
+}
+
+/* ========================================
+   SECONDARY BUTTONS
+   ======================================== */
+
+.fr-btn--green-tilleul-verveine.fr-btn--secondary {
+  box-shadow: inset 0 0 0 1px var(--background-action-high-green-tilleul-verveine);
+  color: var(--background-action-high-green-tilleul-verveine);
+  --hover: inherit;
+  --active: inherit;
+  background-color: initial;
+}
+
+.fr-btn--green-bourgeon.fr-btn--secondary {
+  box-shadow: inset 0 0 0 1px var(--background-action-high-green-bourgeon);
+  color: var(--background-action-high-green-bourgeon);
+  --hover: inherit;
+  --active: inherit;
+  background-color: initial;
+}
+
+.fr-btn--green-emeraude.fr-btn--secondary {
+  box-shadow: inset 0 0 0 1px var(--background-action-high-green-emeraude);
+  color: var(--background-action-high-green-emeraude);
+  --hover: inherit;
+  --active: inherit;
+  background-color: initial;
+}
+
+.fr-btn--green-menthe.fr-btn--secondary {
+  box-shadow: inset 0 0 0 1px var(--background-action-high-green-menthe);
+  color: var(--background-action-high-green-menthe);
+  --hover: inherit;
+  --active: inherit;
+  background-color: initial;
+}
+
+.fr-btn--green-archipel.fr-btn--secondary {
+  box-shadow: inset 0 0 0 1px var(--background-action-high-green-archipel);
+  color: var(--background-action-high-green-archipel);
+  --hover: inherit;
+  --active: inherit;
+  background-color: initial;
+}
+
+.fr-btn--blue-ecume.fr-btn--secondary {
+  box-shadow: inset 0 0 0 1px var(--background-action-high-blue-ecume);
+  color: var(--background-action-high-blue-ecume);
+  --hover: inherit;
+  --active: inherit;
+  background-color: initial;
+}
+
+.fr-btn--blue-cumulus.fr-btn--secondary {
+  box-shadow: inset 0 0 0 1px var(--background-action-high-blue-cumulus);
+  color: var(--background-action-high-blue-cumulus);
+  --hover: inherit;
+  --active: inherit;
+  background-color: initial;
+}
+
+.fr-btn--purple-glycine.fr-btn--secondary {
+  box-shadow: inset 0 0 0 1px var(--background-action-high-purple-glycine);
+  color: var(--background-action-high-purple-glycine);
+  --hover: inherit;
+  --active: inherit;
+  background-color: initial;
+}
+
+.fr-btn--pink-macaron.fr-btn--secondary {
+  box-shadow: inset 0 0 0 1px var(--background-action-high-pink-macaron);
+  color: var(--background-action-high-pink-macaron);
+  --hover: inherit;
+  --active: inherit;
+  background-color: initial;
+}
+
+.fr-btn--pink-tuile.fr-btn--secondary {
+  box-shadow: inset 0 0 0 1px var(--background-action-high-pink-tuile);
+  color: var(--background-action-high-pink-tuile);
+  --hover: inherit;
+  --active: inherit;
+  background-color: initial;
+}
+
+.fr-btn--yellow-tournesol.fr-btn--secondary {
+  box-shadow: inset 0 0 0 1px var(--background-action-high-yellow-tournesol);
+  color: var(--background-action-high-yellow-tournesol);
+  --hover: inherit;
+  --active: inherit;
+  background-color: initial;
+}
+
+.fr-btn--yellow-moutarde.fr-btn--secondary {
+  box-shadow: inset 0 0 0 1px var(--background-action-high-yellow-moutarde);
+  color: var(--background-action-high-yellow-moutarde);
+  --hover: inherit;
+  --active: inherit;
+  background-color: initial;
+}
+
+.fr-btn--orange-terre-battue.fr-btn--secondary {
+  box-shadow: inset 0 0 0 1px var(--background-action-high-orange-terre-battue);
+  color: var(--background-action-high-orange-terre-battue);
+  --hover: inherit;
+  --active: inherit;
+  background-color: initial;
+}
+
+.fr-btn--brown-cafe-creme.fr-btn--secondary {
+  box-shadow: inset 0 0 0 1px var(--background-action-high-brown-cafe-creme);
+  color: var(--background-action-high-brown-cafe-creme);
+  --hover: inherit;
+  --active: inherit;
+  background-color: initial;
+}
+
+.fr-btn--brown-caramel.fr-btn--secondary {
+  box-shadow: inset 0 0 0 1px var(--background-action-high-brown-caramel);
+  color: var(--background-action-high-brown-caramel);
+  --hover: inherit;
+  --active: inherit;
+  background-color: initial;
+}
+
+.fr-btn--brown-opera.fr-btn--secondary {
+  box-shadow: inset 0 0 0 1px var(--background-action-high-brown-opera);
+  color: var(--background-action-high-brown-opera);
+  --hover: inherit;
+  --active: inherit;
+  background-color: initial;
+}
+
+.fr-btn--beige-gris-galet.fr-btn--secondary {
+  box-shadow: inset 0 0 0 1px var(--background-action-high-beige-gris-galet);
+  color: var(--background-action-high-beige-gris-galet);
+  --hover: inherit;
+  --active: inherit;
+  background-color: initial;
+}
+
+.fr-btn--success.fr-btn--secondary {
+  box-shadow: inset 0 0 0 1px var(--background-action-high-success);
+  color: var(--background-action-high-success);
+  --hover: inherit;
+  --active: inherit;
+  background-color: initial;
+}
+
+.fr-btn--warning.fr-btn--secondary {
+  box-shadow: inset 0 0 0 1px var(--background-action-high-warning);
+  color: var(--background-action-high-warning);
+  --hover: inherit;
+  --active: inherit;
+  background-color: initial;
+}
+
+.fr-btn--info.fr-btn--secondary {
+  box-shadow: inset 0 0 0 1px var(--background-action-high-info);
+  color: var(--background-action-high-info);
+  --hover: inherit;
+  --active: inherit;
+  background-color: initial;
+}
+
+.fr-btn--error.fr-btn--secondary {
+  box-shadow: inset 0 0 0 1px var(--background-action-high-error);
+  color: var(--background-action-high-error);
+  --hover: inherit;
+  --active: inherit;
+  background-color: initial;
+}
+
+/* ========================================
+   TERTIARY BUTTONS
+   ======================================== */
+
+.fr-btn--green-tilleul-verveine.fr-btn--tertiary {
+  --hover: inherit;
+  --active: inherit;
+  background-color: initial;
+  box-shadow: inset 0 0 0 1px var(--border-default-grey);
+  color: var(--background-action-high-green-tilleul-verveine);
+}
+
+.fr-btn--green-bourgeon.fr-btn--tertiary {
+  --hover: inherit;
+  --active: inherit;
+  background-color: initial;
+  box-shadow: inset 0 0 0 1px var(--border-default-grey);
+  color: var(--background-action-high-green-bourgeon);
+}
+
+.fr-btn--green-emeraude.fr-btn--tertiary {
+  --hover: inherit;
+  --active: inherit;
+  background-color: initial;
+  box-shadow: inset 0 0 0 1px var(--border-default-grey);
+  color: var(--background-action-high-green-emeraude);
+}
+
+.fr-btn--green-menthe.fr-btn--tertiary {
+  --hover: inherit;
+  --active: inherit;
+  background-color: initial;
+  box-shadow: inset 0 0 0 1px var(--border-default-grey);
+  color: var(--background-action-high-green-menthe);
+}
+
+.fr-btn--green-archipel.fr-btn--tertiary {
+  --hover: inherit;
+  --active: inherit;
+  background-color: initial;
+  box-shadow: inset 0 0 0 1px var(--border-default-grey);
+  color: var(--background-action-high-green-archipel);
+}
+
+.fr-btn--blue-ecume.fr-btn--tertiary {
+  --hover: inherit;
+  --active: inherit;
+  background-color: initial;
+  box-shadow: inset 0 0 0 1px var(--border-default-grey);
+  color: var(--background-action-high-blue-ecume);
+}
+
+.fr-btn--blue-cumulus.fr-btn--tertiary {
+  --hover: inherit;
+  --active: inherit;
+  background-color: initial;
+  box-shadow: inset 0 0 0 1px var(--border-default-grey);
+  color: var(--background-action-high-blue-cumulus);
+}
+
+.fr-btn--purple-glycine.fr-btn--tertiary {
+  --hover: inherit;
+  --active: inherit;
+  background-color: initial;
+  box-shadow: inset 0 0 0 1px var(--border-default-grey);
+  color: var(--background-action-high-purple-glycine);
+}
+
+.fr-btn--pink-macaron.fr-btn--tertiary {
+  --hover: inherit;
+  --active: inherit;
+  background-color: initial;
+  box-shadow: inset 0 0 0 1px var(--border-default-grey);
+  color: var(--background-action-high-pink-macaron);
+}
+
+.fr-btn--pink-tuile.fr-btn--tertiary {
+  --hover: inherit;
+  --active: inherit;
+  background-color: initial;
+  box-shadow: inset 0 0 0 1px var(--border-default-grey);
+  color: var(--background-action-high-pink-tuile);
+}
+
+.fr-btn--yellow-tournesol.fr-btn--tertiary {
+  --hover: inherit;
+  --active: inherit;
+  background-color: initial;
+  box-shadow: inset 0 0 0 1px var(--border-default-grey);
+  color: var(--background-action-high-yellow-tournesol);
+}
+
+.fr-btn--yellow-moutarde.fr-btn--tertiary {
+  --hover: inherit;
+  --active: inherit;
+  background-color: initial;
+  box-shadow: inset 0 0 0 1px var(--border-default-grey);
+  color: var(--background-action-high-yellow-moutarde);
+}
+
+.fr-btn--orange-terre-battue.fr-btn--tertiary {
+  --hover: inherit;
+  --active: inherit;
+  background-color: initial;
+  box-shadow: inset 0 0 0 1px var(--border-default-grey);
+  color: var(--background-action-high-orange-terre-battue);
+}
+
+.fr-btn--brown-cafe-creme.fr-btn--tertiary {
+  --hover: inherit;
+  --active: inherit;
+  background-color: initial;
+  box-shadow: inset 0 0 0 1px var(--border-default-grey);
+  color: var(--background-action-high-brown-cafe-creme);
+}
+
+.fr-btn--brown-caramel.fr-btn--tertiary {
+  --hover: inherit;
+  --active: inherit;
+  background-color: initial;
+  box-shadow: inset 0 0 0 1px var(--border-default-grey);
+  color: var(--background-action-high-brown-caramel);
+}
+
+.fr-btn--brown-opera.fr-btn--tertiary {
+  --hover: inherit;
+  --active: inherit;
+  background-color: initial;
+  box-shadow: inset 0 0 0 1px var(--border-default-grey);
+  color: var(--background-action-high-brown-opera);
+}
+
+.fr-btn--beige-gris-galet.fr-btn--tertiary {
+  --hover: inherit;
+  --active: inherit;
+  background-color: initial;
+  box-shadow: inset 0 0 0 1px var(--border-default-grey);
+  color: var(--background-action-high-beige-gris-galet);
+}
+
+.fr-btn--success.fr-btn--tertiary {
+  --hover: inherit;
+  --active: inherit;
+  background-color: initial;
+  box-shadow: inset 0 0 0 1px var(--border-default-grey);
+  color: var(--background-action-high-success);
+}
+
+.fr-btn--warning.fr-btn--tertiary {
+  --hover: inherit;
+  --active: inherit;
+  background-color: initial;
+  box-shadow: inset 0 0 0 1px var(--border-default-grey);
+  color: var(--background-action-high-warning);
+}
+
+.fr-btn--info.fr-btn--tertiary {
+  --hover: inherit;
+  --active: inherit;
+  background-color: initial;
+  box-shadow: inset 0 0 0 1px var(--border-default-grey);
+  color: var(--background-action-high-info);
+}
+
+.fr-btn--error.fr-btn--tertiary {
+  --hover: inherit;
+  --active: inherit;
+  background-color: initial;
+  box-shadow: inset 0 0 0 1px var(--border-default-grey);
+  color: var(--background-action-high-error);
+}
+
+/* ========================================
+   TERTIARY NO OUTLINE BUTTONS
+   ======================================== */
+
+.fr-btn--green-tilleul-verveine.fr-btn--tertiary-no-outline {
+  --hover: inherit;
+  --active: inherit;
+  background-color: initial;
+  color: var(--background-action-high-green-tilleul-verveine);
+}
+
+.fr-btn--green-bourgeon.fr-btn--tertiary-no-outline {
+  --hover: inherit;
+  --active: inherit;
+  background-color: initial;
+  color: var(--background-action-high-green-bourgeon);
+}
+
+.fr-btn--green-emeraude.fr-btn--tertiary-no-outline {
+  --hover: inherit;
+  --active: inherit;
+  background-color: initial;
+  color: var(--background-action-high-green-emeraude);
+}
+
+.fr-btn--green-menthe.fr-btn--tertiary-no-outline {
+  --hover: inherit;
+  --active: inherit;
+  background-color: initial;
+  color: var(--background-action-high-green-menthe);
+}
+
+.fr-btn--green-archipel.fr-btn--tertiary-no-outline {
+  --hover: inherit;
+  --active: inherit;
+  background-color: initial;
+  color: var(--background-action-high-green-archipel);
+}
+
+.fr-btn--blue-ecume.fr-btn--tertiary-no-outline {
+  --hover: inherit;
+  --active: inherit;
+  background-color: initial;
+  color: var(--background-action-high-blue-ecume);
+}
+
+.fr-btn--blue-cumulus.fr-btn--tertiary-no-outline {
+  --hover: inherit;
+  --active: inherit;
+  background-color: initial;
+  color: var(--background-action-high-blue-cumulus);
+}
+
+.fr-btn--purple-glycine.fr-btn--tertiary-no-outline {
+  --hover: inherit;
+  --active: inherit;
+  background-color: initial;
+  color: var(--background-action-high-purple-glycine);
+}
+
+.fr-btn--pink-macaron.fr-btn--tertiary-no-outline {
+  --hover: inherit;
+  --active: inherit;
+  background-color: initial;
+  color: var(--background-action-high-pink-macaron);
+}
+
+.fr-btn--pink-tuile.fr-btn--tertiary-no-outline {
+  --hover: inherit;
+  --active: inherit;
+  background-color: initial;
+  color: var(--background-action-high-pink-tuile);
+}
+
+.fr-btn--yellow-tournesol.fr-btn--tertiary-no-outline {
+  --hover: inherit;
+  --active: inherit;
+  background-color: initial;
+  color: var(--background-action-high-yellow-tournesol);
+}
+
+.fr-btn--yellow-moutarde.fr-btn--tertiary-no-outline {
+  --hover: inherit;
+  --active: inherit;
+  background-color: initial;
+  color: var(--background-action-high-yellow-moutarde);
+}
+
+.fr-btn--orange-terre-battue.fr-btn--tertiary-no-outline {
+  --hover: inherit;
+  --active: inherit;
+  background-color: initial;
+  color: var(--background-action-high-orange-terre-battue);
+}
+
+.fr-btn--brown-cafe-creme.fr-btn--tertiary-no-outline {
+  --hover: inherit;
+  --active: inherit;
+  background-color: initial;
+  color: var(--background-action-high-brown-cafe-creme);
+}
+
+.fr-btn--brown-caramel.fr-btn--tertiary-no-outline {
+  --hover: inherit;
+  --active: inherit;
+  background-color: initial;
+  color: var(--background-action-high-brown-caramel);
+}
+
+.fr-btn--brown-opera.fr-btn--tertiary-no-outline {
+  --hover: inherit;
+  --active: inherit;
+  background-color: initial;
+  color: var(--background-action-high-brown-opera);
+}
+
+.fr-btn--beige-gris-galet.fr-btn--tertiary-no-outline {
+  --hover: inherit;
+  --active: inherit;
+  background-color: initial;
+  color: var(--background-action-high-beige-gris-galet);
+}
+
+.fr-btn--success.fr-btn--tertiary-no-outline {
+  --hover: inherit;
+  --active: inherit;
+  background-color: initial;
+  color: var(--background-action-high-success);
+}
+
+.fr-btn--warning.fr-btn--tertiary-no-outline {
+  --hover: inherit;
+  --active: inherit;
+  background-color: initial;
+  color: var(--background-action-high-warning);
+}
+
+.fr-btn--info.fr-btn--tertiary-no-outline {
+  --hover: inherit;
+  --active: inherit;
+  background-color: initial;
+  color: var(--background-action-high-info);
+}
+
+.fr-btn--error.fr-btn--tertiary-no-outline {
+  --hover: inherit;
+  --active: inherit;
+  background-color: initial;
+  color: var(--background-action-high-error);
+}

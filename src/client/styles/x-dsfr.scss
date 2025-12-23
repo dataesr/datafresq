@@ -1,0 +1,138 @@
+
+
+
+// Ajout des notices warning, error, et success
+$types:
+  ("error", "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyNCIgaGVpZ2h0PSIyNCIgdmlld0JveD0iMCAwIDI0IDI0Ij48cGF0aCBkPSJNMTcuNSwyLjVoLTExTDEsMTJsNS41LDkuNWgxMUwyMywxMkwxNy41LDIuNXogTTE2LjIsMTQuOGwtMS40LDEuNEwxMiwxMy40bC0yLjgsMi44bC0xLjQtMS40bDIuOC0yLjhMNy44LDkuMmwxLjQtMS40bDIuOCwyLjhsMi44LTIuOGwxLjQsMS40TDEzLjQsMTJMMTYuMiwxNC44eiIvPjwvc3ZnPgo="),
+  ("warning", "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyNCIgaGVpZ2h0PSIyNCIgdmlld0JveD0iMCAwIDI0IDI0Ij48cGF0aCBkPSJtMTIuODY2IDMgOS41MjYgMTYuNWExIDEgMCAwIDEtLjg2NiAxLjVIMi40NzRhMSAxIDAgMCAxLS44NjYtMS41TDExLjEzNCAzYTEgMSAwIDAgMSAxLjczMiAwWk0xMSAxNnYyaDJ2LTJoLTJabTAtN3Y1aDJWOWgtMloiLz48L3N2Zz4K"),
+  ("success", "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyNCIgaGVpZ2h0PSIyNCIgdmlld0JveD0iMCAwIDI0IDI0Ij48cGF0aCBkPSJNMTIgMjJDNi40NzcgMjIgMiAxNy41MjMgMiAxMlM2LjQ3NyAyIDEyIDJzMTAgNC40NzcgMTAgMTAtNC40NzcgMTAtMTAgMTB6bS0uOTk3LTZsNy4wNy03LjA3MS0xLjQxNC0xLjQxNC01LjY1NiA1LjY1Ny0yLjgyOS0yLjgyOS0xLjQxNCAxLjQxNEwxMS4wMDMgMTZ6Ii8+PC9zdmc+Cg==");
+
+@each $type, $mask in $types {
+  .fr-notice--#{$type} {
+    --idle: #0000;
+    --hover: var(--background-contrast-#{$type}-hover) !important;
+    --active: var(--background-contrast-#{$type}-active) !important;
+    background-color: var(--background-contrast-#{$type}) !important;
+    color: var(--text-default-#{$type}) !important;
+
+    .fr-notice__body::before {
+      content: "";
+      -webkit-mask-image: url(#{$mask});
+      mask-image: url(#{$mask});
+    }
+
+  }
+}
+
+// Oblige à ajouter une icône si l'on ajoute une class fr-icon-...
+.fr-badge[class^="fr-icon-"]::before {
+  content: "" !important;
+}
+
+// Ajout d'icones dans les sidemenu
+.fr-sidemenu__btn[class^="fr-icon-"]::before,
+.fr-sidemenu__link.fr-side-icon[class*="fr-icon-"]::before {
+  content: "" !important;
+  font-weight: 700;
+  --icon-size: 1rem;
+  margin-right: 0.5rem;
+  width: var(--icon-size);
+  position: relative;
+  left: 0;
+  top: 0;
+}
+
+.fr-password__show-hide-checkbox {
+  position: absolute;
+  bottom: .25rem;
+  margin: auto;
+  right: .25rem;
+  top: .25rem;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  appearance: none !important;
+  -webkit-appearance: none !important;
+  -moz-appearance: none !important;
+}
+
+button.fr-link {
+  background-image: var(--underline-img),var(--underline-img);
+  background-position: var(--underline-x) 100%,var(--underline-x) calc(100% - var(--underline-thickness));
+  background-repeat: no-repeat,no-repeat;
+  background-size: var(--underline-hover-width) calc(var(--underline-thickness)*2),var(--underline-idle-width) var(--underline-thickness);
+  transition: background-size 0s;
+  background-color: transparent;
+  &:hover {
+    background-color: transparent !important;
+    --underline-hover-width: var(--underline-max-width);
+  }
+}
+
+.fr-link--disabled {
+  color: var(--text-disabled-grey) !important;
+  pointer-events: none !important;
+  cursor: not-allowed !important;
+}
+
+.xfr-nav--horizontal {
+  .fr-nav__list {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    .fr-nav__item {
+      align-items: flex-start;
+      position: static;
+      margin-left: 0 !important;
+      .fr-nav__link {
+        font-weight: 400;
+        height: 100%;
+        margin: 0;
+        min-height: 3.5rem;
+        padding: 1rem;
+        width: auto;
+        font-size: .875rem;
+        line-height: 1.5rem;
+        min-height: 2.5rem;
+        padding: .5rem 1rem;
+      }
+      .fr-nav__link::before {
+        bottom: 0;
+        height: 2px;
+        left: 0;
+        margin-top: 0;
+        position: absolute;
+        top: auto;
+        width: 100%;
+      }
+    }
+  }
+}
+
+.fr-input.xfr-input-otp {
+  width: 2.5rem !important;
+  height: 2.5rem !important;
+  border-radius: .25rem !important;
+  text-align: center !important;
+  font-weight: 500 !important;
+  font-size: 1.25rem !important;
+  box-shadow: none !important;
+  padding: .5rem .5rem !important;
+}
+
+.fr-translate .fr-translate__btn--user::before {
+  --icon-size: 1.25rem !important;
+  -webkit-mask-image: url(/icons/user/account-circle-fill.svg);
+  mask-image: url(/icons/user/account-circle-fill.svg);
+}
+
+.fr-nav__link.fr-nav__link--user {
+  box-shadow: 0 -2px 0 -1px var(--border-default-grey) !important;
+  justify-content: flex-start;
+}
+
+.btns-group--no-margins .fr-btn {
+  margin-bottom: 0 !important;
+}

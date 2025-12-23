@@ -1,0 +1,17 @@
+.search-input-wrapper {
+  min-width: 30rem;
+  outline-offset: unset;
+}
+
+.search-input-wrapper input {
+  width: 100% !important;
+}
+
+.search-input-wrapper input:focus-visible {
+  outline: none !important;
+}
+
+.search-input-wrapper:focus-within {
+  outline: 2px solid #0a76f6;
+  outline-offset: 0;
+}

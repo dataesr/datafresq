@@ -1,0 +1,483 @@
+/* ============================================================================
+   Dropdown Component - Custom styling (fx-dropdown)
+   Replaces dependency on fr-translate, fr-nav, fr-menu DSFR classes
+   ============================================================================ */
+
+/* -----------------------------------------------------------------------------
+   Container - provides positioning context
+   ----------------------------------------------------------------------------- */
+.fx-dropdown {
+  position: relative;
+  display: inline-block;
+}
+
+/* -----------------------------------------------------------------------------
+   Trigger button - with arrow indicator
+   ----------------------------------------------------------------------------- */
+.fx-dropdown__trigger {
+  /* Inherits fr-btn styles */
+}
+
+/* Arrow indicator (::after pseudo-element) */
+/* Use high specificity to override DSFR's fr-icon-* ::after rules */
+.fx-dropdown .fx-dropdown__trigger.fx-dropdown__trigger--has-arrow::after {
+  --icon-size: 1rem;
+  flex: 0 0 auto;
+  display: inline-block;
+  vertical-align: calc((0.75em - var(--icon-size)) * 0.5);
+  background-color: currentColor;
+  width: var(--icon-size);
+  height: var(--icon-size);
+  -webkit-mask-size: 100% 100%;
+  mask-size: 100% 100%;
+  -webkit-mask-image: url("../../assets/icons/arrow-down-s-line.svg");
+  mask-image: url("../../assets/icons/arrow-down-s-line.svg");
+  content: "";
+  margin-left: 0.25rem;
+  margin-right: -0.25rem;
+  transition: transform 0.3s;
+}
+
+/* Override for buttons with fr-icon-* class - force arrow on ::after */
+/* Specificity: 0,4,1 to beat DSFR's 0,2,1 for [class*=fr-icon-]::after */
+.fx-dropdown .fx-dropdown__trigger.fx-dropdown__trigger--has-arrow[class*="fr-icon-"]::after {
+  -webkit-mask-image: url("../../assets/icons/arrow-down-s-line.svg");
+  mask-image: url("../../assets/icons/arrow-down-s-line.svg");
+  content: "";
+}
+
+/* Arrow rotation when expanded */
+.fx-dropdown .fx-dropdown__trigger.fx-dropdown__trigger--has-arrow[aria-expanded="true"]::after {
+  transform: rotate(-180deg);
+}
+
+/* Open state styling */
+.fx-dropdown__trigger[aria-expanded="true"] {
+  color: var(--text-active-blue-france);
+  background-color: var(--background-open-blue-france);
+  --idle: transparent;
+  --hover: var(--background-open-blue-france-hover);
+  --active: var(--background-open-blue-france-active);
+}
+
+.fx-dropdown__trigger[aria-expanded="true"]:hover {
+  background-color: var(--hover-tint);
+}
+
+.fx-dropdown__trigger[aria-expanded="true"]:active {
+  background-color: var(--active-tint);
+}
+
+/* -----------------------------------------------------------------------------
+   Menu container - collapse mechanism + dropdown positioning
+   ----------------------------------------------------------------------------- */
+.fx-dropdown__menu {
+  /* Collapse mechanism */
+  --collapse-max-height: none;
+  overflow: hidden;
+  max-height: var(--collapse-max-height);
+  visibility: hidden;
+  transition:
+    visibility 0.15s,
+    max-height 0.15s;
+
+  /* Dropdown positioning - use fixed to escape overflow:hidden parents */
+  position: absolute;
+  top: 100%;
+  left: 0;
+  z-index: calc(var(--ground, 0) + 1000);
+  pointer-events: none;
+
+  /* Styling */
+  margin: 0;
+  padding: 0;
+  filter: drop-shadow(var(--overlap-shadow, 0 6px 18px rgba(0, 0, 18, 0.16)));
+}
+
+/* Collapsed state */
+.fx-dropdown__menu:not(.fx-dropdown__menu--expanded) {
+  --collapse-max-height: 0;
+}
+
+/* Expanded state */
+.fx-dropdown__menu--expanded {
+  visibility: visible;
+  pointer-events: auto;
+  overflow-x: hidden;
+  overflow-y: auto;
+  max-height: calc(100vh - 10rem);
+}
+
+/* Align to right edge when needed */
+.fx-dropdown__menu--align-end {
+  left: auto;
+  right: 0;
+}
+
+/* -----------------------------------------------------------------------------
+   Menu content - the actual visible content area
+   ----------------------------------------------------------------------------- */
+.fx-dropdown__content {
+  /* Sizing */
+  width: 16rem;
+  max-width: calc(100vw - 2rem);
+  pointer-events: auto;
+
+  /* Spacing */
+  padding: 0;
+  margin: 0;
+
+  /* Background & border */
+  background-color: var(--background-overlap-grey, #fff);
+  background-image: linear-gradient(
+    0deg,
+    var(--background-open-blue-france, #000091),
+    var(--background-open-blue-france, #000091)
+  );
+  background-size: 100% 2px;
+  background-position: 0 0;
+  background-repeat: no-repeat;
+
+  /* Interaction states */
+  --idle: transparent;
+  --hover: var(--background-overlap-grey-hover, rgba(0, 0, 0, 0.05));
+  --active: var(--background-overlap-grey-active, rgba(0, 0, 0, 0.1));
+}
+
+/* -----------------------------------------------------------------------------
+   Menu items - buttons and links inside the dropdown
+   Size-based paddings are controlled by container size class
+   ----------------------------------------------------------------------------- */
+.fx-dropdown__item {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 0.5rem;
+  width: 100%;
+  padding: 0.75rem 1rem; /* md default */
+  font-size: 0.875rem;
+  line-height: 1.5;
+  font-weight: 400;
+  text-align: left;
+  white-space: nowrap;
+  background-color: transparent;
+  border: none;
+  cursor: pointer;
+  color: var(--text-default-grey, #3a3a3a);
+  text-decoration: none;
+
+  /* Hover/focus states */
+  --hover-tint: var(--hover);
+  --active-tint: var(--active);
+}
+
+/* Size variants - item padding scales with trigger size */
+.fx-dropdown--sm .fx-dropdown__item {
+  padding: 0.5rem 0.75rem;
+  font-size: 0.8125rem;
+}
+
+.fx-dropdown--lg .fx-dropdown__item {
+  padding: 1rem 1.25rem;
+  font-size: 1rem;
+}
+
+.fx-dropdown__item:hover {
+  background-color: var(--hover-tint);
+}
+
+.fx-dropdown__item:active {
+  background-color: var(--active-tint);
+}
+
+.fx-dropdown__item:focus {
+  outline: 2px solid var(--outline-focus-blue-france, #0a76f6);
+  outline-offset: -2px;
+}
+
+.fx-dropdown__item:focus:not(:focus-visible) {
+  outline: none;
+}
+
+.fx-dropdown__item:focus-visible {
+  outline: 2px solid var(--outline-focus-blue-france, #0a76f6);
+  outline-offset: -2px;
+}
+
+/* Top border separator between items (skip first child and items after hr) */
+.fx-dropdown__item + .fx-dropdown__item {
+  box-shadow: inset 0 1px 0 0 var(--border-default-grey);
+}
+
+/* Disable DSFR underline effect on links inside dropdown items */
+a.fx-dropdown__item[href],
+.fx-dropdown__item a[href] {
+  background-image: none;
+  background-size: 0;
+  --underline-idle-width: 0;
+  --underline-hover-width: 0;
+}
+
+/* Active/selected state variant */
+.fx-dropdown__item--active,
+.fx-dropdown__item[aria-current="true"] {
+  color: var(--text-active-blue-france, #000091);
+  background-color: var(--background-contrast-blue-france, #e3e3fd);
+}
+
+.fx-dropdown__item--active:hover,
+.fx-dropdown__item[aria-current="true"]:hover {
+  background-color: var(--background-contrast-blue-france-hover, #c1c1fb);
+}
+
+/* Destructive action variant */
+.fx-dropdown__item--destructive {
+  color: var(--text-default-error, #ce0500);
+}
+
+.fx-dropdown__item--destructive:hover {
+  background-color: var(--background-contrast-error-hover, rgba(206, 5, 0, 0.1));
+  color: var(--text-default-error, #ce0500);
+}
+
+/* -----------------------------------------------------------------------------
+   Icon positioning for items
+   Icons use DSFR's fr-icon-* classes via ::before pseudo-element
+   ----------------------------------------------------------------------------- */
+
+/* Default: icon on the left (when fr-icon-* class is present) */
+.fx-dropdown__item[class*="fr-icon-"]::before {
+  --icon-size: 1rem;
+  flex: 0 0 auto;
+  display: inline-block;
+  width: var(--icon-size);
+  height: var(--icon-size);
+  background-color: currentColor;
+  -webkit-mask-size: 100% 100%;
+  mask-size: 100% 100%;
+  vertical-align: middle;
+  order: -1; /* Place before text content */
+}
+
+/* Icon on the right */
+.fx-dropdown__item--icon-right[class*="fr-icon-"]::before {
+  order: 1; /* Place after text content */
+  margin-left: auto;
+}
+
+/* Icon on the left (explicit) */
+.fx-dropdown__item--icon-left[class*="fr-icon-"]::before {
+  order: -1;
+}
+
+/* -----------------------------------------------------------------------------
+   Input items - special styling for inputs (checkbox, radio, text)
+   ----------------------------------------------------------------------------- */
+.fx-dropdown__input {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 0.75rem;
+  width: 100%;
+  padding: 0.5rem 1rem;
+  font-size: 0.875rem;
+  line-height: 1.5;
+  background-color: transparent;
+  cursor: pointer;
+  color: var(--text-default-grey, #3a3a3a);
+}
+
+.fx-dropdown__input:hover {
+  background-color: var(--background-overlap-grey-hover, rgba(0, 0, 0, 0.05));
+}
+
+.fx-dropdown__input:focus-within {
+  background-color: var(--background-overlap-grey-hover, rgba(0, 0, 0, 0.05));
+}
+
+/* Checkbox and Radio inputs */
+.fx-dropdown__input input[type="checkbox"],
+.fx-dropdown__input input[type="radio"] {
+  flex: 0 0 auto;
+  width: 1rem;
+  height: 1rem;
+  margin: 0;
+  cursor: pointer;
+  accent-color: var(--background-active-blue-france, #000091);
+}
+
+/* Size variants - input padding scales with trigger size */
+.fx-dropdown--sm .fx-dropdown__input {
+  padding: 0.375rem 0.75rem;
+  font-size: 0.8125rem;
+}
+
+.fx-dropdown--lg .fx-dropdown__input {
+  padding: 0.625rem 1.25rem;
+  font-size: 1rem;
+}
+
+/* Label for checkbox/radio */
+.fx-dropdown__input label {
+  flex: 1 1 auto;
+  cursor: pointer;
+  user-select: none;
+}
+
+/* Text input styling - special case when it's the first child */
+/*.fx-dropdown__content > .fx-dropdown__input:first-child {
+  padding-top: 0.75rem;
+  padding-bottom: 0.75rem;
+  border-bottom: 1px solid var(--border-default-grey, #ddd);
+  margin-bottom: 0.25rem;
+}*/
+
+/* Text input inside dropdown */
+.fx-dropdown__input input[type="text"],
+.fx-dropdown__input input[type="search"],
+.fx-dropdown__input input[type="email"],
+.fx-dropdown__input input[type="number"] {
+  flex: 1 1 auto;
+  width: 100%;
+  padding: 0.375rem 0.5rem;
+  font-size: 0.875rem;
+  line-height: 1.5;
+  border: 1px solid var(--border-default-grey, #ddd);
+  border-radius: 0.25rem;
+  background-color: var(--background-default-grey, #fff);
+  color: var(--text-default-grey, #3a3a3a);
+}
+
+.fx-dropdown__input input[type="text"]:focus,
+.fx-dropdown__input input[type="search"]:focus,
+.fx-dropdown__input input[type="email"]:focus,
+.fx-dropdown__input input[type="number"]:focus {
+  outline: 2px solid var(--outline-focus-blue-france, #0a76f6);
+  outline-offset: 2px;
+  border-color: var(--border-active-blue-france, #000091);
+}
+
+/* Search wrapper - use this for search inputs in dropdowns */
+.fx-dropdown__search {
+  padding: 0.5rem;
+  border-bottom: 1px solid var(--border-default-grey, #ddd);
+}
+
+.fx-dropdown__search input {
+  flex: 1 1 auto;
+  width: 100%;
+  padding: 0.375rem 0.5rem;
+  font-size: 0.875rem;
+  line-height: 1.5;
+  background-color: transparent;
+}
+
+.fx-dropdown__search input:focus {
+  outline: 2px solid var(--outline-focus-blue-france, #0a76f6);
+  outline-offset: 6px;
+  border-color: var(--border-active-blue-france, #000091);
+}
+
+/* -----------------------------------------------------------------------------
+   Divider - horizontal separator
+   ----------------------------------------------------------------------------- */
+.fx-dropdown__divider,
+.fx-dropdown__content > hr {
+  margin: 0;
+  border: none;
+  padding: 0;
+  height: 1px;
+  background-color: var(--border-default-grey, #ddd);
+}
+
+/* -----------------------------------------------------------------------------
+   Header & Footer sections
+   ----------------------------------------------------------------------------- */
+.fx-dropdown__header {
+  padding: 0.75rem 1rem;
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--text-mention-grey, #666);
+  border-bottom: 1px solid var(--border-default-grey, #ddd);
+}
+
+.fx-dropdown__footer {
+  padding: 0.5rem 1rem;
+  border-top: 1px solid var(--border-default-grey, #ddd);
+  display: flex;
+  gap: 0.5rem;
+  justify-content: flex-end;
+}
+
+/* -----------------------------------------------------------------------------
+   List reset - for ul/ol inside content
+   ----------------------------------------------------------------------------- */
+.fx-dropdown__content ul,
+.fx-dropdown__content ol {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.fx-dropdown__content li {
+  padding: 0;
+  margin: 0;
+}
+
+/* -----------------------------------------------------------------------------
+   Group - for grouping related items with a label
+   ----------------------------------------------------------------------------- */
+.fx-dropdown__group {
+  padding: 0;
+  margin: 0;
+}
+
+.fx-dropdown__group-label {
+  padding: 0.5rem 1rem 0.25rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--text-mention-grey, #666);
+}
+
+/* -----------------------------------------------------------------------------
+   Actions row - for buttons at the bottom (e.g., "Clear all", "Apply")
+   ----------------------------------------------------------------------------- */
+.fx-dropdown__actions {
+  display: flex;
+  gap: 0.5rem;
+  padding: 0.5rem 1rem;
+  border-top: 1px solid var(--border-default-grey, #ddd);
+  justify-content: space-between;
+}
+
+.fx-dropdown__actions--end {
+  justify-content: flex-end;
+}
+
+.fx-dropdown__actions--center {
+  justify-content: center;
+}
+
+/* -----------------------------------------------------------------------------
+   Empty state
+   ----------------------------------------------------------------------------- */
+.fx-dropdown__empty {
+  padding: 1.5rem 1rem;
+  text-align: center;
+  color: var(--text-mention-grey, #666);
+  font-size: 0.875rem;
+}
+
+/* -----------------------------------------------------------------------------
+   Loading state
+   ----------------------------------------------------------------------------- */
+.fx-dropdown__loading {
+  padding: 1.5rem 1rem;
+  text-align: center;
+  color: var(--text-mention-grey, #666);
+  font-size: 0.875rem;
+}

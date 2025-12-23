@@ -1,0 +1,33 @@
+.fx-grid--auto-fit {
+  --fx-grid-min: 400px;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(var(--fx-grid-min), 1fr));
+  align-items: stretch;
+}
+.fx-grid--auto-fill {
+  --fx-grid-min: 400px;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(var(--fx-grid-min), 1fr));
+  align-items: stretch;
+}
+
+/* Gap variants via data-gap */
+.fx-grid--auto-fit-sm,
+.fx-grid--auto-fill-sm {
+  gap: 1rem;
+}
+
+.fx-grid--auto-fit-md,
+.fx-grid--auto-fill-md {
+  gap: 1.5rem;
+}
+
+.fx-grid--auto-fit-lg,
+.fx-grid--auto-fill-lg {
+  gap: 2rem;
+}
+
+.fx-grid--auto-fit-xl,
+.fx-grid--auto-fill-xl {
+  gap: 3rem;
+}

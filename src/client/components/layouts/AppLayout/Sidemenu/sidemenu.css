@@ -1,0 +1,82 @@
+/* ========================================
+   DSFR Sidemenu Extensions
+   Enhanced sidemenu with uppercase, large heavy font, and icons
+   ======================================== */
+.sidemenu {
+  padding: 0 !important;
+  @media (width >= 48em) {
+    .fr-sidemenu {
+      padding-right: 0 !important;
+      padding-left: 0.75rem;
+    }
+    .fr-sidemenu__inner {
+      padding-top: 0.75rem;
+      padding-right: 0.75rem !important;
+    }
+  }
+  /* Base sidemenu link styling - uppercase, large, heavy */
+  .fr-sidemenu__link {
+    text-transform: uppercase;
+    font-size: 1.125rem; /* fr-text--lg equivalent */
+    font-weight: 700; /* fr-text--heavy equivalent */
+    line-height: 1.5rem;
+  }
+
+  /* Nested items (if sidemenu has sublevels) */
+  .fr-sidemenu__item .fr-sidemenu__item .fr-sidemenu__link {
+    font-size: 1rem; /* Slightly smaller for nested items */
+    font-weight: 600;
+    padding-left: 2.25rem; /* Indent for nested items */
+  }
+
+  .fr-sidemenu__item .fr-sidemenu__item .fr-sidemenu__link[class*="fr-icon-"]::before {
+    width: 1.25rem;
+    height: 1.25rem;
+    margin-right: 0.5rem;
+  }
+
+  /* CRITICAL: Override DSFR's ::before used for left border indicator */
+  /* We need to prevent DSFR from hijacking ::before when we have icons */
+  .fr-sidemenu__link[class*="fr-icon-"][aria-current]:not([aria-current="false"])::before {
+    /* Reset DSFR's border styles */
+    position: relative !important;
+    width: 1.5rem !important;
+    height: 1.5rem !important;
+    top: auto !important;
+    bottom: auto !important;
+    left: auto !important;
+
+    /* Apply icon styles */
+    margin-right: 0.75rem;
+    flex-shrink: 0;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background-color: var(--text-action-high-blue-france) !important;
+  }
+
+  /* Use ::after for the left border indicator when icon is present */
+  .fr-sidemenu__link[class*="fr-icon-"][aria-current]:not([aria-current="false"])::after {
+    --idle: transparent;
+    --hover: var(--border-active-blue-france-hover);
+    --active: var(--border-active-blue-france-active);
+    background-color: var(--border-active-blue-france);
+    content: "";
+    position: absolute;
+    width: 2px;
+    top: 0.75rem;
+    bottom: 0.75rem;
+    left: 0;
+  }
+
+  /* Icon support - add icon before the link text */
+  .fr-sidemenu__link[class*="fr-icon-"]::before {
+    margin-right: 0.75rem;
+    flex-shrink: 0;
+    width: 1.5rem;
+    height: 1.5rem;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+  }
+}

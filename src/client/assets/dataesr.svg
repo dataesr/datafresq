@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   version="1.1"
+   id="Calque_5_-_copie"
+   x="0px"
+   y="0px"
+   viewBox="0 0 754.00123 187.60791"
+   xml:space="preserve"
+   width="754.00122"
+   height="187.60791"
+   xmlns:xlink="http://www.w3.org/1999/xlink"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg"><defs
+   id="defs8"><linearGradient
+     id="linearGradient38"><stop
+       style="stop-color:#e4794a;stop-opacity:0;"
+       offset="0.29291055"
+       id="stop39" /><stop
+       style="stop-color:#e4795f;stop-opacity:1;"
+       offset="0.67624652"
+       id="stop38" /></linearGradient><linearGradient
+     id="swatch5"><stop
+       style="stop-color:#a10000;stop-opacity:1;"
+       offset="0"
+       id="stop5" /></linearGradient><linearGradient
+     xlink:href="#linearGradient38"
+     id="linearGradient44"
+     gradientUnits="userSpaceOnUse"
+     x1="1275.0842"
+     y1="979.63281"
+     x2="1275.0842"
+     y2="1668.2449"
+     gradientTransform="matrix(1.0881771,0.00375068,0.00317319,-1.112459,-1014.4771,1568.4683)" /></defs>
+<style
+   type="text/css"
+   id="style1">
+	.st0{fill:#f95c5e;}
+	.st1{fill:#fff;}
+</style>
+
+
+<text
+   xml:space="preserve"
+   style="font-size:144px;line-height:1.55;font-family:sans-serif;letter-spacing:2.5px;white-space:pre;inline-size:0;stroke-miterlimit:0"
+   x="954.58661"
+   y="932.96704"
+   id="text42"
+   transform="matrix(0.4980649,0,0,0.4980649,-336.06348,-381.88091)"><tspan
+     id="tspan42"
+     x="954.58661"
+     y="932.96704"
+     style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:144px;line-height:1.55;font-family:Marianne;-inkscape-font-specification:Marianne;letter-spacing:2.5px;fill:var(--text-black-white-grey);fill-opacity:1;stroke:var(--text-black-white-grey);stroke-miterlimit:0;stroke-opacity:1"><tspan
+       style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:144px;font-family:Marianne;-inkscape-font-specification:'Marianne Bold';letter-spacing:2.5px;fill:var(--text-black-white-grey);fill-opacity:1;stroke:var(--text-black-white-grey);stroke-miterlimit:0;stroke-opacity:1"
+       id="tspan40"
+       dx="0">#data</tspan><tspan
+       style="font-style:normal;font-variant:normal;font-weight:300;font-stretch:normal;font-size:144px;font-family:Marianne;-inkscape-font-specification:'Marianne Light';letter-spacing:2.5px;fill:var(--text-black-white-grey);fill-opacity:1;stroke:var(--text-black-white-grey);stroke-miterlimit:0;stroke-opacity:1"
+       id="tspan41">ESR</tspan></tspan></text><path
+   style="fill:url(#linearGradient44);fill-opacity:1;stroke:#e4794a;stroke-width:5.8996;stroke-linecap:round;stroke-linejoin:miter;stroke-miterlimit:0;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;paint-order:normal"
+   d="m 2.9498582,182.60188 c 0,0 81.9859998,-126.559896 182.0072018,-37.8426 59.6858,52.9414 36.6821,-58.929396 194.1212,-21.5704 231.1864,54.859 159.6612,-338.6231 371.9732,61.4692"
+   id="path5-0-9" /></svg>

@@ -1,0 +1,177 @@
+@keyframes toaster-mount {
+  from {
+    transform: translateY(100%);
+  }
+
+  to {
+    transform: translateY(0);
+  }
+}
+
+@keyframes toaster-unfill {
+  from {
+    height: 100%;
+  }
+
+  to {
+    height: 0%;
+  }
+}
+
+@keyframes toaster-unmount {
+  from {
+    transform: translateX(0);
+  }
+
+  to {
+    transform: translateX(300%);
+  }
+}
+
+#toaster-container {
+  bottom: 4px;
+  box-sizing: border-box;
+  padding: 4px;
+  position: fixed;
+  z-index: 10000;
+}
+
+#toaster-container > * {
+  margin-top: 8px;
+}
+
+@media only screen and (min-width: 992px) {
+  #toaster-container {
+    bottom: 30px;
+    padding: 24px;
+    right: 30px;
+  }
+}
+
+.toaster-toast {
+  align-items: flex-start;
+  animation: toaster-mount 0.3s;
+  border-radius: 0.5rem;
+  box-shadow: 0 6px 18px 0 rgba(0, 0, 18, 0.16);
+  display: flex;
+  flex-wrap: nowrap;
+  min-height: 1.5rem;
+  position: relative;
+  right: 0;
+  top: 0;
+  width: calc(100vw - 8px);
+}
+
+@media only screen and (min-width: 992px) {
+  .toaster-toast {
+    width: 400px;
+  }
+}
+
+.toaster-toast:hover .toaster-progress-bar {
+  animation-play-state: paused;
+}
+
+.toaster-btn-close {
+  --icon-size: 0.75rem !important;
+  border-radius: 100%;
+  height: 1.5rem;
+  position: absolute;
+  right: 0.25rem;
+  top: 0.25rem;
+  width: 1.5rem;
+  padding: 0;
+}
+
+.toaster-btn-close::before,
+.toaster-btn-close::after {
+  --icon-size: 1rem !important;
+}
+
+.toaster-btn-close:hover {
+  background-color: var(--active-tint);
+}
+
+.toaster-colored-box {
+  align-items: center;
+  border-bottom-left-radius: 0.5rem;
+  border-top-left-radius: 0.5rem;
+  bottom: 0;
+  display: flex;
+  justify-content: center;
+  position: absolute;
+  top: 0;
+  width: 40px;
+}
+
+.toaster-colored-box span {
+  z-index: 100;
+}
+
+.toaster-content {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  margin: 0 40px;
+  padding: 8px;
+  width: 100%;
+}
+
+.toaster-progress-bar {
+  animation-name: toaster-unfill;
+  animation-play-state: running;
+  animation-timing-function: linear;
+  border-bottom-left-radius: 0.5rem;
+  background: var(--active);
+  bottom: 0;
+  left: 0;
+  position: absolute;
+  width: 40px;
+}
+
+/* Toast variant styles */
+
+.toaster-toast-error {
+  --active: var(--background-contrast-error-active) !important;
+  --hover: var(--background-contrast-error-hover) !important;
+  background-color: var(--background-contrast-error) !important;
+  color: var(--text-default-error) !important;
+}
+
+.toaster-toast-error > .toaster-colored-box {
+  background-color: var(--error-main-525);
+}
+
+.toaster-toast-info {
+  --active: var(--background-contrast-info-active) !important;
+  --hover: var(--background-contrast-info-hover) !important;
+  background-color: var(--background-contrast-info) !important;
+  border-radius: 0.25rem;
+  color: var(--text-default-info) !important;
+}
+
+.toaster-toast-info > .toaster-colored-box {
+  background-color: var(--info-main-525);
+}
+
+.toaster-toast-success {
+  --active: var(--background-contrast-success-active) !important;
+  --hover: var(--background-contrast-success-hover) !important;
+  background-color: var(--background-contrast-success) !important;
+  color: var(--text-default-success) !important;
+}
+
+.toaster-toast-success > .toaster-colored-box {
+  background-color: var(--success-main-525);
+}
+
+.toaster-toast-warning {
+  --active: var(--background-contrast-warning-active) !important;
+  --hover: var(--background-contrast-warning-hover) !important;
+  background-color: var(--background-contrast-warning) !important;
+  color: var(--text-default-warning) !important;
+}
+
+.toaster-toast-warning > .toaster-colored-box {
+  background-color: var(--warning-main-525);
+}

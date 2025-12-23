@@ -1,0 +1,226 @@
+/* Formation Page Styles */
+
+.hero-section {
+  padding-bottom: 3rem;
+  margin-bottom: 3rem;
+  border-bottom: 1px solid var(--border-default-grey);
+}
+
+.formation-page {
+  background: linear-gradient(
+    to bottom,
+    var(--background-contrast-blue-france) 0%,
+    var(--background-default-grey) 250px
+  );
+}
+
+/* Main Grid Layout */
+.formation-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 6rem;
+  align-items: start;
+}
+
+.formation-section__title {
+  display: flex;
+  align-items: center;
+  margin-bottom: 1.5rem;
+}
+
+/* Parcours List */
+.parcours-list {
+  display: flex;
+  flex-direction: column;
+  gap: 3rem;
+}
+
+.parcours-item {
+  padding: 0.5rem 0 1rem 2rem;
+  margin-left: 1rem;
+  border-left: 3px solid var(--border-default-blue-france);
+}
+
+.parcours-header {
+  margin-bottom: 1rem;
+}
+
+.parcours-meta {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+  margin-top: 1rem;
+}
+
+.parcours-locations {
+  display: flex;
+  align-items: center;
+  color: var(--text-mention-grey);
+}
+
+/* Improved Timeline */
+.parcours-timeline {
+  margin-top: 1rem;
+  padding-top: 1rem;
+}
+
+.timeline-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+.timeline-step {
+  display: flex;
+  gap: 1.5rem;
+  position: relative;
+}
+
+.timeline-step:not(:last-child) {
+  padding-bottom: 1rem;
+}
+
+.timeline-marker {
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 32px;
+}
+
+.timeline-marker-dot {
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: var(--background-action-high-blue-france);
+  border: 3px solid var(--background-default-grey);
+  box-shadow: 0 0 0 3px var(--border-default-blue-france);
+  position: relative;
+  z-index: 2;
+}
+
+.timeline-marker-line {
+  width: 2px;
+  flex: 1;
+  background: var(--border-default-grey);
+  margin-top: 8px;
+}
+
+.timeline-content {
+  flex: 1;
+  padding-top: 0;
+}
+
+.timeline-niveau {
+  margin-bottom: 0.5rem;
+}
+
+.timeline-details {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-top: 0.5rem;
+}
+
+/* Location Badge */
+.location-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 1rem;
+  background: var(--background-contrast-grey);
+  border-radius: 1rem;
+  font-size: 0.875rem;
+}
+
+/* Sidebar */
+.formation-sidebar {
+  position: sticky;
+  top: 2rem;
+}
+
+.formation-cta {
+  width: 100%;
+  justify-content: center;
+}
+
+.contact-btn {
+  width: 100%;
+}
+
+/* Info List */
+.info-list {
+  list-style: none;
+  padding: 0;
+  margin: 1rem 0 0 0;
+}
+
+.info-list li {
+  display: flex;
+  gap: 1rem;
+  align-items: flex-start;
+  margin-bottom: 1rem;
+  font-size: 0.875rem;
+}
+
+.info-list li > span {
+  flex-shrink: 0;
+  color: var(--text-title-blue-france);
+}
+
+.info-list strong {
+  display: inline-block;
+  min-width: 120px;
+}
+
+/* Location Item */
+.location-item {
+  margin-bottom: 1.5rem;
+}
+
+.location-item:last-child {
+  margin-bottom: 0;
+}
+
+/* Loading State */
+.formation-loading {
+  min-height: 400px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .stats-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .parcours-header {
+    flex-direction: column;
+  }
+
+  .info-list strong {
+    min-width: auto;
+    display: block;
+  }
+
+  .timeline-step {
+    gap: 1rem;
+  }
+
+  .timeline-marker {
+    width: 24px;
+  }
+}
+
+@media (max-width: 576px) {
+  .stats-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .parcours-item {
+    padding: 1.5rem;
+  }
+}

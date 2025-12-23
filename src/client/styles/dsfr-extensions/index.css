@@ -1,0 +1,23 @@
+@import "./notice.css";
+@import "./button.css";
+@import "./tag.css";
+@import "./card.css";
+
+.fx-text-title--blue-france {
+  color: var(--text-title-blue-france);
+}
+
+.fx-text-title--grey {
+  color: var(--text-title-grey);
+}
+
+.fx-text--uppercase {
+  text-transform: uppercase;
+}
+
+.fx-spacer {
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+  justify-content: space-between;
+}

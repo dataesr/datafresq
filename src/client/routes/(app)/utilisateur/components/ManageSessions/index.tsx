@@ -1,0 +1,133 @@
+import { useRevokeAllSessions, useRevokeSession, useSessions } from '@/api/users';
+import { Button } from '@/components/Button';
+import { useToast } from '@/hooks/useToast';
+
+export default function ManageSessions() {
+  const { toast } = useToast();
+  const { data: sessions, isLoading, error } = useSessions();
+  const { mutate: revokeSession, isPending: isRevokingSession } = useRevokeSession();
+  const { mutate: revokeAllSessions, isPending: isRevokingAll } = useRevokeAllSessions();
+
+  const sessionCount = sessions.length;
+
+  const handleRevokeSession = (sessionId: string) => {
+    revokeSession(sessionId, {
+      onSuccess: () => {
+        toast({
+          description: 'La session a été supprimée avec succès.',
+          type: 'success',
+        });
+      },
+      onError: () => {
+        toast({
+          description: 'Erreur lors de la suppression de la session',
+          type: 'error',
+        });
+      },
+    });
+  };
+
+  const handleRevokeAllSessions = () => {
+    revokeAllSessions(undefined, {
+      onSuccess: () => {
+        toast({
+          description: 'Toutes les sessions ont été supprimées avec succès.',
+          type: 'success',
+        });
+      },
+      onError: () => {
+        toast({
+          description: 'Erreur lors de la suppression des sessions',
+          type: 'error',
+        });
+      },
+    });
+  };
+
+  if (error) {
+    return (
+      <div className="settings-card">
+        <div className="settings-card__main">
+          <p className="fr-text--error">Erreur lors de la récupération des sessions</p>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="settings-card">
+      <div className="settings-card__main settings-card__main--vertical">
+        <div className="settings-card__header">
+          <p className="fr-h6 fr-mb-0">Sessions</p>
+          <p className="fr-text--sm fr-mb-0">Toutes les sessions actives pour votre compte</p>
+        </div>
+        <div className="settings-card__content">
+          <div className="fr-grid-row fr-grid-row--gutters fr-grid-row--middle fr-mb-1w">
+            <div className="fr-col-12">
+              {isLoading ? (
+                <p className="fr-text--sm">Chargement des sessions...</p>
+              ) : (
+                <>
+                  <p className="fr-text--bold fr-text--lg fr-mb-1w">
+                    {sessionCount} session{sessionCount > 1 ? 's' : ''}
+                  </p>
+                  <ul className="xfr-simple-card-list">
+                    {sessions.map((session, index) => (
+                      <li
+                        key={session.id}
+                        style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}
+                      >
+                        <div style={{ flexGrow: 1 }}>
+                          {index === 0 && (
+                            <p className="fr-badge fr-badge--sm fr-badge--success fr-mb-0">
+                              Session active
+                            </p>
+                          )}
+                          <p className="fr-text--bold fr-text--xs fr-mb-0">{session.userAgent}</p>
+                          <p className="fr-text--xs fr-mb-0 fr-text--mention-grey">
+                            {session.ipAddress || 'IP inconnue'} •{' '}
+                            {new Date(session.lastRefreshedAt).toLocaleDateString('fr-FR', {
+                              day: 'numeric',
+                              month: 'short',
+                              year: 'numeric',
+                              hour: '2-digit',
+                              minute: '2-digit',
+                            })}
+                          </p>
+                        </div>
+                        {index !== 0 && (
+                          <Button
+                            color="error"
+                            icon="delete-bin-line"
+                            onClick={() => handleRevokeSession(session.id)}
+                            size="sm"
+                            title="Révoquer cette session"
+                            variant="text"
+                            iconPosition="left"
+                            disabled={isRevokingSession}
+                          >
+                            Révoquer
+                          </Button>
+                        )}
+                      </li>
+                    ))}
+                  </ul>
+                </>
+              )}
+            </div>
+          </div>
+        </div>
+      </div>
+      <div className="settings-card__footer">
+        <Button
+          disabled={sessionCount < 2 || isRevokingAll}
+          variant="secondary"
+          size="sm"
+          onClick={handleRevokeAllSessions}
+        >
+          {isRevokingAll ? 'Révocation...' : 'Tout révoquer'}
+        </Button>
+      </div>
+    </div>
+  );
+}
