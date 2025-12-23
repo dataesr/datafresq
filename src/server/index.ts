@@ -12,7 +12,7 @@ import { meRoutes } from './routes/me';
 import { sessionsRoutes } from './routes/sessions';
 import { errorResponseSchema } from './schemas/common';
 
-export const app = new Elysia()
+export const app = new Elysia({ prefix: '/api' })
   .use(serverTiming())
   .use(logger())
   .use(

@@ -1,5 +1,4 @@
 import { serve } from 'bun';
-import Elysia from 'elysia';
 import client from '@/index.html';
 import { config } from '~/config';
 import { close as closeDb, connect } from '~/database/mongo';
@@ -12,7 +11,7 @@ async function bootstrap() {
     const server = serve({
       routes: {
         '/*': client,
-        '/api/*': async (req) => new Elysia({ prefix: '/api' }).use(app).handle(req),
+        '/api/*': app.handle,
       },
       development: config.isDevelopment,
     });
