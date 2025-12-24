@@ -113,4 +113,10 @@ async function ensureIndexes(cols: Collections): Promise<void> {
   // === RATE LIMITS ===
   await cols.rateLimits.createIndex({ key: 1 }, { unique: true });
   await cols.rateLimits.createIndex({ expiresAt: 1 }, { expireAfterSeconds: 0 });
+
+  // === PROGRAMS ===
+  await cols.programs.createIndex({ inf: 1 }, { unique: true });
+
+  // === SISE ===
+  await cols.sise.createIndex({ inf: 1, annee: 1 });
 }
