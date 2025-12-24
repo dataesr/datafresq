@@ -207,7 +207,7 @@ new Elysia()
               <h2>📝 Development Tips</h2>
               <p><strong>Hot Reload:</strong> This server automatically restarts when you save changes to email templates.</p>
               <p><strong>Generate Static Files:</strong> Run <code>bun run preview:emails</code> to create standalone HTML files.</p>
-              <p><strong>Documentation:</strong> See <code>src/emails/README.md</code> for full documentation.</p>
+              <p><strong>Documentation:</strong> See <code>emails/README.md</code> for full documentation.</p>
             </div>
 
             <div class="footer">

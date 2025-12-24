@@ -1,20 +1,15 @@
 import cn from 'classnames';
 import { Navigate, Outlet, useSearchParams } from 'react-router';
 import { useOptionalCurrentUser } from '@/api/users';
-import dataesrLogo from '@/assets/dataesr.svg';
-import siesLogo from '@/assets/sies_logo_signature.svg';
 import './styles.css';
 import FullPageLoader from '@/components/FullPageLoader';
 
-/**
- * Validates a redirect URL to prevent open redirect attacks.
- * Only allows relative paths that start with a single slash.
- */
+const dataesrLogo = '/public/dataesr.svg';
+const siesLogo = '/public/sies_logo_signature.svg';
+
 function getSafeRedirectUrl(redirectTo: string | null): string {
   if (!redirectTo) return '/';
 
-  // Must start with exactly one slash (not //)
-  // and must not contain protocol indicators
   const isRelativePath =
     redirectTo.startsWith('/') &&
     !redirectTo.startsWith('//') &&
@@ -83,15 +78,10 @@ function AuthLayoutWrapper({ children }: { children: React.ReactNode }) {
   );
 }
 
-// =============================================================================
-// MAIN LAYOUT
-// =============================================================================
-
 export default function AuthLayout() {
   const { user, isLoading } = useOptionalCurrentUser();
   const [searchParams] = useSearchParams();
 
-  // Show loader while checking auth status
   if (isLoading) {
     return (
       <AuthLayoutWrapper>
@@ -100,14 +90,12 @@ export default function AuthLayout() {
     );
   }
 
-  // Redirect authenticated users to app
   if (user) {
     const redirectTo = searchParams.get('redirect');
     const destination = getSafeRedirectUrl(redirectTo);
     return <Navigate to={destination} replace />;
   }
 
-  // Not authenticated - show auth form
   return (
     <AuthLayoutWrapper>
       <Outlet />

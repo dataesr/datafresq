@@ -1,4 +1,4 @@
-import { serve } from 'bun';
+import { file, serve } from 'bun';
 import client from '@/index.html';
 import { config } from '~/config';
 import { close as closeDb, connect } from '~/database/mongo';
@@ -11,6 +11,15 @@ async function bootstrap() {
     const server = serve({
       routes: {
         '/api/*': app.handle,
+        '/public/*': async (req) => {
+          const url = new URL(req.url);
+          const filePath = `./public${url.pathname.slice(7)}`;
+          const f = file(filePath);
+          if (await f.exists()) {
+            return new Response(f);
+          }
+          return new Response('Not found', { status: 404 });
+        },
         '/*': client,
       },
       development: config.isDevelopment,

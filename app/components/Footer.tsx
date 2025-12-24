@@ -1,4 +1,4 @@
-import siesLogo from '@/assets/sies_logo_signature.svg';
+const siesLogo = '/public/sies_logo_signature.svg';
 
 export default function Footer() {
   return (

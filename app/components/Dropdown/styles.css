@@ -30,8 +30,8 @@
   height: var(--icon-size);
   -webkit-mask-size: 100% 100%;
   mask-size: 100% 100%;
-  -webkit-mask-image: url("../../assets/icons/arrow-down-s-line.svg");
-  mask-image: url("../../assets/icons/arrow-down-s-line.svg");
+  -webkit-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='m12 13.172 4.95-4.95 1.414 1.414L12 16 5.636 9.636 7.05 8.222l4.95 4.95z'/%3E%3C/svg%3E");
+  mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='m12 13.172 4.95-4.95 1.414 1.414L12 16 5.636 9.636 7.05 8.222l4.95 4.95z'/%3E%3C/svg%3E");
   content: "";
   margin-left: 0.25rem;
   margin-right: -0.25rem;
@@ -41,8 +41,8 @@
 /* Override for buttons with fr-icon-* class - force arrow on ::after */
 /* Specificity: 0,4,1 to beat DSFR's 0,2,1 for [class*=fr-icon-]::after */
 .fx-dropdown .fx-dropdown__trigger.fx-dropdown__trigger--has-arrow[class*="fr-icon-"]::after {
-  -webkit-mask-image: url("../../assets/icons/arrow-down-s-line.svg");
-  mask-image: url("../../assets/icons/arrow-down-s-line.svg");
+  -webkit-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='m12 13.172 4.95-4.95 1.414 1.414L12 16 5.636 9.636 7.05 8.222l4.95 4.95z'/%3E%3C/svg%3E");
+  mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='m12 13.172 4.95-4.95 1.414 1.414L12 16 5.636 9.636 7.05 8.222l4.95 4.95z'/%3E%3C/svg%3E");
   content: "";
 }
 

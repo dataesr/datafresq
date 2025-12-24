@@ -1,5 +1,5 @@
-import homeIllustration from '@/assets/home/illustration.svg';
-import ovoid from '@/assets/home/ovoid.svg';
+const homeIllustration = '/public/home/illustration.svg';
+const ovoid = '/public/home/ovoid.svg';
 
 export default function Home() {
   return (

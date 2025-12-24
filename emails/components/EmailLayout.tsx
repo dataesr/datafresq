@@ -19,7 +19,6 @@ export function EmailLayout({
   marianneLogoDarkUrl = emailAssets.marianneLogoDark,
   footer,
 }: EmailLayoutProps) {
-
   return (
     <html lang="fr">
       <head>
