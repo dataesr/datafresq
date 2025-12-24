@@ -18,11 +18,9 @@ export const invitationRoutes = new Elysia({ prefix: '/invitations' })
   .post(
     '/',
     async ({ body, request }) => {
-      // Create pending user
       const now = new Date();
       const email = body.email.toLowerCase();
 
-      // Check if user already exists
       const existingUser = await collections.users.findOne({ email });
 
       const userId = existingUser?.id ?? generateId();
@@ -46,7 +44,7 @@ export const invitationRoutes = new Elysia({ prefix: '/invitations' })
 
       const { token, tokenHash } = generateTokenWithHash();
 
-      const expiresAt = new Date(config.tokens.invitationExpSeconds);
+      const expiresAt = new Date(Date.now() + config.tokens.invitationExpSeconds);
       const tokenInput = {
         id: generateId(),
         userId: user.id,
@@ -61,7 +59,7 @@ export const invitationRoutes = new Elysia({ prefix: '/invitations' })
       await collections.tokens.insertOne(tokenInput);
 
       const url = new URL(request.url);
-      url.pathname = '/inscription';
+      url.pathname = '/auth/inscription';
       url.searchParams.set('token', token);
 
       const emailResponse = await sendInvitationEmail(body.email, url.toString());

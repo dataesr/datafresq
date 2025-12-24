@@ -1,4 +1,5 @@
 import { Elysia } from 'elysia';
+import { config } from '~/config';
 
 import { collections } from '~/database/mongo';
 import {
@@ -7,7 +8,9 @@ import {
   InvalidSessionError,
   InvalidTokenError,
   JWTFailedError,
+  MailerFailedError,
 } from '~/errors';
+import { sendPasswordResetEmail } from '~/external/email';
 import { rateLimitMacro } from '~/macros/rateLimitMacro';
 import { clientInfoPlugin } from '~/plugins/client-info';
 import { cookiesPlugin } from '~/plugins/cookies';
@@ -123,7 +126,6 @@ export const authRoutes = new Elysia({ prefix: '/auth' })
         },
       );
 
-      // Set new cookies
       authCookies.set(accessToken, sessionToken);
 
       return {
@@ -144,11 +146,6 @@ export const authRoutes = new Elysia({ prefix: '/auth' })
       },
     },
   )
-  /**
-   * POST /auth/signout
-   *
-   * Sign out current user by revoking the session.
-   */
   .post(
     '/signout',
     async ({ authCookies }) => {
@@ -179,29 +176,20 @@ export const authRoutes = new Elysia({ prefix: '/auth' })
       cookie: authCookieSchema,
     },
   )
-  /**
-   * POST /auth/mot-de-passe-oublie
-   *
-   * Demander un token de réinitialisation de mot de passe.
-   * Envoie un lien par email (affiche dans la console en dev).
-   */
   .post(
     '/mot-de-passe-oublie',
-    async ({ body }) => {
+    async ({ body, request }) => {
       const user = await collections.users.findOne({ email: body.email.toLowerCase() });
       if (!user) {
-        // Don't reveal if email exists
         return {
           success: true,
           message: 'Si cet email existe, un lien de réinitialisation a été envoyé',
         };
       }
 
-      // Generate reset token
       const { token, tokenHash } = generateTokenWithHash();
 
-      // Store token in database
-      const expiresAt = new Date(Date.now() + 60 * 60 * 1000); // 1 hour
+      const expiresAt = new Date(Date.now() + config.tokens.resetPasswordExpSeconds);
       const tokenInput = {
         id: generateId(),
         userId: user.id,
@@ -215,13 +203,15 @@ export const authRoutes = new Elysia({ prefix: '/auth' })
 
       await collections.tokens.insertOne(tokenInput);
 
-      // TODO: Send email with reset link
-      // For now, log token in console (DEVELOPMENT ONLY)
-      if (process.env.NODE_ENV !== 'production') {
-        console.log(`Password reset token for ${user.email}: ${token}`);
-        console.log(
-          `Reset link: http://localhost:3000/auth/reinitialiser-mot-de-passe?token=${token}`,
-        );
+      const url = new URL(request.url);
+      url.pathname = '/auth/reinitialiser-mot-de-passe';
+      url.searchParams.set('token', token);
+
+      const emailResponse = await sendPasswordResetEmail(body.email, url.toString());
+
+      if (!emailResponse.ok) {
+        console.error('Failed to send reset password email:', await emailResponse.text());
+        throw new MailerFailedError();
       }
 
       return {

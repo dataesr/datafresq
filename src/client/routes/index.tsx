@@ -4,14 +4,14 @@ import ErrorBoundary from '@/components/errors/ErrorBoundary';
 import AdminLayout from '@/components/layouts/AdminLayout';
 import AppLayout from '@/components/layouts/AppLayout';
 import AuthLayout from '@/components/layouts/AuthLayout';
+import Home from './(app)';
 import EspacesPage from './(app)/espaces';
 import EspaceLayout from './(app)/espaces/[id]/layout';
 import FormationPage from './(app)/formations/[id]';
 import FormationsListPage from './(app)/formations/index/index';
-import Home from './(app)';
 import UserSettingsPage from './(app)/utilisateur';
 import AdminPageLayout from './admin/layout';
-import CreerUnCompte from './auth/creer-un-compte';
+import CreerUnCompte from './auth/inscription';
 import MotDePasseOublie from './auth/mot-de-passe-oublie';
 import ReinitialiserMotDePasse from './auth/reinitialiser-mot-de-passe';
 import SignIn from './auth/se-connecter';
@@ -26,7 +26,7 @@ export default function AppRouter() {
           <Route path="se-connecter" element={<SignIn />} />
           <Route path="mot-de-passe-oublie" element={<MotDePasseOublie />} />
           <Route path="reinitialiser-mot-de-passe" element={<ReinitialiserMotDePasse />} />
-          <Route path="creer-un-compte" element={<CreerUnCompte />} />
+          <Route path="inscription" element={<CreerUnCompte />} />
         </Route>
 
         {/* Admin routes */}
