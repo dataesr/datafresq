@@ -189,7 +189,7 @@ export const authRoutes = new Elysia({ prefix: '/auth' })
 
       const { token, tokenHash } = generateTokenWithHash();
 
-      const expiresAt = new Date(Date.now() + config.tokens.resetPasswordExpSeconds);
+      const expiresAt = new Date(Date.now() + config.tokens.resetPasswordExpSeconds * 1000);
       const tokenInput = {
         id: generateId(),
         userId: user.id,

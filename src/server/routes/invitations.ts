@@ -44,7 +44,7 @@ export const invitationRoutes = new Elysia({ prefix: '/invitations' })
 
       const { token, tokenHash } = generateTokenWithHash();
 
-      const expiresAt = new Date(Date.now() + config.tokens.invitationExpSeconds);
+      const expiresAt = new Date(Date.now() + config.tokens.invitationExpSeconds * 1000);
       const tokenInput = {
         id: generateId(),
         userId: user.id,
