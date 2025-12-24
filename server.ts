@@ -6,9 +6,7 @@ import { app } from '~/index';
 
 async function bootstrap() {
   try {
-    console.log('🔌 Connecting to database...');
     await connect();
-    console.log('✅ Database connected');
 
     const server = serve({
       routes: {
@@ -16,12 +14,7 @@ async function bootstrap() {
         '/*': client,
       },
       development: config.isDevelopment,
-      hostname: '0.0.0.0',
       port: 3000,
-      fetch(request) {
-        console.log(`📥 Incoming request: ${request.method} ${request.url}`);
-        return new Response('Route not matched', { status: 404 });
-      },
     });
 
     console.log(`
