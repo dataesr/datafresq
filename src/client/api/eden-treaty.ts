@@ -1,8 +1,9 @@
+// TODO: Don't know yet how to get rid of 422 response schema so APIError is to be reworked
 import { treaty } from '@elysiajs/eden';
 
 import type { App } from '~/index';
 
-export const api = treaty<App>(`${window.location.origin}/api`);
+export const api = treaty<App>(window.location.origin).api;
 
 type TErrorValue = {
   message?: string;
@@ -15,9 +16,6 @@ type TErrorValue = {
   expected?: string;
 };
 
-/**
- * API Error class that preserves Eden Treaty error information
- */
 export class APIError extends Error {
   public readonly status: number;
   public readonly value: TErrorValue;
@@ -28,8 +26,8 @@ export class APIError extends Error {
     let value: TErrorValue = {};
 
     // Debug log the raw error for troubleshooting
-    if (import.meta.env.DEV) {
-      console.debug('[APIError] Raw error:', error);
+    if (typeof process !== 'undefined' && process.env.NODE_ENV === 'development') {
+      console.debug('[APIError] Constructed:', error);
     }
 
     if (error && typeof error === 'object') {
@@ -82,14 +80,12 @@ export class APIError extends Error {
     this.value = value;
 
     // Debug log the constructed error
-    if (import.meta.env.DEV) {
+    if (typeof process !== 'undefined' && process.env.NODE_ENV === 'development') {
       console.debug('[APIError] Constructed:', { status, message, value });
     }
 
     // Maintains proper stack trace for where our error was thrown (only available on V8)
-    if (Error.captureStackTrace) {
-      Error.captureStackTrace(this, APIError);
-    }
+    if (Error.captureStackTrace) Error.captureStackTrace(this, APIError);
   }
 
   /**
