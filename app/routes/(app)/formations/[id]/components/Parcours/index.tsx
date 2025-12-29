@@ -1,6 +1,9 @@
+import { Map as MapLibre, Marker } from '@vis.gl/react-maplibre';
 import { useMemo, useState } from 'react';
+import 'maplibre-gl/dist/maplibre-gl.css';
 import PillsTitle from '@/components/PillsTitle';
 import type { Etape, Location, Parcours, Program } from '~/schemas/programs';
+import './styles.css';
 
 interface ParcoursOrganisationProps {
   parcours: Program['parcours'];
@@ -24,12 +27,21 @@ interface EtapeWithLocations extends Etape {
   locations: Location[];
 }
 
+function sortByLevel(a: EtapeWithLocations, b: EtapeWithLocations): number {
+  const extractNumber = (level: string | null | undefined): number => {
+    if (!level) return 999;
+    const match = /(\d+)/.exec(level);
+    const numStr = match?.[1];
+    return numStr ? Number.parseInt(numStr, 10) : 999;
+  };
+  return extractNumber(a.level) - extractNumber(b.level);
+}
+
 function aggregateParcoursData(
   p: Parcours,
   allEtapes: Etape[],
   allLocations: Location[],
 ): ParcoursAggregation {
-  // Create a map of locations by ID for quick lookup
   const locationsMap = new Map<string, Location>();
   for (const loc of allLocations) {
     locationsMap.set(loc.id, loc);
@@ -40,15 +52,14 @@ function aggregateParcoursData(
     .map((e) => ({
       ...e,
       locations: (e.siteIds || []).map((id) => locationsMap.get(id)).filter(Boolean) as Location[],
-    }));
+    }))
+    .sort(sortByLevel);
 
-  // Aggregate capacity (sum of all etapes with capacity)
   const capacities = parcoursEtapes
     .map((e) => e.capacity)
     .filter((c): c is number => c !== undefined && c !== null);
   const totalCapacity = capacities.length > 0 ? capacities.reduce((a, b) => a + b, 0) : null;
 
-  // Collect unique teaching modalities
   const modalitiesSet = new Set<string>();
   for (const e of parcoursEtapes) {
     for (const m of e.teachingModalities || []) {
@@ -57,7 +68,6 @@ function aggregateParcoursData(
   }
   const teachingModalities = Array.from(modalitiesSet);
 
-  // Check for alternance and distanciel
   const hasAlternance = parcoursEtapes.some((e) =>
     e.teachingModalities?.some(
       (m) =>
@@ -78,7 +88,6 @@ function aggregateParcoursData(
     ),
   );
 
-  // Collect unique sites with full location data
   const sitesMap = new Map<string, Location>();
   for (const e of parcoursEtapes) {
     for (const loc of e.locations) {
@@ -87,10 +96,8 @@ function aggregateParcoursData(
   }
   const sites = Array.from(sitesMap.values());
 
-  // Check if any etape is diplomante
   const hasDiplomanteEtape = parcoursEtapes.some((e) => e.isDiplomante);
 
-  // Collect unique languages
   const languagesSet = new Set<string>();
   for (const e of parcoursEtapes) {
     for (const l of e.pedagogicalInfo?.teachingLanguages || []) {
@@ -112,212 +119,298 @@ function aggregateParcoursData(
   };
 }
 
-function LocationCard({ location }: { location: Location }) {
-  const { address, name, types } = location;
-  const fullAddress = [address?.street, address?.postalCode, address?.city]
-    .filter(Boolean)
-    .join(', ');
+function MiniMap({ locations }: { locations: Location[] }) {
+  const validLocations = locations.filter(
+    (loc) => loc.geo?.coordinates && loc.geo.coordinates.length === 2,
+  );
+
+  if (validLocations.length === 0) return null;
+
+  const firstLoc = validLocations[0];
+  const theme =
+    document.getElementsByTagName('html')?.[0]?.getAttribute('data-fr-theme') === 'dark'
+      ? 'dark'
+      : 'sunny';
+  const API_KEY = '5V4ER9yrsLxoHQrAGQuYNu4yWqXNqKAM6iaX5D1LGpRNTBxvQL3enWXpxMQqTrY8';
+  const mapStyle = `https://api.jawg.io/styles/jawg-${theme}.json?access-token=${API_KEY}`;
 
   return (
-    <div
-      className="fr-p-2w fr-mb-1w"
-      style={{
-        backgroundColor: 'var(--background-contrast-grey)',
-        borderRadius: '4px',
-        borderLeft: '3px solid var(--border-action-high-blue-france)',
-      }}
-    >
-      <div className="fr-text--sm fr-text--bold fr-mb-1v">
-        <span className="fr-icon-map-pin-2-line fr-icon--sm fr-mr-1v" aria-hidden="true" />
-        {name}
-      </div>
-      {address?.siteName && (
-        <div className="fr-text--xs fr-text--mention-grey fr-mb-1v">{address.siteName}</div>
-      )}
-      {fullAddress && <div className="fr-text--xs">{fullAddress}</div>}
-      {types && types.length > 0 && (
-        <div className="fr-mt-1v">
-          {types.map((type) => (
-            <span
-              key={type}
-              className="fr-badge fr-badge--sm fr-badge--no-icon fr-mr-1v"
-              style={{ fontSize: '0.625rem' }}
-            >
-              {type === 'etablissement' ? 'Établissement' : 'Site'}
-            </span>
-          ))}
-        </div>
-      )}
+    <div style={{ width: '180px', height: '140px', flexShrink: 0 }}>
+      <MapLibre
+        initialViewState={{
+          longitude: firstLoc?.geo?.coordinates?.[0] ?? 2.3522,
+          latitude: firstLoc?.geo?.coordinates?.[1] ?? 46.6034,
+          zoom: 10,
+        }}
+        style={{ width: '100%', height: '100%' }}
+        mapStyle={mapStyle}
+        attributionControl={false}
+        scrollZoom={true}
+      >
+        {validLocations.map((loc) => {
+          const coords = loc.geo?.coordinates;
+          if (!coords || coords.length < 2) return null;
+          const lng = coords[0] as number;
+          const lat = coords[1] as number;
+          return (
+            <Marker key={loc.id} longitude={lng} latitude={lat} anchor="bottom">
+              <span
+                className="fr-icon-map-pin-2-fill fr-icon--sm"
+                style={{ color: 'var(--background-action-high-blue-france)' }}
+                aria-hidden="true"
+              />
+            </Marker>
+          );
+        })}
+      </MapLibre>
     </div>
   );
 }
 
-function EtapeCard({ etape, isLast }: { etape: EtapeWithLocations; isLast: boolean }) {
+function EtapeCard({ etape }: { etape: EtapeWithLocations }) {
   const { pedagogicalInfo, recruitmentInfo, teachingModalities, locations } = etape;
+  const hasLocations = locations && locations.length > 0;
+
+  const hasPedagogicalDetails =
+    (pedagogicalInfo?.keywords && pedagogicalInfo.keywords.length > 0) ||
+    (pedagogicalInfo?.disciplines && pedagogicalInfo.disciplines.length > 0) ||
+    pedagogicalInfo?.pedagogicalEmail ||
+    pedagogicalInfo?.administrativeEmail ||
+    pedagogicalInfo?.programLink;
+
+  const hasRecruitmentDetails =
+    (recruitmentInfo?.expectations && recruitmentInfo.expectations.length > 0) ||
+    (recruitmentInfo?.recommendedDiplomas && recruitmentInfo.recommendedDiplomas.length > 0) ||
+    (recruitmentInfo?.examCriteria && recruitmentInfo.examCriteria.length > 0) ||
+    (recruitmentInfo?.selectionMethods && recruitmentInfo.selectionMethods.length > 0);
 
   return (
-    <li className="parcours-step" data-is-last={isLast}>
-      <div className="fr-card fr-card--sm fr-card--no-border fr-card--grey fr-mb-2w">
-        <div className="fr-card__body">
-          <div className="fr-card__content">
-            <div
-              className="fr-card__start"
-              style={{
-                display: 'flex',
-                alignItems: 'center',
-                gap: '0.5rem',
-                flexWrap: 'wrap',
-                marginBottom: '0.5rem',
-              }}
-            >
-              {etape.level && (
-                <span className="fr-badge fr-badge--sm fr-badge--blue-france fr-badge--no-icon">
-                  {etape.level}
-                </span>
-              )}
-              {etape.isDiplomante && (
-                <span className="fr-badge fr-badge--sm fr-badge--green-emeraude fr-badge--no-icon">
-                  Diplômante
-                </span>
-              )}
-              {etape.isOpen ? (
-                <span className="fr-badge fr-badge--sm fr-badge--success fr-badge--no-icon">
-                  Ouverte
-                </span>
-              ) : (
-                <span className="fr-badge fr-badge--sm fr-badge--no-icon">Fermée</span>
-              )}
-            </div>
+    <div
+      className="fr-py-3w fr-px-2v"
+      style={{ borderTop: '1px solid var(--border-default-grey)' }}
+    >
+      <div style={{ display: 'flex', gap: '1rem' }}>
+        <div style={{ flex: 1 }}>
+          <div
+            className="fr-mb-1v"
+            style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', flexWrap: 'wrap' }}
+          >
+            {etape.level && (
+              <span className="fr-badge fr-badge--sm fr-badge--blue-france fr-badge--no-icon">
+                {etape.level}
+              </span>
+            )}
+            {etape.isDiplomante && (
+              <span className="fr-badge fr-badge--sm fr-badge--green-emeraude fr-badge--no-icon">
+                Diplômante
+              </span>
+            )}
+            {!etape.isOpen && (
+              <span className="fr-badge fr-badge--sm fr-badge--no-icon">Fermée</span>
+            )}
+          </div>
 
-            <h4 className="fr-card__title fr-text--md fr-mb-1w">{etape.label}</h4>
+          <p className="fr-text--md fr-text--bold fr-mb-1w">{etape.label}</p>
 
-            <div className="fr-card__desc">
-              <dl className="fr-mb-0" style={{ display: 'grid', gap: '0.5rem' }}>
-                {etape.capacity !== undefined && etape.capacity !== null && (
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                    <dt className="fr-text--sm fr-text--bold fr-mb-0">
-                      <span className="fr-icon-user-line fr-icon--sm" aria-hidden="true" /> Capacité
-                      :
-                    </dt>
-                    <dd className="fr-text--sm fr-mb-0">{etape.capacity} places</dd>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '0.25rem' }}>
+            {etape.capacity !== undefined && etape.capacity !== null && (
+              <div className="fr-text--sm fr-mb-0">
+                <span
+                  className="fr-icon-user-line fr-icon--sm fr-mr-1v fr-text-mention--grey"
+                  aria-hidden="true"
+                />
+                <span className="fr-text-mention--grey">Capacité </span>
+                <span>{etape.capacity} places</span>
+              </div>
+            )}
+
+            {teachingModalities && teachingModalities.length > 0 && (
+              <div className="fr-text--sm fr-mb-0">
+                <span
+                  className="fr-icon-book-2-line fr-icon--sm fr-mr-1v fr-text-mention--grey"
+                  aria-hidden="true"
+                />
+                <span className="fr-text-mention--grey">Modalités </span>
+                <span>{teachingModalities.map((m) => m.label).join(', ')}</span>
+              </div>
+            )}
+
+            {hasLocations && (
+              <div className="fr-text--sm fr-mb-0">
+                <span
+                  className="fr-icon-map-pin-2-line fr-icon--sm fr-mr-1v fr-text-mention--grey"
+                  aria-hidden="true"
+                />
+                <span className="fr-text-mention--grey">Sites </span>
+                <span>{locations.map((location) => location.name).join(', ')}</span>
+              </div>
+            )}
+
+            {pedagogicalInfo?.teachingLanguages && pedagogicalInfo.teachingLanguages.length > 0 && (
+              <div className="fr-text--sm fr-mb-0">
+                <span
+                  className="fr-icon-translate-2 fr-icon--sm fr-mr-1v fr-text-mention--grey"
+                  aria-hidden="true"
+                />
+                <span className="fr-text-mention--grey">Langues </span>
+                <span>{pedagogicalInfo.teachingLanguages.join(', ')}</span>
+              </div>
+            )}
+
+            {pedagogicalInfo?.formationLink && (
+              <div className="fr-mt-1w">
+                <a
+                  href={pedagogicalInfo.formationLink}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="fr-link fr-link--sm fr-icon-external-link-line fr-link--icon-right"
+                >
+                  Fiche formation
+                </a>
+              </div>
+            )}
+          </div>
+
+          {hasPedagogicalDetails && (
+            <details className="fr-mt-2w">
+              <summary className="fr-text--sm fr-mb-0 fr-text--bold" style={{ cursor: 'pointer' }}>
+                <span className="fr-icon-book-2-line fr-icon--sm fr-mr-1v" aria-hidden="true" />
+                Informations pédagogiques
+              </summary>
+              <div
+                className="fr-pl-3w fr-pt-1w"
+                style={{ display: 'flex', flexDirection: 'column', gap: '0.25rem' }}
+              >
+                {pedagogicalInfo?.keywords && pedagogicalInfo.keywords.length > 0 && (
+                  <div className="fr-text--sm fr-mb-0">
+                    <span className="fr-text-mention--grey">Mots-clés : </span>
+                    <span>{pedagogicalInfo.keywords.join(', ')}</span>
                   </div>
                 )}
-
-                {teachingModalities && teachingModalities.length > 0 && (
-                  <div style={{ display: 'flex', alignItems: 'flex-start', gap: '0.5rem' }}>
-                    <dt className="fr-text--sm fr-text--bold fr-mb-0">
-                      <span className="fr-icon-book-2-line fr-icon--sm" aria-hidden="true" />{' '}
-                      Modalités :
-                    </dt>
-                    <dd className="fr-text--sm fr-mb-0">
-                      {teachingModalities.map((m) => m.label).join(', ')}
-                    </dd>
+                {pedagogicalInfo?.disciplines && pedagogicalInfo.disciplines.length > 0 && (
+                  <div className="fr-text--sm fr-mb-0">
+                    <span className="fr-text-mention--grey">Disciplines : </span>
+                    <span>{pedagogicalInfo.disciplines.join(', ')}</span>
                   </div>
                 )}
-
-                {locations && locations.length > 0 && (
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                    <dt className="fr-text--sm fr-text--bold fr-mb-0">
-                      <span className="fr-icon-map-pin-2-line fr-icon--sm" aria-hidden="true" />{' '}
-                      Sites :
-                    </dt>
-                    <dd className="fr-text--sm fr-mb-0">
-                      {locations.length} lieu{locations.length > 1 ? 'x' : ''}
-                    </dd>
+                {pedagogicalInfo?.pedagogicalEmail && (
+                  <div className="fr-text--sm fr-mb-0">
+                    <span className="fr-text-mention--grey">Email pédagogique : </span>
+                    <a
+                      href={`mailto:${pedagogicalInfo.pedagogicalEmail}`}
+                      className="fr-link fr-link--sm"
+                    >
+                      {pedagogicalInfo.pedagogicalEmail}
+                    </a>
                   </div>
                 )}
+                {pedagogicalInfo?.administrativeEmail && (
+                  <div className="fr-text--sm fr-mb-0">
+                    <span className="fr-text-mention--grey">Email administratif : </span>
+                    <a
+                      href={`mailto:${pedagogicalInfo.administrativeEmail}`}
+                      className="fr-link fr-link--sm"
+                    >
+                      {pedagogicalInfo.administrativeEmail}
+                    </a>
+                  </div>
+                )}
+                {pedagogicalInfo?.programLink && (
+                  <div className="fr-text--sm fr-mb-0">
+                    <a
+                      href={pedagogicalInfo.programLink}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="fr-link fr-link--sm fr-icon-external-link-line fr-link--icon-right"
+                    >
+                      Programme détaillé
+                    </a>
+                  </div>
+                )}
+              </div>
+            </details>
+          )}
 
-                {pedagogicalInfo?.teachingLanguages &&
-                  pedagogicalInfo.teachingLanguages.length > 0 && (
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                      <dt className="fr-text--sm fr-text--bold fr-mb-0">
-                        <span className="fr-icon-translate-2 fr-icon--sm" aria-hidden="true" />{' '}
-                        Langues :
-                      </dt>
-                      <dd className="fr-text--sm fr-mb-0">
-                        {pedagogicalInfo.teachingLanguages.join(', ')}
-                      </dd>
+          {hasRecruitmentDetails && (
+            <details className="fr-mt-2w">
+              <summary className="fr-text--sm fr-mb-0 fr-text--bold" style={{ cursor: 'pointer' }}>
+                <span className="fr-icon-clipboard-line fr-icon--sm fr-mr-1v" aria-hidden="true" />
+                Informations de recrutement
+              </summary>
+              <div
+                className="fr-pl-3w fr-pt-1w"
+                style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}
+              >
+                {recruitmentInfo?.expectations && recruitmentInfo.expectations.length > 0 && (
+                  <div className="fr-text--sm fr-mb-0">
+                    <span className="fr-text--bold">Attentes :</span>
+                    <ul className="fr-text--sm fr-mb-0 fr-pl-2w fr-mt-1v">
+                      {recruitmentInfo.expectations.slice(0, 5).map((exp) => (
+                        <li key={exp}>{exp}</li>
+                      ))}
+                      {recruitmentInfo.expectations.length > 5 && (
+                        <li className="fr-text-mention--grey">
+                          +{recruitmentInfo.expectations.length - 5} autres...
+                        </li>
+                      )}
+                    </ul>
+                  </div>
+                )}
+                {recruitmentInfo?.recommendedDiplomas &&
+                  recruitmentInfo.recommendedDiplomas.length > 0 && (
+                    <div className="fr-text--sm fr-mb-0">
+                      <span className="fr-text--bold">Diplômes recommandés :</span>
+                      <ul className="fr-text--sm fr-mb-0 fr-pl-2w fr-mt-1v">
+                        {recruitmentInfo.recommendedDiplomas.slice(0, 5).map((d) => (
+                          <li key={d}>{d}</li>
+                        ))}
+                        {recruitmentInfo.recommendedDiplomas.length > 5 && (
+                          <li className="fr-text-mention--grey">
+                            +{recruitmentInfo.recommendedDiplomas.length - 5} autres...
+                          </li>
+                        )}
+                      </ul>
                     </div>
                   )}
-              </dl>
-
-              {recruitmentInfo &&
-                (recruitmentInfo.expectations?.length ||
-                  recruitmentInfo.recommendedDiplomas?.length) && (
-                  <details className="fr-mt-2w">
-                    <summary className="fr-text--sm fr-text--bold" style={{ cursor: 'pointer' }}>
-                      <span className="fr-icon-clipboard-line fr-icon--sm" aria-hidden="true" />{' '}
-                      Informations de recrutement
-                    </summary>
-                    <div className="fr-pl-2w fr-pt-1w">
-                      {recruitmentInfo.expectations && recruitmentInfo.expectations.length > 0 && (
-                        <div className="fr-mb-1w">
-                          <span className="fr-text--xs fr-text--bold">Attentes :</span>
-                          <ul className="fr-text--xs fr-mb-0 fr-pl-2w">
-                            {recruitmentInfo.expectations.slice(0, 3).map((exp) => (
-                              <li key={exp}>{exp}</li>
-                            ))}
-                            {recruitmentInfo.expectations.length > 3 && (
-                              <li className="fr-text--mention-grey">
-                                +{recruitmentInfo.expectations.length - 3} autres...
-                              </li>
-                            )}
-                          </ul>
-                        </div>
+                {recruitmentInfo?.examCriteria && recruitmentInfo.examCriteria.length > 0 && (
+                  <div className="fr-text--sm fr-mb-0">
+                    <span className="fr-text--bold">Critères d'examen :</span>
+                    <ul className="fr-text--sm fr-mb-0 fr-pl-2w fr-mt-1v">
+                      {recruitmentInfo.examCriteria.slice(0, 5).map((c) => (
+                        <li key={c}>{c}</li>
+                      ))}
+                      {recruitmentInfo.examCriteria.length > 5 && (
+                        <li className="fr-text-mention--grey">
+                          +{recruitmentInfo.examCriteria.length - 5} autres...
+                        </li>
                       )}
-                      {recruitmentInfo.recommendedDiplomas &&
-                        recruitmentInfo.recommendedDiplomas.length > 0 && (
-                          <div>
-                            <span className="fr-text--xs fr-text--bold">
-                              Diplômes recommandés :
-                            </span>
-                            <ul className="fr-text--xs fr-mb-0 fr-pl-2w">
-                              {recruitmentInfo.recommendedDiplomas.slice(0, 3).map((d) => (
-                                <li key={d}>{d}</li>
-                              ))}
-                              {recruitmentInfo.recommendedDiplomas.length > 3 && (
-                                <li className="fr-text--mention-grey">
-                                  +{recruitmentInfo.recommendedDiplomas.length - 3} autres...
-                                </li>
-                              )}
-                            </ul>
-                          </div>
-                        )}
-                    </div>
-                  </details>
-                )}
-
-              {locations && locations.length > 0 && (
-                <details className="fr-mt-2w">
-                  <summary className="fr-text--sm fr-text--bold" style={{ cursor: 'pointer' }}>
-                    <span className="fr-icon-map-pin-2-line fr-icon--sm" aria-hidden="true" /> Voir
-                    les {locations.length} lieu{locations.length > 1 ? 'x' : ''} de formation
-                  </summary>
-                  <div className="fr-pl-2w fr-pt-1w">
-                    {locations.map((loc) => (
-                      <LocationCard key={loc.id} location={loc} />
-                    ))}
+                    </ul>
                   </div>
-                </details>
-              )}
-
-              {pedagogicalInfo?.formationLink && (
-                <div className="fr-mt-2w">
-                  <a
-                    href={pedagogicalInfo.formationLink}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="fr-link fr-link--sm fr-icon-external-link-line fr-link--icon-right"
-                  >
-                    Voir la fiche formation
-                  </a>
-                </div>
-              )}
-            </div>
-          </div>
+                )}
+                {recruitmentInfo?.selectionMethods &&
+                  recruitmentInfo.selectionMethods.length > 0 && (
+                    <div className="fr-text--sm fr-mb-0">
+                      <span className="fr-text--bold">Méthodes de sélection :</span>
+                      <ul className="fr-text--sm fr-mb-0 fr-pl-2w fr-mt-1v">
+                        {recruitmentInfo.selectionMethods.slice(0, 5).map((m) => (
+                          <li key={m}>{m}</li>
+                        ))}
+                        {recruitmentInfo.selectionMethods.length > 5 && (
+                          <li className="fr-text-mention--grey">
+                            +{recruitmentInfo.selectionMethods.length - 5} autres...
+                          </li>
+                        )}
+                      </ul>
+                    </div>
+                  )}
+              </div>
+            </details>
+          )}
         </div>
+
+        {hasLocations && <MiniMap locations={locations} />}
       </div>
-    </li>
+    </div>
   );
 }
 
@@ -326,194 +419,169 @@ function ParcoursCard({ data }: { data: ParcoursAggregation }) {
   const collapseId = `parcours-${p.infp}-${p.openingYear}`;
 
   return (
-    <section className="fr-accordion">
-      <h3 className="fr-accordion__title">
-        <button
-          type="button"
-          className="fr-accordion__btn"
-          aria-expanded="false"
-          aria-controls={collapseId}
-        >
-          <div className="fx-spacer">
-            <div>
-              <span>{p.label}</span>
-              {p.sigle && (
-                <span
-                  className="fr-text--sm fr-ml-1w"
-                  style={{ color: 'var(--text-mention-grey)' }}
-                >
-                  ({p.sigle})
-                </span>
-              )}
-            </div>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', flexWrap: 'wrap' }}>
-              {/* Aggregated badges */}
-              {data.hasAlternance && (
-                <span className="fr-badge fr-badge--sm fr-badge--purple-glycine fr-badge--no-icon">
-                  Alternance
-                </span>
-              )}
-              {data.hasDistanciel && (
-                <span className="fr-badge fr-badge--sm fr-badge--yellow-tournesol fr-badge--no-icon">
-                  Distanciel
-                </span>
-              )}
-              <span className="fr-text--sm" style={{ color: 'var(--text-mention-grey)' }}>
-                {parcoursEtapes.length} étape{parcoursEtapes.length > 1 ? 's' : ''}
-              </span>
-              {p.isOpen ? (
-                <span className="fr-badge fr-badge--sm fr-badge--success fr-badge--no-icon">
-                  Ouvert
-                </span>
-              ) : (
-                <span className="fr-badge fr-badge--sm fr-badge--no-icon">Fermé</span>
-              )}
-            </div>
-          </div>
-        </button>
-      </h3>
-
-      <div className="fr-collapse" id={collapseId}>
-        <div className="fr-p-2w fr-mb-2w" style={{ backgroundColor: 'var(--background-alt-grey)' }}>
-          <h4 className="fr-text--md fr-mb-2w">Résumé du parcours</h4>
-          <div
-            style={{
-              display: 'grid',
-              gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
-              gap: '1rem',
-            }}
+    <div className="fr-card fr-card--shadow fr-mb-2w">
+      <div className="fr-accordion parcours-accordion">
+        <h3 className="fr-accordion__title">
+          <button
+            type="button"
+            className="fr-accordion__btn"
+            aria-expanded="false"
+            aria-controls={collapseId}
           >
-            {p.rncp && (
+            <div className="fx-spacer">
               <div>
-                <span className="fr-text--sm fr-text--bold">
-                  <span className="fr-icon-award-line fr-icon--sm" aria-hidden="true" /> Code RNCP :
-                </span>
-                <span className="fr-text--sm fr-ml-1w">{p.rncp}</span>
+                <span className="fr-text--bold">{p.label}</span>
+                {p.sigle && (
+                  <span className="fr-text--sm fr-ml-1w fr-text-mention--grey">({p.sigle})</span>
+                )}
               </div>
-            )}
-
-            {p.codeSise && (
-              <div>
-                <span className="fr-text--sm fr-text--bold">
-                  <span className="fr-icon-file-text-line fr-icon--sm" aria-hidden="true" /> Code
-                  SISE :
+              <div
+                style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', flexWrap: 'wrap' }}
+              >
+                {data.hasAlternance && (
+                  <span className="fr-badge fr-badge--sm fr-badge--purple-glycine fr-badge--no-icon">
+                    Alternance
+                  </span>
+                )}
+                {data.hasDistanciel && (
+                  <span className="fr-badge fr-badge--sm fr-badge--yellow-tournesol fr-badge--no-icon">
+                    Distanciel
+                  </span>
+                )}
+                <span className="fr-text--sm fr-text-mention--grey">
+                  {parcoursEtapes.length} étape{parcoursEtapes.length > 1 ? 's' : ''}
                 </span>
-                <span className="fr-text--sm fr-ml-1w">{String(p.codeSise)}</span>
+                {p.isOpen ? (
+                  <span className="fr-badge fr-badge--sm fr-badge--success fr-badge--no-icon">
+                    Ouvert
+                  </span>
+                ) : (
+                  <span className="fr-badge fr-badge--sm fr-badge--no-icon">Fermé</span>
+                )}
               </div>
-            )}
+            </div>
+          </button>
+        </h3>
 
-            {data.totalCapacity !== null && (
-              <div>
-                <span className="fr-text--sm fr-text--bold">
-                  <span className="fr-icon-user-line fr-icon--sm" aria-hidden="true" /> Capacité
-                  totale :
-                </span>
-                <span className="fr-text--sm fr-ml-1w">{data.totalCapacity} places</span>
-              </div>
-            )}
+        <div className="fr-collapse" id={collapseId}>
+          <div className="fr-pt-2w fr-px-2w">
+            <div
+              className="fr-mb-2w"
+              style={{
+                display: 'flex',
+                gap: '1rem',
+                flexWrap: 'wrap',
+                alignItems: 'center',
+              }}
+            >
+              {p.rncp && (
+                <div className="fr-text--sm fr-mb-0">
+                  <span
+                    className="fr-icon-award-line fr-icon--sm fr-mr-1v fr-text-mention--grey"
+                    aria-hidden="true"
+                  />
+                  <span className="fr-text-mention--grey">RNCP </span>
+                  <span
+                    className="fr-text--bold"
+                    style={{ fontFamily: '"Courier New", monospace' }}
+                  >
+                    {p.rncp}
+                  </span>
+                </div>
+              )}
 
-            {data.sites.length > 0 && (
-              <div>
-                <span className="fr-text--sm fr-text--bold">
-                  <span className="fr-icon-map-pin-2-line fr-icon--sm" aria-hidden="true" /> Lieux
-                  de formation :
-                </span>
-                <span className="fr-text--sm fr-ml-1w">{data.sites.length}</span>
-              </div>
-            )}
+              {p.codeSise && (
+                <div className="fr-text--sm fr-mb-0">
+                  <span
+                    className="fr-icon-file-text-line fr-icon--sm fr-mr-1v fr-text-mention--grey"
+                    aria-hidden="true"
+                  />
+                  <span className="fr-text-mention--grey">SISE </span>
+                  <span
+                    className="fr-text--bold"
+                    style={{ fontFamily: '"Courier New", monospace' }}
+                  >
+                    {String(p.codeSise)}
+                  </span>
+                </div>
+              )}
 
-            {data.teachingModalities.length > 0 && (
-              <div style={{ gridColumn: 'span 2' }}>
-                <span className="fr-text--sm fr-text--bold">
-                  <span className="fr-icon-book-2-line fr-icon--sm" aria-hidden="true" /> Modalités
-                  d'enseignement :
-                </span>
-                <span className="fr-text--sm fr-ml-1w">{data.teachingModalities.join(', ')}</span>
-              </div>
-            )}
+              {data.totalCapacity !== null && (
+                <div className="fr-text--sm fr-mb-0">
+                  <span
+                    className="fr-icon-user-line fr-icon--sm fr-mr-1v fr-text-mention--grey"
+                    aria-hidden="true"
+                  />
+                  <span className="fr-text-mention--grey">Capacité </span>
+                  <span className="fr-text--bold">{data.totalCapacity} places</span>
+                </div>
+              )}
 
-            {data.languages.length > 0 && (
-              <div>
-                <span className="fr-text--sm fr-text--bold">
-                  <span className="fr-icon-translate-2 fr-icon--sm" aria-hidden="true" /> Langues :
-                </span>
-                <span className="fr-text--sm fr-ml-1w">{data.languages.join(', ')}</span>
-              </div>
-            )}
+              {data.sites.length > 0 && (
+                <div className="fr-text--sm fr-mb-0">
+                  <span
+                    className="fr-icon-map-pin-2-line fr-icon--sm fr-mr-1v fr-text-mention--grey"
+                    aria-hidden="true"
+                  />
+                  <span className="fr-text-mention--grey">Lieux </span>
+                  <span className="fr-text--bold">{data.sites.length}</span>
+                </div>
+              )}
 
-            {data.hasDiplomanteEtape && (
-              <div>
-                <span className="fr-badge fr-badge--sm fr-badge--green-emeraude fr-badge--no-icon">
-                  Parcours diplômant
-                </span>
+              {data.languages.length > 0 && (
+                <div className="fr-text--sm fr-mb-0">
+                  <span
+                    className="fr-icon-translate-2 fr-icon--sm fr-mr-1v fr-text-mention--grey"
+                    aria-hidden="true"
+                  />
+                  <span>{data.languages.join(', ')}</span>
+                </div>
+              )}
+            </div>
+
+            {parcoursEtapes.length > 0 && (
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
+                {parcoursEtapes.map((etape) => (
+                  <EtapeCard key={etape.infe} etape={etape} />
+                ))}
               </div>
             )}
           </div>
         </div>
-
-        {data.sites.length > 0 && (
-          <details className="fr-mb-3w fr-pl-2w">
-            <summary className="fr-text--md fr-text--bold" style={{ cursor: 'pointer' }}>
-              <span className="fr-icon-map-pin-2-line fr-icon--sm" aria-hidden="true" /> Tous les
-              lieux de formation ({data.sites.length})
-            </summary>
-            <div
-              className="fr-pt-2w"
-              style={{
-                display: 'grid',
-                gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))',
-                gap: '0.5rem',
-              }}
-            >
-              {data.sites.map((loc) => (
-                <LocationCard key={loc.id} location={loc} />
-              ))}
-            </div>
-          </details>
-        )}
-
-        {parcoursEtapes.length > 0 && (
-          <>
-            <h4 className="fr-text--md fr-mb-2w fr-pl-2w">
-              Étapes du parcours ({parcoursEtapes.length})
-            </h4>
-            <ol className="parcours-steps fr-pl-2w">
-              {parcoursEtapes.map((etape, idx) => (
-                <EtapeCard
-                  key={etape.infe}
-                  etape={etape}
-                  isLast={idx === parcoursEtapes.length - 1}
-                />
-              ))}
-            </ol>
-          </>
-        )}
       </div>
-    </section>
+    </div>
   );
 }
 
-export default function ParcoursOrganisation({
-  parcours,
-  etapes,
-  locations,
-}: ParcoursOrganisationProps) {
-  const [selectedYear, setSelectedYear] = useState(() => {
-    const years = [...new Set(parcours.map((p) => p.openingYear as number))].sort((a, b) => b - a);
-    return years[0] || new Date().getFullYear();
-  });
+function GlobalStats({ stats, year }: { stats: ReturnType<typeof useGlobalStats>; year: number }) {
+  return (
+    <div
+      className="fr-py-2w fr-px-1w fr-mb-3w"
+      style={{ display: 'flex', gap: '1.5rem', flexWrap: 'wrap', alignItems: 'center' }}
+    >
+      <div className="fr-text--lg fr-text--bold fr-mb-0">
+        <span className="">{stats.total}</span> parcours en {year}
+        {stats.openCount > 0 && (
+          <span className="fr-ml-1v">
+            (
+            <span style={{ color: 'var(--text-default-success)' }}>
+              {stats.openCount} ouvert{stats.openCount > 1 ? 's' : ''}
+            </span>
+            {stats.closedCount > 0 && (
+              <>
+                , {stats.closedCount} fermé{stats.closedCount > 1 ? 's' : ''}
+              </>
+            )}
+            )
+          </span>
+        )}
+      </div>
+    </div>
+  );
+}
 
-  const aggregatedParcours = useMemo(() => {
-    return parcours
-      .filter((p) => p.openingYear === selectedYear)
-      .map((p) => aggregateParcoursData(p, etapes, locations || []));
-  }, [parcours, etapes, locations, selectedYear]);
-
-  const parcoursYears = useMemo(() => {
-    return [...new Set(parcours.map((p) => p.openingYear as number))].sort((a, b) => b - a);
-  }, [parcours]);
-
-  const globalStats = useMemo(() => {
+function useGlobalStats(aggregatedParcours: ParcoursAggregation[]) {
+  return useMemo(() => {
     const openCount = aggregatedParcours.filter((a) => a.parcours.isOpen).length;
     const totalCapacity = aggregatedParcours.reduce((sum, a) => sum + (a.totalCapacity || 0), 0);
     const hasAnyCapacity = aggregatedParcours.some((a) => a.totalCapacity !== null);
@@ -538,6 +606,29 @@ export default function ParcoursOrganisation({
       totalSites,
     };
   }, [aggregatedParcours]);
+}
+
+export default function ParcoursOrganisation({
+  parcours,
+  etapes,
+  locations,
+}: ParcoursOrganisationProps) {
+  const [selectedYear, setSelectedYear] = useState(() => {
+    const years = [...new Set(parcours.map((p) => p.openingYear as number))].sort((a, b) => b - a);
+    return years[0] || new Date().getFullYear();
+  });
+
+  const aggregatedParcours = useMemo(() => {
+    return parcours
+      .filter((p) => p.openingYear === selectedYear)
+      .map((p) => aggregateParcoursData(p, etapes, locations || []));
+  }, [parcours, etapes, locations, selectedYear]);
+
+  const parcoursYears = useMemo(() => {
+    return [...new Set(parcours.map((p) => p.openingYear as number))].sort((a, b) => b - a);
+  }, [parcours]);
+
+  const globalStats = useGlobalStats(aggregatedParcours);
 
   if (parcours.length === 0) return null;
 
@@ -547,88 +638,33 @@ export default function ParcoursOrganisation({
         Parcours de formation ({parcours.length})
       </PillsTitle>
 
-      <div className="fr-mb-4w">
-        <fieldset className="fr-segmented">
-          <legend className="fr-segmented__legend">Voir les parcours pour l'année :</legend>
-          <div className="fr-segmented__elements">
-            {parcoursYears.map((year) => (
-              <div key={year} className="fr-segmented__element">
-                <input
-                  checked={year === selectedYear}
-                  value={year}
-                  type="radio"
-                  id={`segmented-${year}`}
-                  name="segmented"
-                  onChange={() => setSelectedYear(year)}
-                />
-                <label className="fr-label" htmlFor={`segmented-${year}`}>
-                  {year}
-                </label>
-              </div>
-            ))}
-          </div>
-        </fieldset>
-      </div>
-
-      <div className="fr-callout fr-callout--blue-france fr-mb-3w">
-        <h4 className="fr-callout__title">Synthèse {selectedYear}</h4>
-        <div
-          className="fr-callout__text"
-          style={{
-            display: 'flex',
-            flexWrap: 'wrap',
-            gap: '1.5rem',
-            alignItems: 'center',
-          }}
-        >
-          <div>
-            <strong>{globalStats.total}</strong> parcours
-            {globalStats.openCount > 0 && (
-              <span className="fr-ml-1w">
-                (
-                <span className="fr-text--success">
-                  {globalStats.openCount} ouvert{globalStats.openCount > 1 ? 's' : ''}
-                </span>
-                {globalStats.closedCount > 0 && (
-                  <>
-                    , {globalStats.closedCount} fermé{globalStats.closedCount > 1 ? 's' : ''}
-                  </>
-                )}
-                )
-              </span>
-            )}
-          </div>
-          {globalStats.totalCapacity !== null && globalStats.totalCapacity > 0 && (
-            <div>
-              <span className="fr-icon-user-line fr-icon--sm" aria-hidden="true" />{' '}
-              <strong>{globalStats.totalCapacity}</strong> places au total
+      {parcoursYears.length > 1 && (
+        <div className="fr-mb-3w">
+          <fieldset className="fr-segmented">
+            <div className="fr-segmented__elements">
+              {parcoursYears.map((year) => (
+                <div key={year} className="fr-segmented__element">
+                  <input
+                    checked={year === selectedYear}
+                    value={year}
+                    type="radio"
+                    id={`segmented-${year}`}
+                    name="segmented"
+                    onChange={() => setSelectedYear(year)}
+                  />
+                  <label className="fr-label" htmlFor={`segmented-${year}`}>
+                    {year}
+                  </label>
+                </div>
+              ))}
             </div>
-          )}
-          {globalStats.alternanceCount > 0 && (
-            <div>
-              <span className="fr-badge fr-badge--sm fr-badge--purple-glycine fr-badge--no-icon">
-                {globalStats.alternanceCount} en alternance
-              </span>
-            </div>
-          )}
-          {globalStats.distancielCount > 0 && (
-            <div>
-              <span className="fr-badge fr-badge--sm fr-badge--yellow-tournesol fr-badge--no-icon">
-                {globalStats.distancielCount} en distanciel
-              </span>
-            </div>
-          )}
-          {globalStats.totalSites > 0 && (
-            <div>
-              <span className="fr-icon-map-pin-2-line fr-icon--sm" aria-hidden="true" />{' '}
-              <strong>{globalStats.totalSites}</strong> lieu{globalStats.totalSites > 1 ? 'x' : ''}{' '}
-              de formation
-            </div>
-          )}
+          </fieldset>
         </div>
-      </div>
+      )}
 
-      <div className="fr-accordion-group">
+      <GlobalStats stats={globalStats} year={selectedYear} />
+
+      <div>
         {aggregatedParcours.map((data) => (
           <ParcoursCard
             key={`parcours-${data.parcours.infp}-${data.parcours.openingYear}`}

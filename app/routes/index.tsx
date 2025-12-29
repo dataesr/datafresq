@@ -7,6 +7,7 @@ import AuthLayout from '@/components/layouts/AuthLayout';
 import Home from './(app)';
 import EspacesPage from './(app)/espaces';
 import EspaceLayout from './(app)/espaces/[id]/layout';
+import Faq from './(app)/faq';
 import FormationPage from './(app)/formations/[id]';
 import FormationsListPage from './(app)/formations/index/index';
 import UserSettingsPage from './(app)/utilisateur';
@@ -20,7 +21,6 @@ export default function AppRouter() {
   return (
     <ErrorBoundary>
       <Routes>
-        {/* Auth routes */}
         <Route path="auth" element={<AuthLayout />}>
           <Route index element={<Navigate to="/auth/se-connecter" />} />
           <Route path="se-connecter" element={<SignIn />} />
@@ -29,15 +29,14 @@ export default function AppRouter() {
           <Route path="inscription" element={<CreerUnCompte />} />
         </Route>
 
-        {/* Admin routes */}
         <Route path="admin" element={<AdminLayout />}>
           <Route index element={<Navigate to="/admin/utilisateurs" replace />} />
           <Route path=":tab" element={<AdminPageLayout />} />
         </Route>
 
-        {/* Main app routes */}
         <Route element={<AppLayout />}>
           <Route index element={<Home />} />
+          <Route path="faq" element={<Faq />} />
           <Route path="formations" element={<FormationsListPage />} />
           <Route path="formations/:inf" element={<FormationPage />} />
           <Route path="faq" element={<div />} />

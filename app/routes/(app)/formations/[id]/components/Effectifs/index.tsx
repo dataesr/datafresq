@@ -1,163 +1,186 @@
-import {
-  Chart,
-  Credits,
-  type HighchartsReactRefObject,
-  Legend,
-  XAxis,
-  YAxis,
-} from '@highcharts/react';
-import { Line } from '@highcharts/react/series';
+import type { HighchartsReactRefObject } from '@highcharts/react';
+import { Chart, Credits, Legend, Tooltip, XAxis, YAxis } from '@highcharts/react';
+import { Column, Line } from '@highcharts/react/series';
 import { useRef } from 'react';
 import { AnalyticsGraph } from '@/components/AnalyticsGraph';
-import { SparklineStatCard } from '@/components/cards/StatCards';
-import { AutoGrid } from '@/components/Grids/AutoGrid';
-import { getColorForSeries } from '@/components/highcharts';
+import { FeminizationRateCard, SparklineStatCard } from '@/components/cards/StatCards';
+import { getChartColor, getColorForSeries } from '@/components/highcharts';
 import PillsTitle from '@/components/PillsTitle';
+import { type SiseRecord, useSiseStats } from './useSiseStats';
 
 interface EffectifsProps {
-  siseData: any[];
+  siseData: SiseRecord[];
 }
 
 export default function Effectifs({ siseData }: EffectifsProps) {
-  const chartRef = useRef<HighchartsReactRefObject | null>(null);
+  const evolutionChartRef = useRef<HighchartsReactRefObject | null>(null);
+  const studyYearChartRef = useRef<HighchartsReactRefObject | null>(null);
+  const cityChartRef = useRef<HighchartsReactRefObject | null>(null);
 
-  if (!siseData || siseData.length === 0) {
+  const stats = useSiseStats(siseData);
+
+  if (!stats.hasData) {
     return (
-      <section id="effectifs" className="formation-section">
+      <section id="effectifs">
         <PillsTitle as="h2" icon="fr-icon-group-line">
           Effectifs étudiants
         </PillsTitle>
-        <div className="fr-callout">
-          <p>Aucune donnée d'inscription disponible.</p>
+        <div className="fr-py-2w fr-px-3v fr-background-alt--grey fx-radius--sm">
+          <p className="fr-text--sm fr-mb-0 fr-text-mention--grey">
+            Aucune donnée d'inscription disponible.
+          </p>
         </div>
       </section>
     );
   }
 
-  const years = [
-    ...new Set(siseData.map((item: any) => item.annee_universitaire)),
-  ].sort() as string[];
-
-  if (years.length === 0) return null;
-
-  const latestYear = years[years.length - 1];
-  const latestYearData = siseData.filter((item: any) => item.annee_universitaire === latestYear);
-
-  const latestTotal = latestYearData.reduce(
-    (sum: number, item: any) => sum + (item.effectif_sans_cpge || 0),
-    0,
-  );
-  const latestFemmes = latestYearData.reduce(
-    (sum: number, item: any) => sum + (item.femmes || 0),
-    0,
-  );
-  const latestHommes = latestYearData.reduce(
-    (sum: number, item: any) => sum + (item.hommes || 0),
-    0,
-  );
-
-  const getSerie = (key: string): number[] => {
-    return years.map((year) => {
-      const yearData = siseData.filter((item: any) => item.annee_universitaire === year);
-      return yearData.reduce((sum: number, item: any) => sum + (item?.[key] || 0), 0);
-    });
-  };
-
-  const totalData = getSerie('effectif_sans_cpge');
-  const hommesData = getSerie('hommes');
-  const femmesData = getSerie('femmes');
-
-  const hasMultipleYears = years.length > 1;
-  const isLatestYear = latestYear === '2024-2025';
-
   return (
-    <section id="effectifs" className="formation-section">
+    <section id="effectifs">
       <PillsTitle as="h2" icon="fr-icon-group-line">
         Effectifs étudiants
       </PillsTitle>
 
-      {!hasMultipleYears && (
-        <div className={`fr-notice fr-notice--${isLatestYear ? 'info' : 'warning'} fr-mb-3w`}>
-          <div className="fr-container">
-            <div className="fr-notice__body">
-              <p>
-                <span className="fr-notice__title" />
-                <span className="fr-notice__desc">
-                  Aucune donnée disponible pour 2024-2025. <br />
-                  Données disponibles uniquement pour l'année universitaire {latestYear}
-                </span>
-              </p>
-            </div>
-          </div>
-        </div>
-      )}
-
-      <AutoGrid min={280}>
+      <div
+        style={{
+          display: 'grid',
+          gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 300px), 1fr))',
+          gap: '1.5rem',
+          marginBottom: '2rem',
+        }}
+      >
         <SparklineStatCard
-          value={latestTotal}
-          label={`Étudiants (${latestYear})`}
-          trendData={totalData}
+          value={stats.latestTotal}
+          label={`Étudiants inscrits (${stats.latestYear})`}
+          trendData={stats.totalTrend}
           color="green-archipel"
           icon="fr-icon-team-fill"
         />
-        {latestFemmes > 0 && (
-          <SparklineStatCard
-            value={latestFemmes}
-            label="Femmes"
-            trendData={femmesData}
-            color="pink-macaron"
-            icon="fr-icon-user-fill"
-          />
-        )}
-        {latestHommes > 0 && (
-          <SparklineStatCard
-            value={latestHommes}
-            label="Hommes"
-            trendData={hommesData}
-            color="yellow-tournesol"
-            icon="fr-icon-user-fill"
-          />
-        )}
-      </AutoGrid>
+        <FeminizationRateCard
+          femaleCount={stats.latestWomen}
+          maleCount={stats.latestMen}
+          femaleTrendData={stats.womenTrend}
+          maleTrendData={stats.menTrend}
+        />
+      </div>
 
-      <div style={{ display: 'grid', gap: '3rem', marginTop: '3rem' }}>
-        {years.length > 1 && (
+      <div
+        style={{
+          display: 'grid',
+          gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 300px), 1fr))',
+          gap: '1.5rem',
+          marginBottom: '2rem',
+        }}
+      >
+        {stats.showEvolutionChart && (
           <AnalyticsGraph
-            title="Évolution du nombre d'étudiants inscrits"
-            description={`Données disponibles sur ${years.length} années universitaires (${years[0]} - ${latestYear})`}
-            chartRef={chartRef}
+            title="Évolution des effectifs"
+            description={`Données disponibles sur ${stats.years.length} années universitaires (${stats.years[0]} - ${stats.latestYear})`}
+            chartRef={evolutionChartRef}
             source="SISE (Système d'Information sur le Suivi de l'Étudiant)"
           >
             <Chart
-              ref={chartRef}
-              containerProps={{ style: { width: '100%', minWidth: '300px', height: '400px' } }}
+              ref={evolutionChartRef}
+              containerProps={{ style: { width: '100%', minWidth: '300px', height: '350px' } }}
             >
               <Credits enabled={false} />
               <Legend align="center" />
-
-              <XAxis categories={years} title={{ text: 'Année universitaire' }} />
-
+              <Tooltip shared />
+              <XAxis categories={stats.years} title={{ text: 'Année universitaire' }} />
               <YAxis min={0} title={{ text: "Nombre d'étudiants inscrits" }} />
-
               <Line.Series
-                data={totalData}
+                data={stats.totalTrend}
                 options={{
                   name: 'Total',
                   color: getColorForSeries('total'),
                 }}
               />
               <Line.Series
-                data={hommesData}
+                data={stats.womenTrend}
                 options={{
-                  color: getColorForSeries('hommes'),
-                  name: 'Hommes',
+                  name: 'Femmes',
+                  color: getColorForSeries('femmes'),
                 }}
               />
               <Line.Series
-                data={femmesData}
+                data={stats.menTrend}
                 options={{
-                  color: getColorForSeries('femmes'),
+                  name: 'Hommes',
+                  color: getColorForSeries('hommes'),
+                }}
+              />
+            </Chart>
+          </AnalyticsGraph>
+        )}
+
+        {stats.showStudyYearChart && (
+          <AnalyticsGraph
+            title="Répartition par année d'études"
+            description={`Distribution des étudiants selon leur année dans le cursus (${stats.latestYear})`}
+            chartRef={studyYearChartRef}
+            source="SISE (Système d'Information sur le Suivi de l'Étudiant)"
+          >
+            <Chart
+              ref={studyYearChartRef}
+              containerProps={{ style: { width: '100%', minWidth: '300px', height: '350px' } }}
+            >
+              <Credits enabled={false} />
+              <Legend align="center" />
+              <Tooltip shared />
+              <XAxis
+                categories={stats.studyYearData.categories}
+                title={{ text: "Année d'études" }}
+              />
+              <YAxis min={0} title={{ text: "Nombre d'étudiants" }} />
+              <Column.Series
+                data={stats.studyYearData.women}
+                options={{
                   name: 'Femmes',
+                  color: getChartColor('pink-macaron'),
+                  stacking: 'normal',
+                }}
+              />
+              <Column.Series
+                data={stats.studyYearData.men}
+                options={{
+                  name: 'Hommes',
+                  color: getChartColor('yellow-tournesol'),
+                  stacking: 'normal',
+                }}
+              />
+            </Chart>
+          </AnalyticsGraph>
+        )}
+
+        {stats.showCityChart && (
+          <AnalyticsGraph
+            title="Répartition par commune d'implantation"
+            description={`Distribution des étudiants selon le lieu d'implantation (${stats.latestYear})`}
+            chartRef={cityChartRef}
+            source="SISE (Système d'Information sur le Suivi de l'Étudiant)"
+          >
+            <Chart
+              ref={cityChartRef}
+              containerProps={{ style: { width: '100%', minWidth: '300px', height: '350px' } }}
+            >
+              <Credits enabled={false} />
+              <Legend align="center" />
+              <Tooltip shared />
+              <XAxis categories={stats.cityData.categories} title={{ text: 'Commune' }} />
+              <YAxis min={0} title={{ text: "Nombre d'étudiants" }} />
+              <Column.Series
+                data={stats.cityData.women}
+                options={{
+                  name: 'Femmes',
+                  color: getChartColor('pink-macaron'),
+                  stacking: 'normal',
+                }}
+              />
+              <Column.Series
+                data={stats.cityData.men}
+                options={{
+                  name: 'Hommes',
+                  color: getChartColor('yellow-tournesol'),
+                  stacking: 'normal',
                 }}
               />
             </Chart>

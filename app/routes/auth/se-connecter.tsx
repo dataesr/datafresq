@@ -1,6 +1,5 @@
 import { useForm } from '@tanstack/react-form';
 import { Activity } from 'react';
-import { Link } from 'react-router';
 import { useSignIn } from '@/api/auth';
 import { Input } from '@/components/Input';
 import { Password } from '@/components/Password';
@@ -146,17 +145,6 @@ export default function SignIn() {
               </ul>
             )}
           </form.Subscribe>
-        </div>
-
-        <div className="fr-fieldset__element">
-          <div className="fr-grid-row fr-mt-2w">
-            <p className="fr-text--sm">
-              Pas encore de compte ?{' '}
-              <Link to="/auth/creer-un-compte" className="fr-link fr-text--sm">
-                Créer un compte
-              </Link>
-            </p>
-          </div>
         </div>
       </fieldset>
     </form>

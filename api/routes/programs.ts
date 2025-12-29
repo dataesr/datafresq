@@ -13,11 +13,12 @@ import { authMacro } from '~/macros/authMacro';
 import { errorResponseSchema } from '~/schemas/common';
 import {
   type ProgramSearch,
-  programSchema,
+  programDetailResponseSchema,
   programSearchSchema,
   programsFacetsResponseSchema,
   programsParamsSchema,
   programsSearchResponseSchema,
+  type SiseRecord,
 } from '~/schemas/programs';
 
 const fields = Object.keys(programSearchSchema.properties);
@@ -253,7 +254,22 @@ export const programsRoutes = new Elysia({ prefix: '/programs' })
     '/:inf',
     async ({ params: { inf } }) => {
       const programQuery = collections.programs.findOne({ inf });
-      const siseQuery = collections.sise.find({ inf }).toArray();
+      const siseQuery = collections.sise
+        .aggregate<SiseRecord>([
+          { $match: { inf } },
+          {
+            $project: {
+              _id: 0,
+              academicYear: '$annee_universitaire',
+              enrollment: '$effectif_sans_cpge',
+              women: '$femmes',
+              men: '$hommes',
+              studyYear: '$degetu_lib',
+              city: '$implantation_commune',
+            },
+          },
+        ])
+        .toArray();
       const [program, sise] = await Promise.all([programQuery, siseQuery]);
       if (!program) {
         throw new NotFoundError('Program not found');
@@ -266,10 +282,7 @@ export const programsRoutes = new Elysia({ prefix: '/programs' })
         inf: t.String(),
       }),
       response: {
-        200: t.Object({
-          program: programSchema,
-          sise: t.Any(),
-        }),
+        200: programDetailResponseSchema,
         422: errorResponseSchema,
         500: errorResponseSchema,
       },

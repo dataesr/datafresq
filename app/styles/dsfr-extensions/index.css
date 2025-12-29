@@ -21,3 +21,16 @@
   align-items: center;
   justify-content: space-between;
 }
+
+/* Border radius utilities */
+.fx-radius--none {
+  border-radius: 0;
+}
+
+.fx-radius--sm {
+  border-radius: 0.25rem;
+}
+
+.fx-radius--md {
+  border-radius: 0.5rem;
+}

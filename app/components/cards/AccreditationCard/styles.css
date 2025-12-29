@@ -1,6 +1,6 @@
 .accreditation-card {
   background: var(--background-contrast-blue-france);
-  border: 2px solid var(--border-default-blue-france);
+  border: 2px solid var(--border-default-blue-france) !important;
 }
 
 .accreditation-dates {

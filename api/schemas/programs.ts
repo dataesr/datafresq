@@ -289,6 +289,24 @@ export const programsSearchResponseSchema = t.Object({
 });
 
 // ============================================================================
+// SISE Schemas (Student enrollment data)
+// ============================================================================
+
+export const siseRecordSchema = t.Object({
+  academicYear: t.String(),
+  enrollment: t.Number(),
+  women: t.Number(),
+  men: t.Number(),
+  studyYear: t.String(),
+  city: t.String(),
+});
+
+export const programDetailResponseSchema = t.Object({
+  program: programSchema,
+  sise: t.Array(siseRecordSchema),
+});
+
+// ============================================================================
 // Types
 // ============================================================================
 
@@ -314,3 +332,5 @@ export type ProgramsParams = typeof programsParamsSchema.static;
 export type FacetItem = typeof facetItemSchema.static;
 export type ProgramsFacetsResponse = typeof programsFacetsResponseSchema.static;
 export type ProgramsSearchResponse = typeof programsSearchResponseSchema.static;
+export type SiseRecord = typeof siseRecordSchema.static;
+export type ProgramDetailResponse = typeof programDetailResponseSchema.static;

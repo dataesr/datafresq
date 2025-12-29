@@ -20,8 +20,8 @@ interface BrevoEmailWithHtmlParams {
 }
 
 const DEFAULT_SENDER = {
-  name: "dataesr",
-  email: 'dataesr@enseignementsup.gouv.fr',
+  name: '#dataesr',
+  email: 'dataesr@recherche.gouv.fr',
 };
 
 async function sendBrevoEmailWithHtml(data: BrevoEmailWithHtmlParams): Promise<Response> {
@@ -44,7 +44,6 @@ async function sendBrevoEmailWithHtml(data: BrevoEmailWithHtmlParams): Promise<R
     console.log('[Email] Recipients:', data.to.map((r) => r.email).join(', '));
     headers['X-Sib-Sandbox'] = 'drop';
   }
-
 
   return fetch(config.brevo.url, { method: 'POST', headers, body });
 }
