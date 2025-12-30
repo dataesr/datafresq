@@ -1,9 +1,6 @@
-import '@gouvfr/dsfr/dist/dsfr.main.min.css';
-import '@gouvfr/dsfr/dist/utility/utility.main.min.css';
-
 import { QueryClientProvider } from '@tanstack/react-query';
 import { NuqsAdapter } from 'nuqs/adapters/react-router/v7';
-import { StrictMode } from 'react';
+import { StrictMode, useEffect } from 'react';
 import { createRoot } from 'react-dom/client';
 import { BrowserRouter } from 'react-router';
 import { queryClient } from '@/api/query-client';
@@ -13,16 +10,29 @@ import '@/components/highcharts';
 
 import './styles/index.css';
 
+function DSFRInitializer({ children }: { children: React.ReactNode }) {
+  useEffect(() => {
+    if (window.dsfr && typeof window.dsfr.start === 'function') {
+      window.dsfr.start();
+    }
+  }, []);
+
+  return <>{children}</>;
+}
+
 const elem = document.getElementById('root');
 if (!elem) throw new Error('Root element not found');
+
 const app = (
   <StrictMode>
     <BrowserRouter>
       <NuqsAdapter>
         <QueryClientProvider client={queryClient}>
-          <ToastContextProvider>
-            <AppRouter />
-          </ToastContextProvider>
+          <DSFRInitializer>
+            <ToastContextProvider>
+              <AppRouter />
+            </ToastContextProvider>
+          </DSFRInitializer>
         </QueryClientProvider>
       </NuqsAdapter>
     </BrowserRouter>

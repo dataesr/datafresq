@@ -1,25 +1,11 @@
 import cn from 'classnames';
-import { Navigate, Outlet, useSearchParams } from 'react-router';
-import { useOptionalCurrentUser } from '@/api/users';
+import { Outlet } from 'react-router';
 import './styles.css';
-import FullPageLoader from '@/components/FullPageLoader';
 
 const dataesrLogo = '/public/dataesr.svg';
 const siesLogo = '/public/sies_logo_signature.svg';
 
-function getSafeRedirectUrl(redirectTo: string | null): string {
-  if (!redirectTo) return '/';
-
-  const isRelativePath =
-    redirectTo.startsWith('/') &&
-    !redirectTo.startsWith('//') &&
-    !redirectTo.includes('://') &&
-    !redirectTo.includes('\\');
-
-  return isRelativePath ? redirectTo : '/';
-}
-
-function AuthLayoutWrapper({ children }: { children: React.ReactNode }) {
+export default function AuthLayout() {
   return (
     <div className={cn('auth-layout-wrapper', 'fr-background-contrast--grey')}>
       <div className={cn('auth-layout-logo-container')}>
@@ -34,7 +20,7 @@ function AuthLayoutWrapper({ children }: { children: React.ReactNode }) {
         }}
       >
         <div className={cn('auth-layout-card-wrapper', 'fr-card', 'fr-card--shadow', 'fr-py-2w')}>
-          {children}
+          <Outlet />
         </div>
         <div className={cn('auth-layout-footer-logos', 'fr-mt-2w')}>
           <div className="fr-container-fluid">
@@ -75,30 +61,5 @@ function AuthLayoutWrapper({ children }: { children: React.ReactNode }) {
         </ul>
       </div>
     </div>
-  );
-}
-
-export default function AuthLayout() {
-  const { user, isLoading } = useOptionalCurrentUser();
-  const [searchParams] = useSearchParams();
-
-  if (isLoading) {
-    return (
-      <AuthLayoutWrapper>
-        <FullPageLoader />
-      </AuthLayoutWrapper>
-    );
-  }
-
-  if (user) {
-    const redirectTo = searchParams.get('redirect');
-    const destination = getSafeRedirectUrl(redirectTo);
-    return <Navigate to={destination} replace />;
-  }
-
-  return (
-    <AuthLayoutWrapper>
-      <Outlet />
-    </AuthLayoutWrapper>
   );
 }

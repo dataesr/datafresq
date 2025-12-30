@@ -89,7 +89,10 @@ export const authRoutes = new Elysia({ prefix: '/auth' })
     '/session/refresh',
     async ({ jwtAccessToken, clientInfo: { userAgent, ipAddress }, authCookies }) => {
       const { session: currentSessionToken } = authCookies.get();
-      if (!currentSessionToken) throw new InvalidSessionError('Missing session token');
+      if (!currentSessionToken) {
+        authCookies.clear();
+        throw new InvalidSessionError('Missing session token');
+      }
 
       const currentSessionTokenHash = hashToken(currentSessionToken);
 
@@ -97,13 +100,21 @@ export const authRoutes = new Elysia({ prefix: '/auth' })
         sessionTokenHash: currentSessionTokenHash,
       });
 
-      if (!session) throw new InvalidSessionError('Invalid or expired session');
+      if (!session) {
+        authCookies.clear();
+        throw new InvalidSessionError('Invalid or expired session');
+      }
+
       if (session.expiresAt < new Date()) {
-        console.warn('Session renewed within mongo TTL delay');
+        authCookies.clear();
+        console.warn('Session expired within mongo TTL delay');
+        throw new InvalidSessionError('Session expired');
       }
 
       const user = await collections.users.findOne({ id: session.userId });
       if (!user || !user.isActive) {
+        authCookies.clear();
+        await collections.sessions.deleteOne({ id: session.id });
         throw new InvalidSessionError('Utilisateur invalide');
       }
 
@@ -113,7 +124,6 @@ export const authRoutes = new Elysia({ prefix: '/auth' })
 
       const { sessionToken, ...sessionInfo } = generateSessionInfo();
 
-      // Revoke old session
       await collections.sessions.updateOne(
         { id: session.id, userId: user.id },
         {
@@ -239,18 +249,11 @@ export const authRoutes = new Elysia({ prefix: '/auth' })
       },
     },
   )
-  /**
-   * POST /auth/reinitialiser-mot-de-passe
-   *
-   * Réinitialiser le mot de passe avec le token envoyé par email.
-   */
   .post(
     '/reinitialiser-mot-de-passe',
     async ({ body }) => {
-      // Hash the token to find it in database
       const tokenHash = hashToken(body.token);
 
-      // Find token
       const tokenDoc = await collections.tokens.findOne({
         tokenHash,
         type: 'reset-password',
@@ -261,15 +264,12 @@ export const authRoutes = new Elysia({ prefix: '/auth' })
         throw new InvalidTokenError('Token invalide ou expiré');
       }
 
-      // Check if token is expired
       if (tokenDoc.expiresAt < new Date()) {
         throw new InvalidTokenError('Token expiré');
       }
 
-      // Hash new password
       const passwordHash = await Bun.password.hash(body.password);
 
-      // Update user password
       await collections.users.updateOne(
         { id: tokenDoc.userId },
         {
@@ -281,7 +281,6 @@ export const authRoutes = new Elysia({ prefix: '/auth' })
         },
       );
 
-      // Mark token as used
       await collections.tokens.updateOne(
         { id: tokenDoc.id },
         {
@@ -292,7 +291,6 @@ export const authRoutes = new Elysia({ prefix: '/auth' })
         },
       );
 
-      // Revoke all sessions for security (force re-login)
       await collections.sessions.deleteMany({ userId: tokenDoc.userId });
 
       return {

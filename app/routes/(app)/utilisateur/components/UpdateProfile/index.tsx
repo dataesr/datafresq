@@ -1,7 +1,8 @@
 import { useForm } from '@tanstack/react-form';
 import { z } from 'zod';
 
-import { useCurrentUser, useUpdateProfile } from '@/api/users';
+import { useAuth } from '@/api/auth';
+import { useUpdateProfile } from '@/api/users';
 import { Input } from '@/components/Input';
 import { useToast } from '@/hooks/useToast';
 
@@ -20,7 +21,7 @@ const profileSchema = z.object({
 type ProfileForm = z.infer<typeof profileSchema>;
 
 export default function UpdateProfile() {
-  const { user } = useCurrentUser();
+  const { user } = useAuth();
   const { toast } = useToast();
 
   const { mutate: updateProfile, isPending } = useUpdateProfile();

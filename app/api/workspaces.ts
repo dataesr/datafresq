@@ -1,7 +1,7 @@
 import { useMutation, useQueryClient, useSuspenseQuery } from '@tanstack/react-query';
+import { useAuth } from '@/api/auth';
 import { APIError, api } from '@/api/eden-treaty';
 import type { ReadWorkspace } from '~/schemas/workspaces';
-import { useCurrentUser } from './users';
 
 // =============================================================================
 // QUERY KEYS
@@ -212,7 +212,7 @@ export interface WorkspacePermissions {
 
 export function useWorkspacePermissions(workspaceId: string): WorkspacePermissions {
   const { data: workspace } = useWorkspace(workspaceId);
-  const { user } = useCurrentUser();
+  const { user } = useAuth();
 
   const userEmail = user?.email;
 

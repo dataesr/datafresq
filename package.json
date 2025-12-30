@@ -4,6 +4,7 @@
   "private": true,
   "type": "module",
   "scripts": {
+    "postinstall": "cp -r node_modules/@gouvfr/dsfr/dist/artwork public/",
     "dev": "bun --hot server.ts",
     "dev:server": "bun --watch src/server/server.ts",
     "build": "bun build src/client/main.tsx --outdir=dist/client --target=browser --minify --sourcemap",

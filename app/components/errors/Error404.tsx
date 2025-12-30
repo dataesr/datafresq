@@ -1,3 +1,5 @@
+import { Link } from 'react-router';
+
 export default function Error404() {
   return (
     <div className="fr-container">
@@ -6,27 +8,19 @@ export default function Error404() {
           <h1>Page non trouvée</h1>
           <p className="fr-text--sm fr-mb-3w">Erreur 404</p>
           <p className="fr-text--lead fr-mb-3w">
-            La page que vous cherchez est introuvable. Excusez-nous pour la gène occasionnée.
+            La page que vous cherchez est introuvable. Excusez-nous pour la gêne occasionnée.
           </p>
           <p className="fr-text--sm fr-mb-5w">
             Si vous avez tapé l'adresse web dans le navigateur, vérifiez qu'elle est correcte. La
-            page n’est peut-être plus disponible.
+            page n'est peut-être plus disponible.
             <br />
-            Dans ce cas, pour continuer votre visite vous pouvez consulter notre page d’accueil, ou
-            effectuer une recherche avec notre moteur de recherche en haut de page.
-            <br />
-            Sinon contactez-nous pour que l’on puisse vous rediriger vers la bonne information.
+            Dans ce cas, pour continuer votre visite vous pouvez consulter notre page d'accueil.
           </p>
           <ul className="fr-btns-group fr-btns-group--inline-md">
             <li>
-              <a className="fr-btn" href="/">
+              <Link className="fr-btn" to="/">
                 Page d'accueil
-              </a>
-            </li>
-            <li>
-              <a className="fr-btn fr-btn--secondary" href="/contact">
-                Contactez-nous
-              </a>
+              </Link>
             </li>
           </ul>
         </div>
@@ -39,23 +33,26 @@ export default function Error404() {
             height="200"
             viewBox="0 0 160 200"
           >
-            <use className="fr-artwork-motif" href="artwork/background/ovoid.svg#artwork-motif" />
+            <use
+              className="fr-artwork-motif"
+              href="/public/artwork/background/ovoid.svg#artwork-motif"
+            />
             <use
               className="fr-artwork-background"
-              href="artwork/background/ovoid.svg#artwork-background"
+              href="/public/artwork/background/ovoid.svg#artwork-background"
             />
             <g transform="translate(40, 60)">
               <use
                 className="fr-artwork-decorative"
-                href="artwork/pictograms/system/technical-error.svg#artwork-decorative"
+                href="/public/artwork/pictograms/system/technical-error.svg#artwork-decorative"
               />
               <use
                 className="fr-artwork-minor"
-                href="artwork/pictograms/system/technical-error.svg#artwork-minor"
+                href="/public/artwork/pictograms/system/technical-error.svg#artwork-minor"
               />
               <use
                 className="fr-artwork-major"
-                href="artwork/pictograms/system/technical-error.svg#artwork-major"
+                href="/public/artwork/pictograms/system/technical-error.svg#artwork-major"
               />
             </g>
           </svg>

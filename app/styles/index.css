@@ -139,12 +139,6 @@ button.fr-link {
   padding: 0.5rem 0.5rem !important;
 }
 
-.fr-translate .fr-translate__btn--user::before {
-  --icon-size: 1.25rem !important;
-  -webkit-mask-image: url("@gouvfr/dsfr/dist/icons/user/account-circle-fill.svg");
-  mask-image: url("@gouvfr/dsfr/dist/icons/user/account-circle-fill.svg");
-}
-
 .fr-nav__link.fr-nav__link--user {
   box-shadow: 0 -2px 0 -1px var(--border-default-grey) !important;
   justify-content: flex-start;

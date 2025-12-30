@@ -38,15 +38,15 @@ export default function SelectTheme() {
                     >
                       <use
                         className="fr-artwork-decorative"
-                        href="@gouvfr/dsfr/dist/artwork/light.svg#artwork-decorative"
+                        href="/public/dsfr/dist/artwork/light.svg#artwork-decorative"
                       />
                       <use
                         className="fr-artwork-minor"
-                        href="@gouvfr/dsfr/dist/artwork/light.svg#artwork-minor"
+                        href="/public/dsfr/dist/artwork/light.svg#artwork-minor"
                       />
                       <use
                         className="fr-artwork-major"
-                        href="@gouvfr/dsfr/dist/artwork/light.svg#artwork-major"
+                        href="/public/dsfr/dist/artwork/light.svg#artwork-major"
                       />
                     </svg>
                   </label>
@@ -73,15 +73,15 @@ export default function SelectTheme() {
                     >
                       <use
                         className="fr-artwork-decorative"
-                        href="@gouvfr/dsfr/dist/artwork/dark.svg#artwork-decorative"
+                        href="/public/dsfr/dist/artwork/dark.svg#artwork-decorative"
                       />
                       <use
                         className="fr-artwork-minor"
-                        href="@gouvfr/dsfr/dist/artwork/dark.svg#artwork-minor"
+                        href="/public/dsfr/dist/artwork/dark.svg#artwork-minor"
                       />
                       <use
                         className="fr-artwork-major"
-                        href="@gouvfr/dsfr/dist/artwork/dark.svg#artwork-major"
+                        href="/public/dsfr/dist/artwork/dark.svg#artwork-major"
                       />
                     </svg>
                   </label>
@@ -108,15 +108,15 @@ export default function SelectTheme() {
                     >
                       <use
                         className="fr-artwork-decorative"
-                        href="@gouvfr/dsfr/dist/artwork/system.svg#artwork-decorative"
+                        href="/public/dsfr/dist/artwork/system.svg#artwork-decorative"
                       />
                       <use
                         className="fr-artwork-minor"
-                        href="@gouvfr/dsfr/dist/artwork/system.svg#artwork-minor"
+                        href="/public/dsfr/dist/artwork/system.svg#artwork-minor"
                       />
                       <use
                         className="fr-artwork-major"
-                        href="@gouvfr/dsfr/dist/artwork/system.svg#artwork-major"
+                        href="/public/dsfr/dist/artwork/system.svg#artwork-major"
                       />
                     </svg>
                   </label>

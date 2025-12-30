@@ -1,27 +1,26 @@
-import { Suspense } from 'react';
 import { Outlet } from 'react-router';
+import { useAuth } from '@/api/auth';
 import { APIError } from '@/api/eden-treaty';
-import { useCurrentUser } from '@/api/users';
 import ErrorBoundary from '@/components/errors/ErrorBoundary';
 import Footer from '@/components/Footer';
-import FullPageLoader from '@/components/FullPageLoader';
 import Header from '@/components/Header';
 
 export default function AdminLayout() {
-  const { isAdmin } = useCurrentUser();
+  const { isAdmin } = useAuth();
+
   if (!isAdmin) {
-    throw new APIError({ value: { message: 'Unauthorized' }, status: 403 });
+    throw new APIError({ status: 403, value: { message: 'Accès réservé aux administrateurs' } });
   }
 
   return (
-    <ErrorBoundary>
-      <Suspense fallback={<FullPageLoader />}>
-        <Header />
-        <main>
+    <>
+      <Header />
+      <main>
+        <ErrorBoundary>
           <Outlet />
-        </main>
-        <Footer />
-      </Suspense>
-    </ErrorBoundary>
+        </ErrorBoundary>
+      </main>
+      <Footer />
+    </>
   );
 }

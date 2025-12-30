@@ -1,9 +1,9 @@
-import { useCurrentUser } from '@/api/users';
+import { useAuth } from '@/api/auth';
 import { Avatar } from '@/components/Avatar';
 import './styles.css';
 
 export default function ManageAvatar() {
-  const { user } = useCurrentUser();
+  const { user } = useAuth();
 
   if (!user) return null;
 
