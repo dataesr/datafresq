@@ -1,23 +1,22 @@
 import { useState } from 'react';
 import { Link } from 'react-router';
 import { useProgramsSearch } from '@/api/programs';
-import { Button } from '@/components/Button';
-import { SearchInput } from '@/components/SearchInput';
-import FiltersModal from './components/FiltersModal';
+import { FilterBuilder } from './components/FilterBuilder';
 import ProgramsTable from './components/ProgramTable';
 import { useProgramsFilters } from './hooks/useProgramsFilters';
 
 export default function FormationsListPage() {
-  const [searchInputValue, setSearchInputValue] = useState('');
   const [selectedPrograms, setSelectedPrograms] = useState<string[]>([]);
 
   // Get URL state and handlers from hook
-  const { params, currentFilters, handleSearchChange } = useProgramsFilters();
+  const { params, currentFilters, handleSearchChange, handleApplyFilters } = useProgramsFilters();
 
   // Fetch programs based on URL state
   const {
     programs,
+    totalCount,
     isLoading: isProgramsLoading,
+    isFetching: isProgramsFetching,
     error: programsError,
   } = useProgramsSearch({
     query: params.q,
@@ -25,17 +24,6 @@ export default function FormationsListPage() {
     pageSize: Number(params.pageSize),
     filters: currentFilters,
   });
-
-  // Sync search input with URL on mount
-  useState(() => {
-    setSearchInputValue(params.q);
-  });
-
-  // Handle search form submit
-  const handleSearch = (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    handleSearchChange(searchInputValue);
-  };
 
   return (
     <section>
@@ -69,29 +57,18 @@ export default function FormationsListPage() {
         {/* Page title */}
         <h1 className="fr-h2">Explorer les formations</h1>
 
-        {/* Search form */}
-        <form
-          onSubmit={handleSearch}
-          style={{ display: 'flex', alignItems: 'center', gap: '.5rem' }}
-        >
-          <SearchInput
-            placeholder="Rechercher des formations..."
-            size="md"
-            type="text"
-            value={searchInputValue}
-            onChange={setSearchInputValue}
-          />
-          <Button icon="search-line" size="md" type="submit">
-            Rechercher
-          </Button>
-          <FiltersModal />
-        </form>
-
-        {/* Active filters pills */}
-        {/*<ActiveFilters />*/}
+        {/* Filter Builder with integrated search */}
+        <FilterBuilder
+          filters={currentFilters}
+          onFiltersChange={handleApplyFilters}
+          searchQuery={params.q}
+          onSearchQueryChange={handleSearchChange}
+          resultCount={totalCount}
+          isLoading={isProgramsFetching}
+        />
 
         {/* Results section */}
-        <div className="fr-mt-3w">
+        <div>
           {/* Loading state */}
           {isProgramsLoading && programs.length === 0 && (
             <div className="fr-py-4w" style={{ textAlign: 'center' }}>

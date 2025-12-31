@@ -27,6 +27,7 @@ type SearchParamsInput = Pick<
   | 'diplomaCategory'
   | 'academy'
   | 'region'
+  | 'paysageId'
   | 'sector'
   | 'disciplinarySector'
   | 'domain'
@@ -47,6 +48,7 @@ async function searchPrograms(params: SearchParamsInput) {
       diplomaCategory: params.diplomaCategory?.length ? params.diplomaCategory : undefined,
       academy: params.academy?.length ? params.academy : undefined,
       region: params.region?.length ? params.region : undefined,
+      paysageId: params.paysageId?.length ? params.paysageId : undefined,
       sector: params.sector?.length ? params.sector : undefined,
       disciplinarySector: params.disciplinarySector?.length ? params.disciplinarySector : undefined,
       domain: params.domain?.length ? params.domain : undefined,
@@ -69,6 +71,7 @@ async function getFacets(params: Omit<SearchParamsInput, 'page' | 'pageSize'>) {
       diplomaCategory: params.diplomaCategory?.length ? params.diplomaCategory : undefined,
       academy: params.academy?.length ? params.academy : undefined,
       region: params.region?.length ? params.region : undefined,
+      paysageId: params.paysageId?.length ? params.paysageId : undefined,
       sector: params.sector?.length ? params.sector : undefined,
       disciplinarySector: params.disciplinarySector?.length ? params.disciplinarySector : undefined,
       domain: params.domain?.length ? params.domain : undefined,
@@ -98,6 +101,7 @@ export interface FilterState {
   diplomaCategory: string[];
   academy: string[];
   region: string[];
+  paysageId: string[];
   sector: string[];
   disciplinarySector: string[];
   domain: string[];
@@ -112,6 +116,7 @@ export const EMPTY_FILTERS: FilterState = {
   diplomaCategory: [],
   academy: [],
   region: [],
+  paysageId: [],
   sector: [],
   disciplinarySector: [],
   domain: [],

@@ -476,8 +476,25 @@ a.fx-dropdown__item[href],
    Loading state
    ----------------------------------------------------------------------------- */
 .fx-dropdown__loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
   padding: 1.5rem 1rem;
   text-align: center;
   color: var(--text-mention-grey, #666);
   font-size: 0.875rem;
+}
+
+.fx-dropdown__loading .fr-icon-loader-4-line {
+  animation: fx-dropdown-spin 1s linear infinite;
+}
+
+@keyframes fx-dropdown-spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
 }

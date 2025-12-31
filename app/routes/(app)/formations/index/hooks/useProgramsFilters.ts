@@ -24,6 +24,7 @@ export function useProgramsFilters() {
       diplomaCategory: parseAsArrayOf(parseAsString).withDefault([]),
       academy: parseAsArrayOf(parseAsString).withDefault([]),
       region: parseAsArrayOf(parseAsString).withDefault([]),
+      paysageId: parseAsArrayOf(parseAsString).withDefault([]),
       sector: parseAsArrayOf(parseAsString).withDefault([]),
       disciplinarySector: parseAsArrayOf(parseAsString).withDefault([]),
       domain: parseAsArrayOf(parseAsString).withDefault([]),
@@ -46,6 +47,7 @@ export function useProgramsFilters() {
       diplomaCategory: params.diplomaCategory,
       academy: params.academy,
       region: params.region,
+      paysageId: params.paysageId,
       sector: params.sector,
       disciplinarySector: params.disciplinarySector,
       domain: params.domain,
@@ -64,6 +66,7 @@ export function useProgramsFilters() {
       ...params.diplomaCategory,
       ...params.academy,
       ...params.region,
+      ...params.paysageId,
       ...params.sector,
       ...params.disciplinarySector,
       ...params.domain,
@@ -117,6 +120,7 @@ export function useProgramsFilters() {
         diplomaCategory: filters.diplomaCategory,
         academy: filters.academy,
         region: filters.region,
+        paysageId: filters.paysageId,
         sector: filters.sector,
         disciplinarySector: filters.disciplinarySector,
         domain: filters.domain,
@@ -148,6 +152,7 @@ export function useProgramsFilters() {
   const handleClearAllFilters = useCallback(() => {
     setParams({
       ...EMPTY_FILTERS,
+      paysageId: [],
       hasSiseInfos: '',
       hasRncpInfos: '',
       hasRomeInfos: '',
@@ -165,11 +170,19 @@ export function useProgramsFilters() {
       page: 1,
       pageSize: '10',
       ...EMPTY_FILTERS,
+      paysageId: [],
       hasSiseInfos: '',
       hasRncpInfos: '',
       hasRomeInfos: '',
     });
   }, [setParams]);
+
+  const handlePaysageIdChange = useCallback(
+    (values: string[]) => {
+      setParams({ paysageId: values, page: 1 });
+    },
+    [setParams],
+  );
 
   return {
     // State
@@ -183,6 +196,7 @@ export function useProgramsFilters() {
     handlePageSizeChange,
     handleCycleChange,
     handleDiplomaTypeChange,
+    handlePaysageIdChange,
     handleApplyFilters,
     handleRemoveFilter,
     handleClearAllFilters,

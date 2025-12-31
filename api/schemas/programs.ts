@@ -239,6 +239,11 @@ export const programsParamsSchema = t.Object({
   institution: t.Optional(
     t.Union([t.String(), t.Array(t.String())], { description: 'Institution UAI code' }),
   ),
+  paysageId: t.Optional(
+    t.Union([t.String(), t.Array(t.String())], {
+      description: 'Paysage ID for institution filtering',
+    }),
+  ),
   sector: t.Optional(
     t.Union([t.String(), t.Array(t.String())], {
       description: 'Institution sector (public/private)',

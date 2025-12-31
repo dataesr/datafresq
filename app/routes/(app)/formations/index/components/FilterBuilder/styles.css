@@ -1,0 +1,62 @@
+/* =============================================================================
+   FilterBuilder Component Styles
+   ============================================================================= */
+
+/* Base row styles */
+.filter-builder__row {
+  --filter-row-background: var(--background-default-grey);
+  animation: filter-row-appear 0.2s ease-out;
+  border: 1px solid var(--border-default-grey);
+  border-radius: 0.25rem;
+  transition: border-color 0.15s ease;
+  background-color: var(--filter-row-background);
+}
+
+/* Dark mode: use contrast grey for better visibility */
+:root[data-fr-theme="dark"] .filter-builder__row {
+  --filter-row-background: var(--background-contrast-grey);
+}
+
+@keyframes filter-row-appear {
+  from {
+    opacity: 0;
+    transform: translateY(-0.5rem);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Hover state for rows */
+.filter-builder__row:hover {
+  border-color: var(--border-active-blue-france, #000091);
+}
+
+/* Focus-within state for rows */
+.filter-builder__row:focus-within {
+  border-color: var(--border-active-blue-france, #000091);
+  box-shadow: 0 0 0 2px var(--background-action-low-blue-france, rgba(0, 0, 145, 0.1));
+}
+
+/* Loading spinner animation */
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Tag dismiss button hover */
+.filter-builder .fr-tag button:hover {
+  background-color: var(--background-action-low-blue-france, rgba(0, 0, 145, 0.1));
+}
+
+/* Responsive adjustments */
+@media (max-width: 48rem) {
+  .filter-builder__row {
+    flex-wrap: wrap;
+  }
+}
