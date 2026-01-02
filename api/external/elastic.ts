@@ -133,11 +133,31 @@ export function extractTermBuckets(
   const termsAgg = agg as estypes.AggregationsStringTermsAggregate;
   if (!termsAgg.buckets) return [];
 
-  return (termsAgg.buckets as estypes.AggregationsStringTermsBucket[]).map((bucket) => ({
-    key: bucket.key.toString(),
-    count: bucket.doc_count,
-  }));
+  return (termsAgg.buckets as estypes.AggregationsStringTermsBucket[]).map((bucket) => {
+    // Handle boolean field keys: ES returns 0/1 for boolean terms aggregations
+    let key: string;
+    if (bucket.key === 1 || bucket.key === true) {
+      key = 'true';
+    } else if (bucket.key === 0 || bucket.key === false) {
+      key = 'false';
+    } else {
+      key = bucket.key.toString();
+    }
+    return {
+      key,
+      count: bucket.doc_count,
+    };
+  });
 }
+
+/**
+ * Convert string "true"/"false" to actual boolean values for Elasticsearch
+ */
+const toBooleanIfNeeded = (value: string): string | boolean => {
+  if (value === 'true') return true;
+  if (value === 'false') return false;
+  return value;
+};
 
 export const setFilters = (
   filters: {
@@ -152,6 +172,8 @@ export const setFilters = (
     })
     .map(({ key, value }) => {
       if (Array.isArray(value)) return { terms: { [key]: value } };
-      return { term: { [key]: value } };
+      // Convert "true"/"false" strings to actual booleans for boolean fields
+      const processedValue = toBooleanIfNeeded(value as string);
+      return { term: { [key]: processedValue } };
     });
 };

@@ -1,0 +1,182 @@
+/* =============================================================================
+   HOME PAGE STYLES
+   Layout-specific styles only - uses DSFR utilities for spacing/colors
+   ============================================================================= */
+
+.home {
+  min-height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Shared inner container - mirrors .page class properties */
+.home__inner {
+  margin: auto;
+  width: min(90%, 96rem);
+}
+
+/* Section backgrounds */
+.home-section--default {
+  background: var(--background-default-grey);
+}
+
+.home-section--alt {
+  background: var(--background-alt-grey);
+  flex: 1;
+}
+
+/* Icon box - shared between stats and features */
+.home-icon-box {
+  width: 2.5rem;
+  height: 2.5rem;
+  min-width: 2.5rem;
+  border-radius: 0.375rem;
+  background: var(--background-contrast-blue-france);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-action-high-blue-france);
+}
+
+/* Hero Section
+   -------------------------------------------------------------------------- */
+.home-hero {
+  background: linear-gradient(
+    to bottom,
+    var(--background-contrast-blue-france) 0%,
+    var(--background-default-grey) 100%
+  );
+  padding: 2rem 0 3rem;
+  overflow: hidden;
+  position: relative;
+}
+
+@media (min-width: 48rem) {
+  .home-hero {
+    padding: 3rem 0 4rem;
+  }
+}
+
+.home-hero__content {
+  display: flex;
+  flex-direction: column-reverse;
+  align-items: center;
+  gap: 2rem;
+  position: relative;
+  z-index: 1;
+}
+
+@media (min-width: 62rem) {
+  .home-hero__content {
+    flex-direction: row;
+    justify-content: space-between;
+    gap: 3rem;
+  }
+}
+
+.home-hero__text {
+  flex: 1;
+  max-width: 100%;
+  text-align: center;
+}
+
+@media (min-width: 62rem) {
+  .home-hero__text {
+    max-width: 55%;
+    text-align: left;
+  }
+}
+
+.home-hero__separator {
+  width: 3rem;
+  height: 3px;
+  padding: 0;
+  background: var(--border-default-blue-france);
+  border: none;
+  margin: 0 auto 1.5rem;
+}
+
+@media (min-width: 62rem) {
+  .home-hero__separator {
+    margin: 0 0 1.5rem 0;
+  }
+}
+
+.home-hero__title {
+  font-size: 1.5rem;
+  line-height: 1.2;
+  margin-bottom: 1rem;
+}
+
+@media (min-width: 48rem) {
+  .home-hero__title {
+    font-size: 1.75rem;
+  }
+}
+
+@media (min-width: 62rem) {
+  .home-hero__title {
+    font-size: 2rem;
+  }
+}
+
+.home-hero__cta {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  align-items: center;
+}
+
+@media (min-width: 30rem) {
+  .home-hero__cta {
+    flex-direction: row;
+    justify-content: center;
+  }
+}
+
+@media (min-width: 62rem) {
+  .home-hero__cta {
+    justify-content: flex-start;
+  }
+}
+
+/* Hero Illustration */
+.home-hero__illustration {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: relative;
+  max-width: 220px;
+  width: 100%;
+}
+
+@media (min-width: 62rem) {
+  .home-hero__illustration {
+    max-width: 32%;
+  }
+}
+
+.home-hero__illustration img {
+  width: 100%;
+  height: auto;
+  position: relative;
+  z-index: 10;
+}
+
+.home-hero__ovoid {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  width: 115%;
+  height: auto;
+  z-index: 0;
+  opacity: 0.5;
+}
+
+@media (min-width: 62rem) {
+  .home-hero__ovoid {
+    opacity: 0.8;
+  }
+}

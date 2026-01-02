@@ -39,6 +39,34 @@
   border-color: var(--border-default-blue-france);
 }
 
+.fx-card--lift {
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+.fx-card--lift:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+}
+
+/* Background variants */
+.fx-card--bg-default {
+  background: var(--background-default-grey);
+}
+
+.fx-card--bg-alt {
+  background: var(--background-alt-grey);
+}
+
+.fx-card--bg-contrast {
+  background: var(--background-contrast-grey);
+}
+
+.fx-card--bg-transparent {
+  background: transparent;
+}
+
 .fx-card--highlight {
   background: linear-gradient(
     135deg,

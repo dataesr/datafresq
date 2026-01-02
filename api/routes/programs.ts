@@ -228,6 +228,7 @@ export const programsRoutes = new Elysia({ prefix: '/programs' })
               filter: filters,
             },
           },
+          track_total_hits: true,
           track_scores: true,
           highlight: q
             ? {
@@ -532,6 +533,7 @@ export const programsRoutes = new Elysia({ prefix: '/programs' })
               filter: filters,
             },
           },
+          track_total_hits: true,
           aggs: AGGREGATIONS,
         })
         .catch((err) => {

@@ -28,13 +28,13 @@ export default function AuthLayout() {
               <p className="fr-logo">
                 Ministère
                 <br />
-                chargé
-                <br />
                 de l'enseignement
                 <br />
-                supérieur
+                supérieur,
                 <br />
-                et de la recherche
+                de la recherche
+                <br />
+                et de l'espace
               </p>
             </div>
           </div>
