@@ -13,3 +13,18 @@
     transform: rotate(360deg);
   }
 }
+
+/* Utility class for spinning icons - works with DSFR mask-based icons */
+.fr-icon--spin::before {
+  animation: spin 1s linear infinite !important;
+}
+
+/* Specific support for dropdown items with spinning icons */
+.fx-dropdown__item.fr-icon--spin::before {
+  animation: spin 1s linear infinite !important;
+}
+
+/* Target any element with both an fr-icon class and the spin modifier */
+[class*="fr-icon-"].fr-icon--spin::before {
+  animation: spin 1s linear infinite !important;
+}

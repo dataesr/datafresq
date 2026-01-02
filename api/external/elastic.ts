@@ -37,10 +37,14 @@ const createIndexProxy = (index: string) => {
   }) as typeof client;
 };
 
-// Create proxies for all indices
-export const elastic = Object.fromEntries(
-  Object.entries(indexMap).map(([name, index]) => [name, createIndexProxy(index)]),
-) as Record<keyof typeof indexMap, typeof client>;
+// Create proxies for all indices, plus raw client for PIT searches
+export const elastic = {
+  ...Object.fromEntries(
+    Object.entries(indexMap).map(([name, index]) => [name, createIndexProxy(index)]),
+  ),
+  // Raw client for operations that must not include index (e.g., search with PIT)
+  client,
+} as Record<keyof typeof indexMap, typeof client> & { client: typeof client };
 
 // Types for enhanced search results
 export type SearchHit<T> = T & {

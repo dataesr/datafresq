@@ -19,6 +19,7 @@ import {
   type ProgramColumnId,
 } from '@/components/table';
 import { useProgramsFilters } from '../../hooks/useProgramsFilters';
+import ExportButton from '../ExportButton';
 
 interface ProgramsTableProps {
   selectedPrograms: string[];
@@ -156,9 +157,10 @@ export default function ProgramsTable({ selectedPrograms, onSelectionChange }: P
             />
           </Activity>
         </div>
-        <div style={{ display: 'flex', gap: '.5rem' }}>
+        <div style={{ display: 'flex', gap: '.5rem', alignItems: 'center' }}>
           <PageSizeSelector onChange={handlePageSizeChange} value={pageSize.toString()} />
           <ColumnVisibilityToggle table={table} columnLabels={columnLabels} />
+          <ExportButton totalCount={totalCount} />
         </div>
       </div>
       <div style={{ overflowX: 'auto' }}>

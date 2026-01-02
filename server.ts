@@ -24,6 +24,7 @@ async function bootstrap() {
       },
       development: config.isDevelopment,
       port: 3000,
+      idleTimeout: 60, // 1 minutes - allows longer requests for exports
     });
 
     console.log(`

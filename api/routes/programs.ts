@@ -1,4 +1,5 @@
 import { Elysia, t } from 'elysia';
+import * as XLSX from 'xlsx';
 import { collections } from '~/database/mongo';
 import { NotFoundError } from '~/errors';
 import { DatabaseError } from '~/errors/database.error';
@@ -59,6 +60,114 @@ const AGGREGATIONS = {
   hasRomeInfos: { terms: { field: 'hasRomeInfos', size: 2 } },
 };
 
+// Export configuration
+const EXPORT_CONFIG = {
+  maxResults: 10000, // Maximum number of results to export
+  pitKeepAlive: '5m', // Point in time keep alive duration
+  batchSize: 2000, // Number of results per batch
+} as const;
+
+// Build filters from query parameters (shared logic)
+function buildFilters(query: {
+  cycle?: string | string[];
+  diplomaType?: string | string[];
+  diplomaCode?: string | string[];
+  diplomaCategory?: string | string[];
+  academy?: string | string[];
+  region?: string | string[];
+  institution?: string | string[];
+  paysageId?: string | string[];
+  sector?: string | string[];
+  disciplinarySector?: string | string[];
+  domain?: string | string[];
+  keyword?: string | string[];
+  hasSiseInfos?: string;
+  hasRncpInfos?: string;
+  hasRomeInfos?: string;
+}) {
+  return setFilters([
+    { key: FILTER_FIELD_MAP.cycle, value: query.cycle },
+    { key: FILTER_FIELD_MAP.diplomaType, value: query.diplomaType },
+    { key: FILTER_FIELD_MAP.diplomaCode, value: query.diplomaCode },
+    { key: FILTER_FIELD_MAP.diplomaCategory, value: query.diplomaCategory },
+    { key: FILTER_FIELD_MAP.academy, value: query.academy },
+    { key: FILTER_FIELD_MAP.region, value: query.region },
+    { key: FILTER_FIELD_MAP.institution, value: query.institution },
+    { key: FILTER_FIELD_MAP.paysageId, value: query.paysageId },
+    { key: FILTER_FIELD_MAP.sector, value: query.sector },
+    { key: FILTER_FIELD_MAP.disciplinarySector, value: query.disciplinarySector },
+    { key: FILTER_FIELD_MAP.domain, value: query.domain },
+    { key: FILTER_FIELD_MAP.keyword, value: query.keyword },
+    { key: FILTER_FIELD_MAP.hasSiseInfos, value: query.hasSiseInfos },
+    { key: FILTER_FIELD_MAP.hasRncpInfos, value: query.hasRncpInfos },
+    { key: FILTER_FIELD_MAP.hasRomeInfos, value: query.hasRomeInfos },
+  ]);
+}
+
+// Transform program data for export (flatten nested structures)
+function transformProgramForExport(program: ProgramSearch) {
+  const firstEtablissement = program.etablissements?.[0];
+
+  return {
+    inf: program.inf,
+    label: program.label,
+    cycle: program.cycle,
+    diplomaType: program.diploma?.type,
+    diplomaCode: program.diploma?.code,
+    diplomaCategory: program.diploma?.category,
+    accreditationStart: program.accreditation?.startDate,
+    accreditationEnd: program.accreditation?.endDate,
+    etablissementUai: firstEtablissement?.uai,
+    etablissementName: firstEtablissement?.name,
+    etablissementSector: firstEtablissement?.sector,
+    etablissementAcademy: firstEtablissement?.academy,
+    etablissementRegion: firstEtablissement?.region,
+    etablissementCity: firstEtablissement?.address?.city,
+    etablissementCount: program.etablissements?.length ?? 0,
+    hasSiseInfos: program.hasSiseInfos,
+    hasRncpInfos: program.hasRncpInfos,
+    hasRomeInfos: program.hasRomeInfos,
+  };
+}
+
+// Column headers for XLSX export
+const XLSX_HEADERS = {
+  inf: 'Identifiant',
+  label: 'Intitulé',
+  cycle: 'Cycle',
+  diplomaType: 'Type de diplôme',
+  diplomaCode: 'Code diplôme',
+  diplomaCategory: 'Catégorie diplôme',
+  accreditationStart: 'Début accréditation',
+  accreditationEnd: 'Fin accréditation',
+  etablissementUai: 'UAI établissement',
+  etablissementName: 'Nom établissement',
+  etablissementSector: 'Secteur',
+  etablissementAcademy: 'Académie',
+  etablissementRegion: 'Région',
+  etablissementCity: 'Ville',
+  etablissementCount: "Nombre d'établissements",
+  hasSiseInfos: 'Données SISE',
+  hasRncpInfos: 'Données RNCP',
+  hasRomeInfos: 'Données ROME',
+};
+
+// Export query schema (extends search params with format)
+const exportParamsSchema = t.Composite([
+  t.Omit(programsParamsSchema, ['page', 'pageSize']),
+  t.Object({
+    format: t.Union([t.Literal('json'), t.Literal('xlsx')], {
+      description: 'Export format (json or xlsx)',
+    }),
+    maxResults: t.Optional(
+      t.Numeric({
+        description: `Maximum number of results to export (default: ${EXPORT_CONFIG.maxResults})`,
+        default: EXPORT_CONFIG.maxResults,
+      }),
+    ),
+  }),
+]);
+
 export const programsRoutes = new Elysia({ prefix: '/programs' })
   .use(authMacro)
   .get(
@@ -90,23 +199,23 @@ export const programsRoutes = new Elysia({ prefix: '/programs' })
       const from = (page - 1) * pageSize;
 
       // Build filters array
-      const filters = setFilters([
-        { key: FILTER_FIELD_MAP.cycle, value: cycle },
-        { key: FILTER_FIELD_MAP.diplomaType, value: diplomaType },
-        { key: FILTER_FIELD_MAP.diplomaCode, value: diplomaCode },
-        { key: FILTER_FIELD_MAP.diplomaCategory, value: diplomaCategory },
-        { key: FILTER_FIELD_MAP.academy, value: academy },
-        { key: FILTER_FIELD_MAP.region, value: region },
-        { key: FILTER_FIELD_MAP.institution, value: institution },
-        { key: FILTER_FIELD_MAP.paysageId, value: paysageId },
-        { key: FILTER_FIELD_MAP.sector, value: sector },
-        { key: FILTER_FIELD_MAP.disciplinarySector, value: disciplinarySector },
-        { key: FILTER_FIELD_MAP.domain, value: domain },
-        { key: FILTER_FIELD_MAP.keyword, value: keyword },
-        { key: FILTER_FIELD_MAP.hasSiseInfos, value: hasSiseInfos },
-        { key: FILTER_FIELD_MAP.hasRncpInfos, value: hasRncpInfos },
-        { key: FILTER_FIELD_MAP.hasRomeInfos, value: hasRomeInfos },
-      ]);
+      const filters = buildFilters({
+        cycle,
+        diplomaType,
+        diplomaCode,
+        diplomaCategory,
+        academy,
+        region,
+        institution,
+        paysageId,
+        sector,
+        disciplinarySector,
+        domain,
+        keyword,
+        hasSiseInfos,
+        hasRncpInfos,
+        hasRomeInfos,
+      });
 
       const searchResponse = await elastic.programs
         .search<ProgramSearch>({
@@ -162,6 +271,217 @@ export const programsRoutes = new Elysia({ prefix: '/programs' })
     },
   )
   .get(
+    '/export',
+    async ({ query, set }) => {
+      const {
+        q,
+        format,
+        maxResults = EXPORT_CONFIG.maxResults,
+        cycle,
+        diplomaType,
+        diplomaCode,
+        diplomaCategory,
+        academy,
+        region,
+        institution,
+        paysageId,
+        sector,
+        disciplinarySector,
+        domain,
+        keyword,
+        hasSiseInfos,
+        hasRncpInfos,
+        hasRomeInfos,
+      } = query;
+
+      // Limit max results to prevent abuse
+      const effectiveMaxResults = Math.min(Number(maxResults), EXPORT_CONFIG.maxResults);
+
+      // Build the query
+      const textQuery = q ? { query_string: { query: q } } : { match_all: {} };
+      const filters = buildFilters({
+        cycle,
+        diplomaType,
+        diplomaCode,
+        diplomaCategory,
+        academy,
+        region,
+        institution,
+        paysageId,
+        sector,
+        disciplinarySector,
+        domain,
+        keyword,
+        hasSiseInfos,
+        hasRncpInfos,
+        hasRomeInfos,
+      });
+
+      const esQuery = {
+        bool: {
+          must: [textQuery],
+          filter: filters,
+        },
+      };
+
+      const timestamp = new Date().toISOString().split('T')[0];
+
+      // Collect all results using search_after with PIT (Point In Time)
+      const allPrograms: ReturnType<typeof transformProgramForExport>[] = [];
+
+      // Create a Point In Time to ensure consistent results
+      // @ts-expect-error - proxy injects index at runtime
+      const pitResponse = await elastic.programs.openPointInTime({
+        keep_alive: EXPORT_CONFIG.pitKeepAlive,
+      });
+      let pitId = pitResponse.id;
+
+      try {
+        let searchAfter: (string | number)[] | undefined;
+        let hasMore = true;
+
+        while (hasMore && allPrograms.length < effectiveMaxResults) {
+          const searchResponse = await elastic.client.search<ProgramSearch>({
+            size: Math.min(EXPORT_CONFIG.batchSize, effectiveMaxResults - allPrograms.length),
+            query: esQuery,
+            pit: {
+              id: pitId,
+              keep_alive: EXPORT_CONFIG.pitKeepAlive,
+            },
+            sort: [{ _shard_doc: 'asc' }], // Most efficient sort for iteration
+            ...(searchAfter && { search_after: searchAfter }),
+            track_total_hits: false, // Faster pagination
+            _source: true,
+          });
+
+          const hits = searchResponse.hits.hits;
+
+          if (hits.length === 0) {
+            hasMore = false;
+            break;
+          }
+
+          // Process batch
+          for (const hit of hits) {
+            if (hit._source && allPrograms.length < effectiveMaxResults) {
+              allPrograms.push(transformProgramForExport(hit._source as ProgramSearch));
+            }
+          }
+
+          // Get sort values from last hit for next page
+          const lastHit = hits.at(-1);
+          if (lastHit?.sort) {
+            searchAfter = lastHit.sort as (string | number)[];
+          }
+
+          // Update PIT ID if it changed
+          if (searchResponse.pit_id) {
+            pitId = searchResponse.pit_id;
+          }
+        }
+      } catch (err) {
+        console.error('Export error:', err);
+        throw new DatabaseError(err instanceof Error ? err.message : 'Error during export');
+      } finally {
+        // Always clean up the PIT
+        await elastic.programs.closePointInTime({ id: pitId }).catch(() => {
+          // Ignore errors when closing PIT
+        });
+      }
+
+      const totalCount = allPrograms.length;
+
+      // Return JSON format
+      if (format === 'json') {
+        const filename = `formations-export-${timestamp}.json`;
+
+        set.headers['Content-Type'] = 'application/json';
+        set.headers['Content-Disposition'] = `attachment; filename="${filename}"`;
+        set.headers['X-Total-Count'] = String(totalCount);
+
+        return {
+          exportedAt: new Date().toISOString(),
+          totalCount,
+          programs: allPrograms,
+        };
+      }
+
+      // Generate XLSX
+      const filename = `formations-export-${timestamp}.xlsx`;
+
+      // Create worksheet with headers
+      const worksheetData = [
+        Object.values(XLSX_HEADERS), // Header row
+        ...allPrograms.map((program) =>
+          Object.keys(XLSX_HEADERS).map((key) => {
+            const value = program[key as keyof typeof program];
+            // Convert booleans to Oui/Non for readability
+            if (typeof value === 'boolean') {
+              return value ? 'Oui' : 'Non';
+            }
+            return value ?? '';
+          }),
+        ),
+      ];
+
+      const worksheet = XLSX.utils.aoa_to_sheet(worksheetData);
+
+      // Set column widths for better readability
+      const colWidths = [
+        { wch: 15 }, // inf
+        { wch: 60 }, // label
+        { wch: 8 }, // cycle
+        { wch: 20 }, // diplomaType
+        { wch: 15 }, // diplomaCode
+        { wch: 20 }, // diplomaCategory
+        { wch: 15 }, // accreditationStart
+        { wch: 15 }, // accreditationEnd
+        { wch: 12 }, // etablissementUai
+        { wch: 40 }, // etablissementName
+        { wch: 10 }, // etablissementSector
+        { wch: 20 }, // etablissementAcademy
+        { wch: 25 }, // etablissementRegion
+        { wch: 20 }, // etablissementCity
+        { wch: 20 }, // etablissementCount
+        { wch: 12 }, // hasSiseInfos
+        { wch: 12 }, // hasRncpInfos
+        { wch: 12 }, // hasRomeInfos
+      ];
+      worksheet['!cols'] = colWidths;
+
+      // Create workbook
+      const workbook = XLSX.utils.book_new();
+      XLSX.utils.book_append_sheet(workbook, worksheet, 'Formations');
+
+      // Generate buffer
+      const xlsxBuffer = XLSX.write(workbook, {
+        type: 'buffer',
+        bookType: 'xlsx',
+        compression: true,
+      });
+
+      set.headers['Content-Type'] =
+        'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet';
+      set.headers['Content-Disposition'] = `attachment; filename="${filename}"`;
+      set.headers['Content-Length'] = String(xlsxBuffer.length);
+      set.headers['X-Total-Count'] = String(totalCount);
+
+      return new Response(xlsxBuffer, {
+        headers: set.headers as HeadersInit,
+      });
+    },
+    {
+      isAuth: true,
+      query: exportParamsSchema,
+      detail: {
+        description:
+          'Export les formations au format JSON ou XLSX. Utilise le scroll Elasticsearch pour exporter de grands volumes de données.',
+        summary: 'Exporter les formations',
+        tags: ['Formations'],
+      },
+    },
+  )
+  .get(
     '/facets',
     async ({ query }) => {
       const {
@@ -185,23 +505,23 @@ export const programsRoutes = new Elysia({ prefix: '/programs' })
 
       const textQuery = q ? { query_string: { query: q } } : { match_all: {} };
 
-      const filters = setFilters([
-        { key: FILTER_FIELD_MAP.cycle, value: cycle },
-        { key: FILTER_FIELD_MAP.diplomaType, value: diplomaType },
-        { key: FILTER_FIELD_MAP.diplomaCode, value: diplomaCode },
-        { key: FILTER_FIELD_MAP.diplomaCategory, value: diplomaCategory },
-        { key: FILTER_FIELD_MAP.academy, value: academy },
-        { key: FILTER_FIELD_MAP.region, value: region },
-        { key: FILTER_FIELD_MAP.institution, value: institution },
-        { key: FILTER_FIELD_MAP.paysageId, value: paysageId },
-        { key: FILTER_FIELD_MAP.sector, value: sector },
-        { key: FILTER_FIELD_MAP.disciplinarySector, value: disciplinarySector },
-        { key: FILTER_FIELD_MAP.domain, value: domain },
-        { key: FILTER_FIELD_MAP.keyword, value: keyword },
-        { key: FILTER_FIELD_MAP.hasSiseInfos, value: hasSiseInfos },
-        { key: FILTER_FIELD_MAP.hasRncpInfos, value: hasRncpInfos },
-        { key: FILTER_FIELD_MAP.hasRomeInfos, value: hasRomeInfos },
-      ]);
+      const filters = buildFilters({
+        cycle,
+        diplomaType,
+        diplomaCode,
+        diplomaCategory,
+        academy,
+        region,
+        institution,
+        paysageId,
+        sector,
+        disciplinarySector,
+        domain,
+        keyword,
+        hasSiseInfos,
+        hasRncpInfos,
+        hasRomeInfos,
+      });
 
       const searchResponse = await elastic.programs
         .search({

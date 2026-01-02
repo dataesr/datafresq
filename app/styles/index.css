@@ -1,6 +1,4 @@
-/* @use './animations.scss'; */
-/* @use './icons.scss'; */
-/* @use './x-dsfr.scss'; */
+@import "./animations.css";
 @import "./table.css";
 @import "./layout.css";
 @import "./dsfr-extensions/index.css";
