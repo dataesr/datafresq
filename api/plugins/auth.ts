@@ -23,6 +23,7 @@ export const authPlugin = new Elysia({ name: 'auth-plugin' })
 
     return {
       user: {
+        id: payload.sub,
         email: payload.email.toLowerCase(),
         role: payload.role,
       },

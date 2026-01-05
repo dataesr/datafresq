@@ -1,9 +1,8 @@
 import cn from 'classnames';
+import { Activity } from 'react';
 import { Link, useLocation } from 'react-router';
 import { useWorkspaces } from '@/api/workspaces';
-import CreateWorkspaceForm from '@/components/forms/CreateWorkspaceForm';
 import './sidemenu.css';
-import { Activity } from 'react';
 
 const menuLinks = [
   {
@@ -75,31 +74,44 @@ export default function Sidemenu() {
               }}
             >
               <span className="fr-text--lg fr-mb-0 fr-text--heavy">MES ESPACES</span>
-              <CreateWorkspaceForm />
+              <Link
+                to="/espaces/nouveau"
+                className="fr-btn fr-btn--tertiary-no-outline fr-icon-add-line fr-btn--sm"
+                title="Créer un espace"
+                aria-label="Créer un espace"
+              />
             </div>
             <Activity mode={!isEmpty ? 'visible' : 'hidden'}>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-                {workspaces.map((workspace) => (
-                  <Link
-                    to={`/espaces/${workspace.id}`}
-                    key={workspace.id}
-                    className={cn('fr-nav__link fr-nav__link--sidebar fr-text--heavy', {
-                      'xfr-btn-text-default': !pathname.startsWith(`/espaces/${workspace.id}`),
-                    })}
-                  >
-                    <div>
-                      <span className="clamp-1">
-                        {workspace.name}
-                        <br />
-                      </span>
-                      <span className="fr-text--regular fr-text--xs fr-text-mention--grey">
-                        par {workspace.ownerInfo?.firstName || ''}{' '}
-                        {workspace.ownerInfo?.lastName || ''}
-                      </span>
-                    </div>
-                  </Link>
-                ))}
-              </div>
+              <ul className="sidemenu-workspaces">
+                {workspaces.map((workspace) => {
+                  const isActive = pathname.startsWith(`/espaces/${workspace.id}`);
+                  return (
+                    <li key={workspace.id} className="sidemenu-workspaces__item">
+                      <Link
+                        to={`/espaces/${workspace.id}`}
+                        className={cn('sidemenu-workspaces__link', {
+                          'sidemenu-workspaces__link--active': isActive,
+                        })}
+                      >
+                        <span
+                          className="sidemenu-workspaces__color"
+                          style={{
+                            backgroundColor: `var(--artwork-minor-${workspace.color})`,
+                          }}
+                          aria-hidden="true"
+                        />
+                        <span className="sidemenu-workspaces__content">
+                          <span className="sidemenu-workspaces__name">{workspace.name}</span>
+                          <span className="sidemenu-workspaces__meta">
+                            {workspace.programs?.length || 0} formation
+                            {(workspace.programs?.length || 0) > 1 ? 's' : ''}
+                          </span>
+                        </span>
+                      </Link>
+                    </li>
+                  );
+                })}
+              </ul>
             </Activity>
             <Activity mode={isEmpty ? 'visible' : 'hidden'}>
               <p className="fr-text--sm fr-text-mention--grey fr-pl-2w">Aucun espace de travail</p>

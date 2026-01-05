@@ -8,17 +8,17 @@ import { userLightSchema } from './users';
 export const workspaceUserRoleSchema = t.Union([t.Literal('viewer'), t.Literal('editor')]);
 
 export const workspaceUserSchema = t.Object({
-  email: t.String(),
+  userId: t.String(),
   role: workspaceUserRoleSchema,
   addedAt: t.Date(),
-  addedBy: t.String(),
+  addedBy: t.String(), // userId of user who added this member
 });
 
 export const workspaceUserWithInfoSchema = t.Object({
-  email: t.String(),
+  userId: t.String(),
   role: workspaceUserRoleSchema,
   addedAt: t.Date(),
-  addedBy: t.String(),
+  addedBy: t.String(), // userId of user who added this member
   userInfo: t.Optional(userLightSchema),
 });
 
@@ -31,7 +31,7 @@ export const createWorkspaceSchema = t.Object({
   users: t.Optional(
     t.Array(
       t.Object({
-        email: t.String({ format: 'email' }),
+        userId: t.String(),
         role: workspaceUserRoleSchema,
       }),
     ),
@@ -73,7 +73,7 @@ export const workspaceEventTypeSchema = t.Union([
 ]);
 
 export const workspaceEventDetailsSchema = t.Object({
-  targetUser: t.Optional(t.String()),
+  targetUserId: t.Optional(t.String()),
   userRole: t.Optional(workspaceUserRoleSchema),
   programIds: t.Optional(t.Array(t.String())),
   changes: t.Optional(
@@ -154,14 +154,19 @@ export const workspaceCacheSchema = t.Object({
 export const addUsersSchema = t.Object({
   users: t.Array(
     t.Object({
-      email: t.String({ format: 'email' }),
+      userId: t.String(),
       role: workspaceUserRoleSchema,
     }),
   ),
 });
 
 export const removeUsersSchema = t.Object({
-  users: t.Array(t.String({ format: 'email' })),
+  userIds: t.Array(t.String()),
+});
+
+export const updateUserRoleSchema = t.Object({
+  userId: t.String(),
+  role: workspaceUserRoleSchema,
 });
 
 export const addProgramsSchema = t.Object({
@@ -189,5 +194,6 @@ export type WorkspaceHistoryResponse = typeof workspaceHistoryResponseSchema.sta
 export type WorkspaceCache = typeof workspaceCacheSchema.static;
 export type AddUsers = typeof addUsersSchema.static;
 export type RemoveUsers = typeof removeUsersSchema.static;
+export type UpdateUserRole = typeof updateUserRoleSchema.static;
 export type AddPrograms = typeof addProgramsSchema.static;
 export type RemovePrograms = typeof removeProgramsSchema.static;

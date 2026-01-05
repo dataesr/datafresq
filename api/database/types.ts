@@ -5,7 +5,7 @@ export type WorkspaceUserRole = 'viewer' | 'editor';
 
 // Workspace user with role and metadata
 export interface WorkspaceUserDoc {
-  email: string;
+  userId: string;
   role: WorkspaceUserRole;
   addedAt: Date;
   addedBy: string;
@@ -26,24 +26,17 @@ export type WorkspaceEventType =
 export interface WorkspaceEventDoc {
   workspaceId: string;
   type: WorkspaceEventType;
-  actor: string; // email of user who performed action
+  actor: string;
   timestamp: Date;
   details: {
-    // For user events
-    targetUser?: string;
+    targetUserId?: string;
     userRole?: WorkspaceUserRole;
-
-    // For program events
     programIds?: string[];
-
-    // For workspace updates
     changes?: {
       field: string;
       oldValue?: unknown;
       newValue?: unknown;
     }[];
-
-    // For creation
     workspaceName?: string;
   };
 }
@@ -51,9 +44,9 @@ export interface WorkspaceEventDoc {
 export type UserRole = 'admin' | 'user';
 
 export type UserDoc = {
-  id: string; // stringified ObjectId
+  id: string;
   email: string;
-  passwordHash?: string; // Optional until user sets password
+  passwordHash?: string;
   firstName: string | null;
   lastName: string | null;
   role: UserRole;

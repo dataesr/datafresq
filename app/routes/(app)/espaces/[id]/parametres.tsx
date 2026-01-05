@@ -1,28 +1,42 @@
-import { useId, useState } from 'react';
+import { useState } from 'react';
 import { Link, useNavigate, useParams } from 'react-router';
+import { useAuth } from '@/api/auth';
+import type { UserSearchResult } from '@/api/users';
 import {
   useAddUsers,
   useDeleteWorkspace,
   useRemoveUsers,
+  useUpdateUserRole,
   useUpdateWorkspace,
   useWorkspace,
   useWorkspacePermissions,
 } from '@/api/workspaces';
+import { Avatar } from '@/components/Avatar';
+import { getDisplayName } from '@/components/CollaboratorList';
+import ColorPicker from '@/components/ColorPicker';
+import { Dropdown } from '@/components/Dropdown';
 import { Input } from '@/components/Input';
 import { Modal, useModal } from '@/components/Modal';
+import UserSearchSelect from '@/components/UserSearchSelect';
 import { useToast } from '@/hooks/useToast';
 import type { ReadWorkspace } from '~/schemas/workspaces';
+
+const ROLE_OPTIONS = [
+  { id: 'viewer' as const, label: 'Lecteur' },
+  { id: 'editor' as const, label: 'Éditeur' },
+];
 
 function GeneralSettings({ workspace }: { workspace: ReadWorkspace }) {
   const { toast } = useToast();
   const updateWorkspace = useUpdateWorkspace();
   const [name, setName] = useState(workspace.name);
   const [description, setDescription] = useState(workspace.description || '');
+  const [color, setColor] = useState(workspace.color);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     updateWorkspace.mutate(
-      { id: workspace.id, name, description },
+      { id: workspace.id, name, description, color },
       {
         onSuccess: () => {
           toast({
@@ -71,6 +85,12 @@ function GeneralSettings({ workspace }: { workspace: ReadWorkspace }) {
               onChange={(e) => setDescription(e.target.value)}
             />
           </div>
+          <ColorPicker
+            label="Couleur"
+            hint="Choisissez une couleur pour identifier cet espace"
+            value={color}
+            onChange={setColor}
+          />
           <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
             <button
               type="submit"
@@ -101,15 +121,24 @@ function UserRow({
 }) {
   const { toast } = useToast();
   const removeUsers = useRemoveUsers();
+  const updateUserRole = useUpdateUserRole();
+
+  const displayName = user.userInfo
+    ? getDisplayName({
+        firstName: user.userInfo.firstName,
+        lastName: user.userInfo.lastName,
+        email: user.userInfo.email,
+      })
+    : user.userId;
 
   const handleRemove = () => {
     removeUsers.mutate(
-      { workspaceId, emails: [user.email] },
+      { workspaceId, userIds: [user.userId] },
       {
         onSuccess: () => {
           toast({
             type: 'success',
-            description: `${user.email} a été retiré`,
+            description: `${displayName} a été retiré`,
           });
         },
         onError: (error) => {
@@ -122,9 +151,29 @@ function UserRow({
     );
   };
 
-  const initials =
-    `${user.userInfo?.firstName?.[0] || ''}${user.userInfo?.lastName?.[0] || ''}`.toUpperCase() ||
-    user.email?.[0]?.toUpperCase();
+  const handleRoleChange = (newRole: 'viewer' | 'editor') => {
+    if (newRole === user.role) return;
+
+    updateUserRole.mutate(
+      { workspaceId, userId: user.userId, role: newRole },
+      {
+        onSuccess: () => {
+          toast({
+            type: 'success',
+            description: `${displayName} est maintenant ${newRole === 'editor' ? 'éditeur' : 'lecteur'}`,
+          });
+        },
+        onError: (error) => {
+          toast({
+            type: 'error',
+            description: error.message,
+          });
+        },
+      },
+    );
+  };
+
+  const selectedRoleLabel = ROLE_OPTIONS.find((opt) => opt.id === user.role)?.label || 'Lecteur';
 
   return (
     <li
@@ -133,39 +182,49 @@ function UserRow({
         display: 'flex',
         alignItems: 'center',
         borderBottom: '1px solid var(--border-default-grey)',
+        gap: '.5rem',
       }}
     >
-      <div
-        style={{
-          width: 40,
-          height: 40,
-          borderRadius: '50%',
-          backgroundColor: 'var(--background-action-high-blue-france)',
-          color: 'var(--text-inverted-grey)',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          fontWeight: 'bold',
-          marginRight: '1rem',
-        }}
-      >
-        {initials}
-      </div>
-      <div style={{ flex: 1 }}>
-        <p className="fr-mb-0 fr-text--bold">
-          {user.userInfo?.firstName} {user.userInfo?.lastName}
+      <Avatar name={displayName} size={40} />
+      <div style={{ flex: 1, minWidth: 0 }}>
+        <p
+          className="fr-mb-0 fr-text--bold"
+          style={{ overflow: 'hidden', textOverflow: 'ellipsis' }}
+        >
+          {displayName}
         </p>
-        <p className="fr-mb-0 fr-text--sm fr-text-mention--grey">{user.email}</p>
+        <p
+          className="fr-mb-0 fr-text--sm fr-text-mention--grey"
+          style={{ overflow: 'hidden', textOverflow: 'ellipsis' }}
+        >
+          {user.userInfo?.email}
+        </p>
       </div>
-      <span
-        className={`fr-badge fr-badge--sm ${user.role === 'editor' ? 'fr-badge--green-emeraude' : 'fr-badge--blue-cumulus'}`}
-      >
-        {user.role === 'editor' ? 'Éditeur' : 'Lecteur'}
-      </span>
+      {isOwner ? (
+        <Dropdown label={selectedRoleLabel} size="sm" outline disabled={updateUserRole.isPending}>
+          {ROLE_OPTIONS.map((option) => (
+            <button
+              key={option.id}
+              type="button"
+              role="menuitem"
+              className={`fx-dropdown__item ${user.role === option.id ? 'fx-dropdown__item--active' : ''}`}
+              onClick={() => handleRoleChange(option.id)}
+            >
+              {option.label}
+            </button>
+          ))}
+        </Dropdown>
+      ) : (
+        <span
+          className={`fr-badge fr-badge--sm ${user.role === 'editor' ? 'fr-badge--green-emeraude' : 'fr-badge--blue-cumulus'}`}
+        >
+          {user.role === 'editor' ? 'Éditeur' : 'Lecteur'}
+        </span>
+      )}
       {isOwner && (
         <button
           type="button"
-          className="fr-btn fr-btn--sm fr-btn--tertiary-no-outline fr-icon-delete-line fr-ml-2w"
+          className="fr-btn fr-btn--sm fr-btn--tertiary-no-outline fr-icon-delete-line"
           title="Retirer cet utilisateur"
           onClick={handleRemove}
           disabled={removeUsers.isPending}
@@ -177,24 +236,31 @@ function UserRow({
   );
 }
 
-function AddUserModal({ workspaceId, onClose }: { workspaceId: string; onClose: () => void }) {
+function UsersSettings({ workspace }: { workspace: ReadWorkspace }) {
   const { toast } = useToast();
+  const { user: currentUser } = useAuth();
   const addUsers = useAddUsers();
-  const [email, setEmail] = useState('');
-  const [role, setRole] = useState<'viewer' | 'editor'>('viewer');
-  const emailId = useId();
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
+  // Exclude existing users, the owner, and the current user
+  const existingUserIds = workspace.users.map((u) => u.userId);
+  const excludeUserIds = [
+    ...existingUserIds,
+    workspace.owner,
+    ...(currentUser ? [currentUser.id] : []),
+  ];
+
+  const handleUserSelect = (user: UserSearchResult) => {
     addUsers.mutate(
-      { workspaceId, users: [{ email, role }] },
+      {
+        workspaceId: workspace.id,
+        users: [{ userId: user.id, role: 'viewer' }],
+      },
       {
         onSuccess: () => {
           toast({
             type: 'success',
-            description: `${email} a été ajouté`,
+            description: `${getDisplayName({ firstName: user.firstName, lastName: user.lastName, email: user.email })} a été ajouté comme lecteur`,
           });
-          onClose();
         },
         onError: (error) => {
           toast({
@@ -207,135 +273,34 @@ function AddUserModal({ workspaceId, onClose }: { workspaceId: string; onClose: 
   };
 
   return (
-    <form onSubmit={handleSubmit}>
-      <div className="fr-input-group">
-        <label className="fr-label" htmlFor={emailId}>
-          Email de l'utilisateur
-        </label>
-        <input
-          id={emailId}
-          className="fr-input"
-          type="email"
-          required
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          placeholder="utilisateur@example.com"
-        />
-      </div>
-
-      <fieldset className="fr-fieldset">
-        <legend className="fr-fieldset__legend fr-text--regular">Rôle</legend>
-        <div className="fr-fieldset__content">
-          <div className="fr-radio-group">
-            <input
-              type="radio"
-              id="role-viewer"
-              name="role"
-              value="viewer"
-              checked={role === 'viewer'}
-              onChange={() => setRole('viewer')}
-            />
-            <label className="fr-label" htmlFor="role-viewer">
-              Lecteur
-              <span className="fr-hint-text">Peut voir le contenu de l'espace</span>
-            </label>
-          </div>
-          <div className="fr-radio-group">
-            <input
-              type="radio"
-              id="role-editor"
-              name="role"
-              value="editor"
-              checked={role === 'editor'}
-              onChange={() => setRole('editor')}
-            />
-            <label className="fr-label" htmlFor="role-editor">
-              Éditeur
-              <span className="fr-hint-text">Peut ajouter et retirer des formations</span>
-            </label>
-          </div>
-        </div>
-      </fieldset>
-
-      <div className="fr-modal__footer">
-        <ul className="fr-btns-group fr-btns-group--right fr-btns-group--inline-lg">
-          <li>
-            <button type="button" className="fr-btn fr-btn--secondary" onClick={onClose}>
-              Annuler
-            </button>
-          </li>
-          <li>
-            <button
-              type="submit"
-              className="fr-btn fr-icon-user-add-line fr-btn--icon-left"
-              disabled={addUsers.isPending}
-            >
-              {addUsers.isPending ? 'Ajout...' : 'Ajouter'}
-            </button>
-          </li>
-        </ul>
-      </div>
-    </form>
-  );
-}
-
-function UsersSettings({ workspace }: { workspace: ReadWorkspace }) {
-  const { modalProps, open, close } = useModal();
-
-  return (
     <div className="fr-grid-row fr-pb-6w">
       <div className="fr-col-12 fr-col-md-4 fr-px-1w">
-        <p className="fr-text--lead fr-text--bold fr-mb-1w">Utilisateurs</p>
+        <p className="fr-text--lead fr-text--bold fr-mb-1w">Collaborateurs</p>
         <p className="fr-text--sm fr-text-mention--grey fr-mb-0">
           Les éditeurs peuvent ajouter et retirer des formations. Les lecteurs peuvent uniquement
           consulter le contenu.
         </p>
       </div>
       <div className="fr-col-12 fr-col-md-6 fr-col-offset-md-2 fr-px-2w">
-        {workspace.users.length === 0 ? (
-          <p className="fr-text--sm fr-text-mention--grey">Aucun utilisateur ajouté</p>
-        ) : (
-          <ul style={{ listStyle: 'none', padding: 0, margin: 0 }}>
-            {workspace.users.map((user) => (
-              <UserRow key={user.email} user={user} workspaceId={workspace.id} isOwner />
-            ))}
-          </ul>
-        )}
+        {/* Add new users section */}
+        <UserSearchSelect
+          label="Ajouter un collaborateur"
+          hint=" - Recherchez par nom ou email"
+          placeholder="Rechercher un utilisateur..."
+          onSelect={handleUserSelect}
+          excludeUserIds={excludeUserIds}
+        />
 
-        <div className="fr-mt-3w" style={{ display: 'flex', justifyContent: 'flex-end' }}>
-          <button
-            type="button"
-            className="fr-btn fr-btn--sm fr-btn--icon-left fr-icon-user-add-line"
-            onClick={open}
-          >
-            Ajouter un utilisateur
-          </button>
-        </div>
-
-        <Modal {...modalProps}>
-          <div className="fr-container fr-container--fluid fr-container-md">
-            <div className="fr-grid-row fr-grid-row--center">
-              <div className="fr-col-12 fr-col-md-6">
-                <div className="fr-modal__body">
-                  <div className="fr-modal__header">
-                    <button
-                      type="button"
-                      className="fr-btn--close fr-btn"
-                      title="Fermer"
-                      onClick={close}
-                    >
-                      Fermer
-                    </button>
-                  </div>
-                  <div className="fr-modal__content">
-                    <h1 className="fr-modal__title">Ajouter un utilisateur</h1>
-                    <AddUserModal workspaceId={workspace.id} onClose={close} />
-                  </div>
-                </div>
-              </div>
-            </div>
+        {/* Existing users */}
+        {workspace.users.length > 0 && (
+          <div className="fr-mt-3w">
+            <ul style={{ listStyle: 'none', padding: 0, margin: 0 }}>
+              {workspace.users.map((user) => (
+                <UserRow key={user.userId} user={user} workspaceId={workspace.id} isOwner />
+              ))}
+            </ul>
           </div>
-        </Modal>
+        )}
       </div>
     </div>
   );
@@ -349,14 +314,16 @@ function VisibilitySettings({ workspace }: { workspace: ReadWorkspace }) {
   const { toast } = useToast();
   const updateWorkspace = useUpdateWorkspace();
 
-  const handleToggle = () => {
+  const handleToggle = (isPublic: boolean) => {
+    if (isPublic === workspace.isPublic) return;
+
     updateWorkspace.mutate(
-      { id: workspace.id, isPublic: !workspace.isPublic },
+      { id: workspace.id, isPublic },
       {
         onSuccess: () => {
           toast({
             type: 'success',
-            description: `L'espace est maintenant ${!workspace.isPublic ? 'public' : 'privé'}`,
+            description: `L'espace est maintenant ${isPublic ? 'public' : 'privé'}`,
           });
         },
         onError: (error) => {
@@ -374,51 +341,38 @@ function VisibilitySettings({ workspace }: { workspace: ReadWorkspace }) {
       <div className="fr-col-12 fr-col-md-4 fr-px-1w">
         <p className="fr-text--lead fr-text--bold fr-mb-1w">Visibilité</p>
         <p className="fr-text--sm fr-text-mention--grey fr-mb-0">
-          Un espace privé n'est visible que par vous et les personnes que vous invitez. Un espace
-          public est visible par tous les utilisateurs.
+          Définissez qui peut voir cet espace
         </p>
       </div>
       <div className="fr-col-12 fr-col-md-6 fr-col-offset-md-2 fr-px-2w">
-        <fieldset
-          className="fr-segmented"
-          style={{ width: '100%' }}
-          disabled={updateWorkspace.isPending}
-        >
-          <div className="fr-segmented__elements" style={{ width: '100%' }}>
-            <div className="fr-segmented__element" style={{ flex: '0 0 50%' }}>
+        <fieldset className="fr-fieldset" disabled={updateWorkspace.isPending}>
+          <div className="fr-fieldset__content">
+            <div className="fr-radio-group">
               <input
                 type="radio"
                 id="visibility-private"
                 name="visibility"
-                value="private"
                 checked={!workspace.isPublic}
-                onChange={handleToggle}
+                onChange={() => handleToggle(false)}
               />
-              <label
-                className={`fr-label ${!workspace.isPublic ? 'fr-icon-check-line' : ''}`}
-                htmlFor="visibility-private"
-                style={{ padding: '1.5rem', justifyContent: 'center' }}
-              >
-                <span className="fr-icon-lock-line fr-icon--sm fr-mr-1w" aria-hidden="true" />
+              <label className="fr-label" htmlFor="visibility-private">
                 Privé
+                <span className="fr-hint-text">
+                  Seuls vous et les collaborateurs invités peuvent y accéder
+                </span>
               </label>
             </div>
-            <div className="fr-segmented__element" style={{ flex: '0 0 50%' }}>
+            <div className="fr-radio-group">
               <input
                 type="radio"
                 id="visibility-public"
                 name="visibility"
-                value="public"
                 checked={workspace.isPublic}
-                onChange={handleToggle}
+                onChange={() => handleToggle(true)}
               />
-              <label
-                className={`fr-label ${workspace.isPublic ? 'fr-icon-check-line' : ''}`}
-                htmlFor="visibility-public"
-                style={{ padding: '1.5rem', justifyContent: 'center' }}
-              >
-                <span className="fr-icon-global-line fr-icon--sm fr-mr-1w" aria-hidden="true" />
+              <label className="fr-label" htmlFor="visibility-public">
                 Public
+                <span className="fr-hint-text">Visible par tous les utilisateurs</span>
               </label>
             </div>
           </div>
@@ -469,7 +423,7 @@ function DangerZone({ workspace }: { workspace: ReadWorkspace }) {
           Zone de danger
         </p>
         <p className="fr-text--sm fr-text-mention--grey fr-mb-0">
-          Actions irréversibles. Soyez prudent.
+          Actions irréversibles sur cet espace
         </p>
       </div>
       <div className="fr-col-12 fr-col-md-6 fr-col-offset-md-2 fr-px-2w">
@@ -477,12 +431,13 @@ function DangerZone({ workspace }: { workspace: ReadWorkspace }) {
           style={{
             padding: '1.5rem',
             border: '1px solid var(--border-default-error)',
-            borderRadius: '8px',
+            borderRadius: '0.5rem',
           }}
         >
           <p className="fr-text--bold fr-mb-1w">Supprimer cet espace de travail</p>
           <p className="fr-text--sm fr-text-mention--grey fr-mb-2w">
-            Cette action est irréversible. Toutes les données associées seront supprimées.
+            Une fois supprimé, l'espace de travail et toutes ses données seront définitivement
+            perdus. Cette action est irréversible.
           </p>
           <button
             type="button"
@@ -573,36 +528,47 @@ function DangerZone({ workspace }: { workspace: ReadWorkspace }) {
 // =============================================================================
 
 export default function Parametres() {
-  const { id: workspaceId = '' } = useParams<{ id: string }>();
+  const { id: workspaceId } = useParams();
+  const { data: workspace, isLoading, isError } = useWorkspace(workspaceId!);
+  const { isOwner } = useWorkspacePermissions(workspaceId!);
 
-  const { data: workspace } = useWorkspace(workspaceId);
-  const { isOwner } = useWorkspacePermissions(workspaceId);
+  if (isLoading) {
+    return <div className="fr-py-4w">Chargement...</div>;
+  }
+
+  if (isError || !workspace) {
+    return (
+      <div className="fr-py-4w">
+        <p className="fr-text--error">Impossible de charger les paramètres de l'espace.</p>
+        <Link to="/espaces" className="fr-btn fr-btn--secondary">
+          Retour aux espaces
+        </Link>
+      </div>
+    );
+  }
 
   if (!isOwner) {
     return (
       <div className="fr-py-4w">
-        <div className="fr-callout fr-callout--red-marianne">
-          <h3 className="fr-callout__title">Accès refusé</h3>
-          <p className="fr-callout__text">
-            Seul le propriétaire peut modifier les paramètres de cet espace de travail.
-          </p>
-          <Link to={`/espaces/${workspaceId}`} className="fr-btn fr-btn--secondary">
-            Retour à l'espace de travail
-          </Link>
-        </div>
+        <p className="fr-text--error">
+          Vous n'avez pas les droits pour modifier les paramètres de cet espace.
+        </p>
+        <Link to={`/espaces/${workspaceId}`} className="fr-btn fr-btn--secondary">
+          Retour à l'espace
+        </Link>
       </div>
     );
   }
 
   return (
-    <div className="fr-py-4w">
-      <GeneralSettings key={`general-settings-${workspaceId}`} workspace={workspace} />
+    <div>
+      <GeneralSettings key={`general-${workspaceId}`} workspace={workspace} />
       <hr />
-      <UsersSettings key={`users-settings-${workspaceId}`} workspace={workspace} />
+      <UsersSettings key={`users-${workspaceId}`} workspace={workspace} />
       <hr />
-      <VisibilitySettings key={`visibility-settings-${workspaceId}`} workspace={workspace} />
+      <VisibilitySettings key={`visibility-${workspaceId}`} workspace={workspace} />
       <hr />
-      <DangerZone key={`danger-zone-${workspaceId}`} workspace={workspace} />
+      <DangerZone key={`danger-${workspaceId}`} workspace={workspace} />
     </div>
   );
 }

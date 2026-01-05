@@ -1,6 +1,12 @@
-import { useMutation, useQueryClient, useSuspenseQuery } from '@tanstack/react-query';
+import { useMutation, useQuery, useQueryClient, useSuspenseQuery } from '@tanstack/react-query';
 import { APIError, api } from '@/api/eden-treaty';
-import type { ChangePassword, UpdateUser } from '~/schemas/users';
+import type { ChangePassword, UpdateUser, UserSearch } from '~/schemas/users';
+
+// =============================================================================
+// TYPES
+// =============================================================================
+
+export type UserSearchResult = UserSearch;
 
 // =============================================================================
 // QUERY KEYS
@@ -8,6 +14,7 @@ import type { ChangePassword, UpdateUser } from '~/schemas/users';
 
 export const userKeys = {
   sessions: ['user', 'sessions'] as const,
+  search: (query: string) => ['users', 'search', query] as const,
 };
 
 // =============================================================================
@@ -44,6 +51,15 @@ async function revokeAllSessions() {
   return { success: true, message: data.message };
 }
 
+async function searchUsers(query: string): Promise<UserSearchResult[]> {
+  if (!query || query.length < 2) {
+    return [];
+  }
+  const { data, error } = await api.users.search.get({ query: { q: query } });
+  if (error) throw new APIError(error);
+  return data;
+}
+
 // =============================================================================
 // QUERY HOOKS
 // =============================================================================
@@ -53,6 +69,16 @@ export function useSessions() {
     queryKey: userKeys.sessions,
     queryFn: getSessions,
     staleTime: 30 * 1000, // 30 seconds
+  });
+}
+
+export function useUserSearch(query: string) {
+  return useQuery({
+    queryKey: userKeys.search(query),
+    queryFn: () => searchUsers(query),
+    enabled: query.length >= 2,
+    staleTime: 60 * 1000, // 1 minute
+    placeholderData: (previousData) => previousData, // Keep previous results while loading new ones
   });
 }
 

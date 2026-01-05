@@ -44,6 +44,7 @@ async function createWorkspace(input: {
   description?: string;
   color?: string;
   isPublic?: boolean;
+  users?: { userId: string; role: 'viewer' | 'editor' }[];
 }) {
   const { data, error } = await api.workspaces.post(input);
   if (error) throw new APIError(error);
@@ -75,15 +76,29 @@ async function addUsers({
   users,
 }: {
   workspaceId: string;
-  users: { email: string; role: 'viewer' | 'editor' }[];
+  users: { userId: string; role: 'viewer' | 'editor' }[];
 }) {
   const { data, error } = await api.workspaces({ id: workspaceId }).users.post({ users });
   if (error) throw new APIError(error);
   return data;
 }
 
-async function removeUsers({ workspaceId, emails }: { workspaceId: string; emails: string[] }) {
-  const { data, error } = await api.workspaces({ id: workspaceId }).users.delete({ users: emails });
+async function removeUsers({ workspaceId, userIds }: { workspaceId: string; userIds: string[] }) {
+  const { data, error } = await api.workspaces({ id: workspaceId }).users.delete({ userIds });
+  if (error) throw new APIError(error);
+  return data;
+}
+
+async function updateUserRole({
+  workspaceId,
+  userId,
+  role,
+}: {
+  workspaceId: string;
+  userId: string;
+  role: 'viewer' | 'editor';
+}) {
+  const { data, error } = await api.workspaces({ id: workspaceId }).users.patch({ userId, role });
   if (error) throw new APIError(error);
   return data;
 }
@@ -214,10 +229,10 @@ export function useWorkspacePermissions(workspaceId: string): WorkspacePermissio
   const { data: workspace } = useWorkspace(workspaceId);
   const { user } = useAuth();
 
-  const userEmail = user?.email;
+  const userId = user?.id;
 
-  const isOwner = workspace.owner === userEmail;
-  const userMembership = workspace.users.find((u) => u.email === userEmail);
+  const isOwner = workspace.owner === userId;
+  const userMembership = workspace.users.find((u) => u.userId === userId);
   const isEditor = userMembership?.role === 'editor';
   const isViewer = userMembership?.role === 'viewer';
   const isMember = !!userMembership || isOwner;
@@ -307,6 +322,21 @@ export function useRemoveUsers() {
 
   return useMutation({
     mutationFn: removeUsers,
+    onSuccess: (updatedWorkspace) => {
+      queryClient.setQueryData(workspaceQueryKeys.detail(updatedWorkspace.id), updatedWorkspace);
+      queryClient.invalidateQueries({ queryKey: workspaceQueryKeys.detail(updatedWorkspace.id) });
+      queryClient.invalidateQueries({
+        queryKey: workspaceQueryKeys.history(updatedWorkspace.id),
+      });
+    },
+  });
+}
+
+export function useUpdateUserRole() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: updateUserRole,
     onSuccess: (updatedWorkspace) => {
       queryClient.setQueryData(workspaceQueryKeys.detail(updatedWorkspace.id), updatedWorkspace);
       queryClient.invalidateQueries({ queryKey: workspaceQueryKeys.detail(updatedWorkspace.id) });

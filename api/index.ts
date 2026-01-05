@@ -11,6 +11,7 @@ import { logger } from './plugins/logger';
 import { invitationRoutes } from './routes/invitations';
 import { meRoutes } from './routes/me';
 import { sessionsRoutes } from './routes/sessions';
+import { usersRoutes } from './routes/users';
 import { errorResponseSchema } from './schemas/common';
 
 export const app = new Elysia({ prefix: '/api' })
@@ -57,6 +58,7 @@ export const app = new Elysia({ prefix: '/api' })
   .use(meRoutes)
   .use(programsRoutes)
   .use(sessionsRoutes)
+  .use(usersRoutes)
   .use(workspacesRoutes);
 
 export type App = typeof app;

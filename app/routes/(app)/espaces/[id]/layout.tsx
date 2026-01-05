@@ -46,25 +46,22 @@ export default function EspaceLayout() {
     workspace.ownerInfo
       ? {
           id: workspace.owner,
-          email: workspace.owner,
+          email: workspace.ownerInfo.email,
           firstName: workspace.ownerInfo.firstName,
           lastName: workspace.ownerInfo.lastName,
-          avatar: workspace.ownerInfo.avatar,
         }
       : null,
     ...workspace.users.map((u) => ({
-      id: u.email,
-      email: u.email,
+      id: u.userId,
+      email: u.userInfo?.email ?? '',
       firstName: u.userInfo?.firstName,
       lastName: u.userInfo?.lastName,
-      avatar: u.userInfo?.avatar,
     })),
   ].filter(Boolean) as {
     id: string;
     email: string;
     firstName?: string | null;
     lastName?: string | null;
-    avatar?: string | null;
   }[];
 
   const tabs = [
@@ -133,7 +130,15 @@ export default function EspaceLayout() {
             >
               <div style={{ flex: 1 }}>
                 <Avatars users={allUsers} size={32} />
-                <h1 className="fr-h2 fr-mb-1w">{workspace.name}</h1>
+                <h1 className="fr-h2 fr-mb-3v">{workspace.name}</h1>
+                <div
+                  style={{
+                    height: '4px',
+                    backgroundColor: `var(--artwork-minor-${workspace.color})`,
+                    borderRadius: '2px',
+                    marginBottom: '.75rem',
+                  }}
+                />
                 <p className="fr-text--sm fr-text-mention--grey fr-mb-1w">
                   <span className="fr-icon-inbox-line fr-icon--sm fr-mr-1w" aria-hidden="true" />
                   {workspace.programs.length} formation{workspace.programs.length > 1 ? 's' : ''}

@@ -3,60 +3,67 @@ import { Activity, useState } from 'react';
 import { Link } from 'react-router';
 import { usePublicWorkspaces, useWorkspaces } from '@/api/workspaces';
 import { DebouncedInput } from '@/components/debounced-input';
-import CreateWorkspaceForm from '@/components/forms/CreateWorkspaceForm';
 import { AutoGrid } from '@/components/Grids/AutoGrid';
 import type { ReadWorkspace } from '~/schemas/workspaces';
 
 function WorkspaceBadge({ isPublic }: { isPublic: boolean }) {
   return (
-    <p
+    <span
       className={cn(
-        'fr-badge fr-badge--sm',
-        isPublic ? 'fr-badge--green-emeraude' : 'fr-badge--pink-tuile',
+        'fr-badge fr-badge--sm fr-badge--no-icon',
+        isPublic ? 'fr-badge--green-emeraude' : 'fr-badge--blue-cumulus',
       )}
     >
       {isPublic ? 'Public' : 'Privé'}
-    </p>
+    </span>
   );
 }
 
 function WorkspaceCardSkeleton() {
   return (
-    <div className="fr-card fr-card--sm fr-card--shadow">
-      <div className="fr-card__body">
-        <div className="fr-card__content">
-          <div
-            className="fr-my-1w"
-            style={{ height: '1.5rem', width: '70%', background: 'var(--background-alt-grey)' }}
-          />
-          <div
-            className="fr-my-1w"
-            style={{ height: '1rem', width: '100%', background: 'var(--background-alt-grey)' }}
-          />
-          <div
-            className="fr-my-1w"
-            style={{ height: '1rem', width: '50%', background: 'var(--background-alt-grey)' }}
-          />
-        </div>
-      </div>
-      <div className="fr-card__header">
-        <div
-          className="fr-card__img"
-          style={{
-            height: '120px',
-            background: 'var(--background-alt-grey)',
-            borderTopLeftRadius: '.5rem',
-            borderTopRightRadius: '.5rem',
-          }}
-        />
-      </div>
+    <div className="fx-card fx-card--sm fx-card--rounded">
+      <div
+        style={{
+          height: '4px',
+          width: '100%',
+          background: 'var(--background-alt-grey)',
+          borderRadius: '2px',
+          marginBottom: '1rem',
+        }}
+      />
+      <div
+        style={{
+          height: '1.25rem',
+          width: '60%',
+          background: 'var(--background-alt-grey)',
+          marginBottom: '0.75rem',
+          borderRadius: '2px',
+        }}
+      />
+      <div
+        style={{
+          height: '0.875rem',
+          width: '100%',
+          background: 'var(--background-alt-grey)',
+          marginBottom: '0.5rem',
+          borderRadius: '2px',
+        }}
+      />
+      <div
+        style={{
+          height: '0.875rem',
+          width: '40%',
+          background: 'var(--background-alt-grey)',
+          borderRadius: '2px',
+        }}
+      />
     </div>
   );
 }
 
 function WorkspaceSkeleton() {
   return (
-    <AutoGrid type="fill" min={256}>
+    <AutoGrid type="fill" min={320}>
       {[1, 2, 3, 4, 5, 6].map((i) => (
         <WorkspaceCardSkeleton key={i} />
       ))}
@@ -65,54 +72,96 @@ function WorkspaceSkeleton() {
 }
 
 function WorkspaceCard({ workspace }: { workspace: ReadWorkspace }) {
-  const { description, id, isPublic, name, programs, users } = workspace;
+  const { color, description, id, isPublic, name, programs, users, ownerInfo } = workspace;
 
   return (
-    <div className="fr-card fr-card--sm fr-card--shadow fr-enlarge-link">
-      <div className="fr-card__body">
-        <div className="fr-card__content">
-          <h3 className="fr-card__title">
-            <Link to={`/espaces/${id}`}>{name}</Link>
-          </h3>
-          <p className="fr-card__desc clamp-2">{description || 'Aucune description'}</p>
-          <div className="fr-card__start">
-            <p className="fr-card__detail fr-mb-1v">
-              <span className="fr-icon-group-line fr-pr-1w fr-icon--sm" aria-hidden="true" />
-              {(users?.length ?? 0) + 1} utilisateur{(users?.length ?? 0) + 1 > 1 ? 's' : ''}
-            </p>
-            <p className="fr-card__detail fr-mb-1w">
-              <span className="fr-icon-inbox-line fr-pr-1w fr-icon--sm" aria-hidden="true" />
-              {programs?.length ?? 0} formation{(programs?.length ?? 0) > 1 ? 's' : ''}
-            </p>
-          </div>
-        </div>
+    <div
+      className="fx-card fr-enlarge-link fx-card--sm fx-card--rounded fx-card--lift"
+      style={{ textDecoration: 'none', display: 'block' }}
+    >
+      {/* Color bar */}
+      <div
+        style={{
+          height: '4px',
+          backgroundColor: `var(--artwork-minor-${color})`,
+          borderRadius: '2px',
+          marginBottom: '0.75rem',
+        }}
+      />
+
+      {/* Header: title + badge */}
+      <div
+        style={{
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'flex-start',
+          gap: '0.5rem',
+          marginBottom: '0.5rem',
+        }}
+      >
+        <Link
+          to={`/espaces/${id}`}
+          className="fr-text--md fr-text--bold fr-mb-0 clamp-1"
+          style={{ flex: 1 }}
+        >
+          {name}
+        </Link>
+        <WorkspaceBadge isPublic={isPublic} />
       </div>
-      <div className="fr-card__header">
-        <div className="fr-card__img">
-          <img
-            alt="texture"
-            className="fr-responsive-img"
-            src="https://i.imgur.com/cqJ1tS4_d.jpg?maxwidth=800&shape=thumb&fidelity=high"
-          />
-        </div>
-        <ul className="fr-badges-group">
-          <li>
-            <WorkspaceBadge isPublic={isPublic} />
-          </li>
-        </ul>
-      </div>
+
+      {/* Description */}
+      <p className="fr-text--sm fr-text-mention--grey clamp-2 fr-mb-2w">
+        {description || 'Aucune description'}
+      </p>
+
+      {/* Footer: metadata */}
+      <p className="fr-text--xs fr-text-mention--grey fr-mb-0">
+        <span className="fr-icon-user-line fr-icon--sm fr-mr-1v" aria-hidden="true" />
+        {ownerInfo?.firstName} {ownerInfo?.lastName}
+        <span className="fr-mx-1w">•</span>
+        <span className="fr-icon-team-line fr-icon--sm fr-mr-1v" aria-hidden="true" />
+        {(users?.length ?? 0) + 1}
+        <span className="fr-mx-1w">•</span>
+        <span className="fr-icon-file-text-line fr-icon--sm fr-mr-1v" aria-hidden="true" />
+        {programs?.length ?? 0} formation{(programs?.length ?? 0) > 1 ? 's' : ''}
+      </p>
     </div>
   );
 }
 
 function CreateWorkspaceCard() {
   return (
-    <div
-      className="fr-card fr-card--sm fr-card--shadow fr--enlarge-link"
-      style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+    <Link
+      to="/espaces/nouveau"
+      className="fx-card fx-card--sm fx-card--rounded"
+      style={{
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        minHeight: '140px',
+        textDecoration: 'none',
+        border: '2px dashed var(--border-default-grey)',
+        background: 'transparent',
+      }}
     >
-      <CreateWorkspaceForm triggerLabel="Créer un espace" />
-    </div>
+      <div style={{ textAlign: 'center' }}>
+        <span
+          className="fr-icon-add-line fr-icon--lg"
+          aria-hidden="true"
+          style={{
+            color: 'var(--text-action-high-blue-france)',
+            marginBottom: '0.5rem',
+            display: 'block',
+          }}
+        />
+        <p
+          className="fr-text--sm fr-text--bold fr-mb-0"
+          style={{ color: 'var(--text-action-high-blue-france)' }}
+        >
+          Créer un espace
+        </p>
+      </div>
+    </Link>
   );
 }
 
@@ -139,7 +188,7 @@ function WorkspaceCardList({
   }
 
   return (
-    <AutoGrid type="fill" min={256} gap="md">
+    <AutoGrid type="fill" min={320} gap="md">
       {showCreateCard && <CreateWorkspaceCard />}
       {workspaces?.map((workspace) => (
         <WorkspaceCard key={workspace.id} workspace={workspace} />
@@ -211,7 +260,7 @@ export default function EspacesPage() {
         </div>
       </div>
 
-      <nav className="fr-nav" aria-label="Navigation des espaces">
+      <nav className="fr-nav xfr-nav--horizontal" aria-label="Navigation des espaces">
         <ul className="fr-nav__list">
           <li className="fr-nav__item">
             <button
@@ -254,9 +303,9 @@ export default function EspacesPage() {
       <Activity mode={activeTab === 'my' ? 'visible' : 'hidden'}>
         <MyWorkspacesTab />
       </Activity>
-      {/*<Activity mode={activeTab === 'shared' ? 'visible' : 'hidden'}>
-        <SharedWorkspacesTab />
-      </Activity>*/}
+      <Activity mode={activeTab === 'shared' ? 'visible' : 'hidden'}>
+        <WorkspaceSkeleton />
+      </Activity>
       <Activity mode={activeTab === 'public' ? 'visible' : 'hidden'}>
         <PublicWorkspacesTab />
       </Activity>

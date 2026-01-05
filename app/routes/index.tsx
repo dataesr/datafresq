@@ -7,6 +7,7 @@ import AppLayout from '@/components/layouts/AppLayout';
 import AuthLayout from '@/components/layouts/AuthLayout';
 import EspacesPage from './(app)/espaces';
 import EspaceLayout from './(app)/espaces/[id]/layout';
+import NouveauEspacePage from './(app)/espaces/nouveau';
 import Faq from './(app)/faq';
 import FormationPage from './(app)/formations/[id]';
 import FormationsListPage from './(app)/formations/index/index';
@@ -72,6 +73,7 @@ export default function AppRouter() {
         <Route path="formations/:inf" element={<FormationPage />} />
 
         <Route path="espaces" element={<EspacesPage />} />
+        <Route path="espaces/nouveau" element={<NouveauEspacePage />} />
         <Route path="espaces/:id" element={<EspaceLayout />} />
         <Route path="espaces/:id/:tab" element={<EspaceLayout />} />
 

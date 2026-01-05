@@ -3,6 +3,7 @@ import { Elysia, t } from 'elysia';
 import { config } from '~/config';
 
 export const jwtSchema = t.Object({
+  sub: t.String(), // User ID
   email: t.String(),
   role: t.String(),
   iat: t.Optional(t.Number()),

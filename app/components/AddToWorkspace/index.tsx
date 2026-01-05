@@ -1,10 +1,10 @@
 import cn from 'classnames';
 import { useRef, useState } from 'react';
+import { Link } from 'react-router';
 import { useAddPrograms, useWorkspaces } from '@/api/workspaces';
 import { Modal, useModal } from '@/components/Modal';
 import './styles.css';
 import { useToast } from '@/hooks/useToast';
-import CreateWorkspaceForm from '../forms/CreateWorkspaceForm';
 
 interface AddToWorkspaceProps {
   formationIds: string[];
@@ -190,7 +190,12 @@ export default function AddToWorkspace({
               justifyContent: 'flex-end',
             }}
           >
-            <CreateWorkspaceForm triggerLabel="Créer un espace de travail" />
+            <Link
+              to="/espaces/nouveau"
+              className="fr-btn fr-btn--sm fr-btn--tertiary-no-outline fr-icon-add-line fr-btn--icon-left"
+            >
+              Créer un espace
+            </Link>
           </div>
           <button
             type="button"

@@ -68,7 +68,14 @@ export const userLightSchema = t.Object({
   email: t.String(),
   firstName: t.Nullable(t.String()),
   lastName: t.Nullable(t.String()),
-  avatar: t.Optional(t.Nullable(t.String())),
+});
+
+// User search result - for user search endpoints
+export const userSearchSchema = t.Object({
+  id: t.String(),
+  email: t.String(),
+  firstName: t.Nullable(t.String()),
+  lastName: t.Nullable(t.String()),
 });
 
 // ============================================================================
@@ -82,6 +89,7 @@ export type UpdateUserRole = typeof updateUserRoleSchema.static;
 export type UserMe = typeof userMeSchema.static;
 export type UserAdmin = typeof userAdminSchema.static;
 export type UserLight = typeof userLightSchema.static;
+export type UserSearch = typeof userSearchSchema.static;
 
 // ============================================================================
 // MongoDB Projections
@@ -117,5 +125,12 @@ export const USER_LIGHT_PROJECTION = {
   email: 1,
   firstName: 1,
   lastName: 1,
-  avatar: 1,
+} as const;
+
+export const USER_SEARCH_PROJECTION = {
+  _id: 0,
+  id: 1,
+  email: 1,
+  firstName: 1,
+  lastName: 1,
 } as const;

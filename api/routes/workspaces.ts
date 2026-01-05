@@ -16,6 +16,7 @@ import {
   readWorkspaceSchema,
   removeProgramsSchema,
   removeUsersSchema,
+  updateUserRoleSchema,
   updateWorkspaceSchema,
   type WorkspaceEvent,
   workspaceHistoryResponseSchema,
@@ -27,28 +28,31 @@ import {
   logProgramsRemoved,
   logUserAdded,
   logUserRemoved,
+  logUserRoleChanged,
   logWorkspaceCreated,
   logWorkspaceUpdated,
 } from './workspaces/utils/events';
 
 const workspacePipeline = [
+  // Lookup owner info by ID
   {
     $lookup: {
       from: 'users',
       localField: 'owner',
-      foreignField: 'email',
+      foreignField: 'id',
       as: 'ownerInfo',
       pipeline: [{ $project: USER_LIGHT_PROJECTION }],
     },
   },
   { $set: { ownerInfo: { $first: '$ownerInfo' } } },
+  // Lookup all user infos by userId
   {
     $lookup: {
       from: 'users',
-      localField: 'users.email',
-      foreignField: 'email',
+      localField: 'users.userId',
+      foreignField: 'id',
       as: '_userInfos',
-      pipeline: [{ $project: USER_LIGHT_PROJECTION }],
+      pipeline: [{ $project: { ...USER_LIGHT_PROJECTION, id: 1 } }],
     },
   },
   // Merge user info back into users array
@@ -59,7 +63,7 @@ const workspacePipeline = [
           input: '$users',
           as: 'user',
           in: {
-            email: '$$user.email',
+            userId: '$$user.userId',
             role: '$$user.role',
             addedAt: '$$user.addedAt',
             addedBy: '$$user.addedBy',
@@ -68,7 +72,7 @@ const workspacePipeline = [
                 $filter: {
                   input: '$_userInfos',
                   as: 'info',
-                  cond: { $eq: ['$$info.email', '$$user.email'] },
+                  cond: { $eq: ['$$info.id', '$$user.userId'] },
                 },
               },
             },
@@ -83,18 +87,18 @@ const workspacePipeline = [
 /**
  * Check if user has edit permission (owner or editor)
  */
-function canEdit(workspace: WorkspaceDoc, userEmail: string): boolean {
-  if (workspace.owner === userEmail) return true;
-  return workspace.users.some((u) => u.email === userEmail && u.role === 'editor');
+function canEdit(workspace: WorkspaceDoc, userId: string): boolean {
+  if (workspace.owner === userId) return true;
+  return workspace.users.some((u) => u.userId === userId && u.role === 'editor');
 }
 
 /**
  * Check if user has view permission (owner, editor, viewer, or public)
  */
-function canView(workspace: WorkspaceDoc, userEmail: string): boolean {
+function canView(workspace: WorkspaceDoc, userId: string): boolean {
   if (workspace.isPublic) return true;
-  if (workspace.owner === userEmail) return true;
-  return workspace.users.some((u) => u.email === userEmail);
+  if (workspace.owner === userId) return true;
+  return workspace.users.some((u) => u.userId === userId);
 }
 
 // =============================================================================
@@ -113,11 +117,11 @@ const workspaces = new Elysia()
       const workspaceId = generateId();
 
       // Transform users to include metadata
-      const usersWithMeta = users.map((u) => ({
-        email: u.email,
+      const usersWithMeta: WorkspaceUserDoc[] = users.map((u) => ({
+        userId: u.userId,
         role: u.role,
         addedAt: new Date(),
-        addedBy: user.email,
+        addedBy: user.id,
       }));
 
       const { insertedId } = await collections.workspaces.insertOne({
@@ -127,7 +131,7 @@ const workspaces = new Elysia()
         description,
         isPublic,
         name,
-        owner: user.email,
+        owner: user.id,
         programs: programs ?? [],
         updatedAt: new Date(),
         users: usersWithMeta,
@@ -136,16 +140,16 @@ const workspaces = new Elysia()
       if (!insertedId) throw new DatabaseError();
 
       // Log creation event
-      await logWorkspaceCreated(workspaceId, name, user.email);
+      await logWorkspaceCreated(workspaceId, name, user.id);
 
       // Log user additions
       for (const u of usersWithMeta) {
-        await logUserAdded(workspaceId, user.email, u.email, u.role);
+        await logUserAdded(workspaceId, user.id, u.userId, u.role);
       }
 
       // If programs were added, refresh cache
       if (programs.length > 0) {
-        await logProgramsAdded(workspaceId, user.email, programs);
+        await logProgramsAdded(workspaceId, user.id, programs);
         await refreshWorkspaceCache(workspaceId);
       }
 
@@ -229,7 +233,7 @@ const workspaces = new Elysia()
   .get(
     '/me/workspaces',
     async ({ user, query: { query } }) => {
-      const baseMatch = { $or: [{ owner: user.email }, { 'users.email': user.email }] };
+      const baseMatch = { $or: [{ owner: user.id }, { 'users.userId': user.id }] };
       const queryFilter = query
         ? {
             $and: [
@@ -276,7 +280,7 @@ const workspaces = new Elysia()
       const workspace = await collections.workspaces.findOne({ id });
 
       if (!workspace) throw new NotFoundError();
-      if (!canView(workspace, user.email)) throw new ForbiddenError();
+      if (!canView(workspace, user.id)) throw new ForbiddenError();
 
       const workspaceWithInfo = await collections.workspaces
         .aggregate<ReadWorkspace>([{ $match: { id } }, ...workspacePipeline])
@@ -308,7 +312,7 @@ const workspaces = new Elysia()
       const workspace = await collections.workspaces.findOne({ id });
 
       if (!workspace) throw new NotFoundError();
-      if (!canView(workspace, user.email)) throw new ForbiddenError();
+      if (!canView(workspace, user.id)) throw new ForbiddenError();
 
       if (!workspace.programs?.length) return [];
 
@@ -359,7 +363,7 @@ const workspaces = new Elysia()
       const workspace = await collections.workspaces.findOne({ id });
 
       if (!workspace) throw new NotFoundError();
-      if (!canView(workspace, user.email)) throw new ForbiddenError();
+      if (!canView(workspace, user.id)) throw new ForbiddenError();
 
       // Get from cache or compute
       const cache = await getOrComputeWorkspaceCache(id);
@@ -407,7 +411,7 @@ const workspaceSettings = new Elysia()
   .resolve(async ({ user, params: { id } }) => {
     const workspace = await collections.workspaces.findOne({ id });
     if (!workspace) throw new NotFoundError('Workspace not found');
-    if (workspace.owner !== user?.email)
+    if (workspace.owner !== user?.id)
       throw new ForbiddenError('You are not the owner of this workspace');
     return { workspace };
   })
@@ -441,7 +445,7 @@ const workspaceSettings = new Elysia()
       if (!acknowledged) throw new InternalServerError('Failed to update workspace');
 
       if (changes.length > 0) {
-        await logWorkspaceUpdated(id, user.email, changes);
+        await logWorkspaceUpdated(id, user.id, changes);
       }
 
       const updatedWorkspace = await collections.workspaces
@@ -474,23 +478,32 @@ const workspaceSettings = new Elysia()
   )
   .post(
     '/workspaces/:id/users',
-    async ({ params: { id }, body: { users }, user }) => {
-      const newUsers: WorkspaceUserDoc[] = users.map((u) => ({
-        email: u.email,
+    async ({ params: { id }, body: { users }, user, workspace }) => {
+      // Filter out users that are already in the workspace
+      const existingUserIds = workspace.users.map((u) => u.userId);
+      const newUsersFiltered = users.filter((u) => !existingUserIds.includes(u.userId));
+
+      if (newUsersFiltered.length === 0) {
+        // Return current workspace if no new users to add
+        const currentWorkspace = await collections.workspaces
+          .aggregate<ReadWorkspace>([{ $match: { id } }, ...workspacePipeline])
+          .toArray();
+        if (!currentWorkspace[0]) throw new InternalServerError();
+        return currentWorkspace[0];
+      }
+
+      const newUsers: WorkspaceUserDoc[] = newUsersFiltered.map((u) => ({
+        userId: u.userId,
         role: u.role,
         addedAt: new Date(),
-        addedBy: user.email,
+        addedBy: user.id,
       }));
 
       const { acknowledged } = await collections.workspaces.updateOne(
         { id },
         {
           $push: {
-            users: {
-              $each: newUsers.filter(
-                (u) => !newUsers.some((existing) => existing.email === u.email),
-              ),
-            },
+            users: { $each: newUsers },
           },
           $set: { updatedAt: new Date() },
         },
@@ -499,15 +512,15 @@ const workspaceSettings = new Elysia()
       if (!acknowledged) throw new InternalServerError('Failed to add users to workspace');
 
       for (const u of newUsers) {
-        await logUserAdded(id, user.email, u.email, u.role);
+        await logUserAdded(id, user.id, u.userId, u.role);
       }
 
-      const workspace = await collections.workspaces
+      const updatedWorkspace = await collections.workspaces
         .aggregate<ReadWorkspace>([{ $match: { id } }, ...workspacePipeline])
         .toArray();
 
-      if (!workspace[0]) throw new InternalServerError();
-      return workspace[0];
+      if (!updatedWorkspace[0]) throw new InternalServerError();
+      return updatedWorkspace[0];
     },
     {
       isAuth: true,
@@ -529,21 +542,82 @@ const workspaceSettings = new Elysia()
       },
     },
   )
+  .patch(
+    '/workspaces/:id/users',
+    async ({ params: { id }, body: { userId, role }, user }) => {
+      // Find the workspace and the user's current role
+      const workspace = await collections.workspaces.findOne({ id });
+      if (!workspace) throw new NotFoundError('Workspace not found');
+
+      const existingUser = workspace.users.find((u) => u.userId === userId);
+      if (!existingUser) throw new NotFoundError('User not found in workspace');
+
+      // Don't update if role is the same
+      if (existingUser.role === role) {
+        const current = await collections.workspaces
+          .aggregate<ReadWorkspace>([{ $match: { id } }, ...workspacePipeline])
+          .toArray();
+        if (!current[0]) throw new InternalServerError();
+        return current[0];
+      }
+
+      const oldRole = existingUser.role;
+
+      const { acknowledged } = await collections.workspaces.updateOne(
+        { id, 'users.userId': userId },
+        {
+          $set: {
+            'users.$.role': role,
+            updatedAt: new Date(),
+          },
+        },
+      );
+
+      if (!acknowledged) throw new InternalServerError('Failed to update user role');
+
+      await logUserRoleChanged(id, user.id, userId, oldRole, role);
+
+      const updatedWorkspace = await collections.workspaces
+        .aggregate<ReadWorkspace>([{ $match: { id } }, ...workspacePipeline])
+        .toArray();
+
+      if (!updatedWorkspace[0]) throw new InternalServerError();
+      return updatedWorkspace[0];
+    },
+    {
+      isAuth: true,
+      params: t.Object({
+        id: t.String(),
+      }),
+      body: updateUserRoleSchema,
+      response: {
+        200: readWorkspaceSchema,
+        403: errorResponseSchema,
+        404: errorResponseSchema,
+        500: errorResponseSchema,
+      },
+      detail: {
+        summary: "Modifier le rôle d'un utilisateur",
+        description: "Changer le rôle d'un utilisateur dans un espace de travail",
+        tags: ['Espaces de travail'],
+      },
+    },
+  )
   .delete(
     '/workspaces/:id/users',
-    async ({ params: { id }, body: { users }, user }) => {
+    async ({ params: { id }, body: { userIds }, user }) => {
       const { acknowledged } = await collections.workspaces.updateOne(
         { id },
         {
-          $pull: { users: { email: { $in: users } } },
+          $pull: { users: { userId: { $in: userIds } } },
           $set: { updatedAt: new Date() },
         },
       );
 
       if (!acknowledged) throw new InternalServerError();
 
-      for (const targetUser of users) {
-        await logUserRemoved(id, user.email, targetUser);
+      for (const targetUserId of userIds) {
+        await logUserRemoved(id, user.id, targetUserId);
       }
 
       const workspace = await collections.workspaces
@@ -607,7 +681,7 @@ const workspacePrograms = new Elysia()
   .resolve(async ({ user, params: { id } }) => {
     const workspace = await collections.workspaces.findOne({ id });
     if (!workspace) throw new NotFoundError();
-    if (!canEdit(workspace, user?.email as string)) throw new ForbiddenError();
+    if (!canEdit(workspace, user?.id as string)) throw new ForbiddenError();
     return { workspace };
   })
   .post(
@@ -623,7 +697,7 @@ const workspacePrograms = new Elysia()
 
       if (!acknowledged) throw new InternalServerError();
 
-      await logProgramsAdded(id, user.email, programs);
+      await logProgramsAdded(id, user.id, programs);
       await refreshWorkspaceCache(id);
 
       const workspace = await collections.workspaces
@@ -665,7 +739,7 @@ const workspacePrograms = new Elysia()
 
       if (!acknowledged) throw new InternalServerError();
 
-      await logProgramsRemoved(id, user.email, programs);
+      await logProgramsRemoved(id, user.id, programs);
       await refreshWorkspaceCache(id);
 
       const workspace = await collections.workspaces
@@ -710,7 +784,7 @@ const workspacePrograms = new Elysia()
             $lookup: {
               from: 'users',
               localField: 'actor',
-              foreignField: 'email',
+              foreignField: 'id',
               as: 'actorInfo',
               pipeline: [{ $project: USER_LIGHT_PROJECTION }],
             },
@@ -759,24 +833,24 @@ const workspacePrograms = new Elysia()
       if (!workspace) throw new NotFoundError('Workspace not found');
 
       // Owner cannot leave their own workspace
-      if (workspace.owner === user.email) {
+      if (workspace.owner === user.id) {
         throw new BadRequestError('Owner cannot leave the workspace. You may delete it.');
       }
 
-      const isMember = workspace.users.some((u: WorkspaceUserDoc) => u.email === user.email);
+      const isMember = workspace.users.some((u: WorkspaceUserDoc) => u.userId === user.id);
       if (!isMember) throw new BadRequestError('You are not a member of this workspace');
 
       const { acknowledged } = await collections.workspaces.updateOne(
         { id },
         {
-          $pull: { users: { email: user.email } },
+          $pull: { users: { userId: user.id } },
           $set: { updatedAt: new Date() },
         },
       );
 
       if (!acknowledged) throw new InternalServerError('Failed to leave workspace');
 
-      await logUserRemoved(id, user.email, user.email);
+      await logUserRemoved(id, user.id, user.id);
 
       return { message: 'You have successfully left the workspace.' };
     },

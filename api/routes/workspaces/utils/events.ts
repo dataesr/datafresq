@@ -57,7 +57,7 @@ export async function logWorkspaceUpdated(
 export async function logUserAdded(
   workspaceId: string,
   actor: string,
-  targetUser: string,
+  targetUserId: string,
   userRole: WorkspaceUserRole,
 ): Promise<void> {
   await logWorkspaceEvent({
@@ -65,7 +65,7 @@ export async function logUserAdded(
     type: 'user_added',
     actor,
     details: {
-      targetUser,
+      targetUserId,
       userRole,
     },
   });
@@ -77,14 +77,14 @@ export async function logUserAdded(
 export async function logUserRemoved(
   workspaceId: string,
   actor: string,
-  targetUser: string,
+  targetUserId: string,
 ): Promise<void> {
   await logWorkspaceEvent({
     workspaceId,
     type: 'user_removed',
     actor,
     details: {
-      targetUser,
+      targetUserId,
     },
   });
 }
@@ -95,7 +95,7 @@ export async function logUserRemoved(
 export async function logUserRoleChanged(
   workspaceId: string,
   actor: string,
-  targetUser: string,
+  targetUserId: string,
   oldRole: WorkspaceUserRole,
   newRole: WorkspaceUserRole,
 ): Promise<void> {
@@ -104,7 +104,7 @@ export async function logUserRoleChanged(
     type: 'user_role_changed',
     actor,
     details: {
-      targetUser,
+      targetUserId,
       userRole: newRole,
       changes: [
         {
@@ -163,14 +163,14 @@ export async function logProgramsRemoved(
 export async function logOwnershipTransferred(
   workspaceId: string,
   actor: string,
-  newOwner: string,
+  newOwnerId: string,
 ): Promise<void> {
   await logWorkspaceEvent({
     workspaceId,
     type: 'ownership_transferred',
     actor,
     details: {
-      targetUser: newOwner,
+      targetUserId: newOwnerId,
     },
   });
 }

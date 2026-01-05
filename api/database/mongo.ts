@@ -99,7 +99,7 @@ async function ensureIndexes(cols: Collections): Promise<void> {
   // === WORKSPACES ===
   await cols.workspaces.createIndex({ id: 1 }, { unique: true });
   await cols.workspaces.createIndex({ owner: 1 });
-  await cols.workspaces.createIndex({ 'users.email': 1 });
+  await cols.workspaces.createIndex({ 'users.userId': 1 });
   await cols.workspaces.createIndex({ isPublic: 1 });
 
   // === WORKSPACE EVENTS ===

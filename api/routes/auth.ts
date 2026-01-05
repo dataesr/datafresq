@@ -40,7 +40,7 @@ export const authRoutes = new Elysia({ prefix: '/auth' })
       const isPasswordValid = await Bun.password.verify(body.password, user.passwordHash || '');
       if (!isPasswordValid) throw new InvalidCredentialsError();
 
-      const payload = { email: user.email, role: user.role };
+      const payload = { sub: user.id, email: user.email, role: user.role };
       const accessToken = await jwtAccessToken.sign(payload);
       const { sessionToken, ...sessionInfo } = generateSessionInfo();
 
@@ -118,7 +118,7 @@ export const authRoutes = new Elysia({ prefix: '/auth' })
         throw new InvalidSessionError('Utilisateur invalide');
       }
 
-      const payload = { email: user.email, role: user.role };
+      const payload = { sub: user.id, email: user.email, role: user.role };
       const accessToken = await jwtAccessToken.sign(payload);
       if (!accessToken) throw new JWTFailedError();
 
