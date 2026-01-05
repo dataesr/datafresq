@@ -1,7 +1,7 @@
 import cn from 'classnames';
 import { Activity } from 'react';
 import { Link, useLocation } from 'react-router';
-import { useWorkspaces } from '@/api/workspaces';
+import { useSharedWorkspaces, useWorkspaces } from '@/api/workspaces';
 import './sidemenu.css';
 
 const menuLinks = [
@@ -30,8 +30,10 @@ const menuLinks = [
 export default function Sidemenu() {
   const { pathname } = useLocation();
   const { data: workspaces } = useWorkspaces();
+  const { data: sharedWorkspaces } = useSharedWorkspaces();
 
   const isEmpty = workspaces.length === 0;
+  const isSharedEmpty = sharedWorkspaces.length === 0;
 
   return (
     <div className="sidemenu">
@@ -117,6 +119,41 @@ export default function Sidemenu() {
               <p className="fr-text--sm fr-text-mention--grey fr-pl-2w">Aucun espace de travail</p>
             </Activity>
           </div>
+          <Activity mode={!isSharedEmpty ? 'visible' : 'hidden'}>
+            <div className="fr-mt-2w fr-px-1w fr-hidden fr-unhidden-md">
+              <p className="fr-text--lg fr-mb-1w fr-text--heavy">PARTAGÉS AVEC MOI</p>
+              <ul className="sidemenu-workspaces">
+                {sharedWorkspaces.map((workspace) => {
+                  const isActive = pathname.startsWith(`/espaces/${workspace.id}`);
+                  return (
+                    <li key={workspace.id} className="sidemenu-workspaces__item">
+                      <Link
+                        to={`/espaces/${workspace.id}`}
+                        className={cn('sidemenu-workspaces__link', {
+                          'sidemenu-workspaces__link--active': isActive,
+                        })}
+                      >
+                        <span
+                          className="sidemenu-workspaces__color"
+                          style={{
+                            backgroundColor: `var(--artwork-minor-${workspace.color})`,
+                          }}
+                          aria-hidden="true"
+                        />
+                        <span className="sidemenu-workspaces__content">
+                          <span className="sidemenu-workspaces__name">{workspace.name}</span>
+                          <span className="sidemenu-workspaces__meta">
+                            {workspace.programs?.length || 0} formation
+                            {(workspace.programs?.length || 0) > 1 ? 's' : ''}
+                          </span>
+                        </span>
+                      </Link>
+                    </li>
+                  );
+                })}
+              </ul>
+            </div>
+          </Activity>{' '}
         </div>
       </nav>
     </div>
