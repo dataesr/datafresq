@@ -15,17 +15,17 @@ export default function Historique() {
       case 'workspace_updated':
         return `a modifié l'espace de travail`;
       case 'user_added':
-        return `a ajouté ${event.details.targetUser} (${event.details.userRole})`;
+        return `a ajouté ${event.details.targetUserInfo ? `${event.details.targetUserInfo.firstName} ${event.details.targetUserInfo.lastName}` : 'un utilisateur'} (${event.details.userRole})`;
       case 'user_removed':
-        return `a retiré ${event.details.targetUser}`;
+        return `a retiré ${event.details.targetUserInfo ? `${event.details.targetUserInfo.firstName} ${event.details.targetUserInfo.lastName}` : 'un utilisateur'}`;
       case 'user_role_changed':
-        return `a changé le rôle de ${event.details.targetUser} en ${event.details.userRole}`;
+        return `a changé le rôle de ${event.details.targetUserInfo ? `${event.details.targetUserInfo.firstName} ${event.details.targetUserInfo.lastName}` : 'un utilisateur'} en ${event.details.userRole}`;
       case 'program_added':
         return `a ajouté ${event.details.programIds?.length || 0} formation(s)`;
       case 'program_removed':
         return `a retiré ${event.details.programIds?.length || 0} formation(s)`;
       case 'ownership_transferred':
-        return `a transféré la propriété à ${event.details.targetUser}`;
+        return `a transféré la propriété à ${event.details.targetUserInfo ? `${event.details.targetUserInfo.firstName} ${event.details.targetUserInfo.lastName}` : 'un utilisateur'}`;
       default:
         return 'action inconnue';
     }

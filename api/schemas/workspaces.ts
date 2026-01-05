@@ -74,6 +74,7 @@ export const workspaceEventTypeSchema = t.Union([
 
 export const workspaceEventDetailsSchema = t.Object({
   targetUserId: t.Optional(t.String()),
+  targetUserInfo: t.Optional(userLightSchema),
   userRole: t.Optional(workspaceUserRoleSchema),
   programIds: t.Optional(t.Array(t.String())),
   changes: t.Optional(

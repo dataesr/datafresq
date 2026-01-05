@@ -205,12 +205,16 @@ export default function EspaceLayout() {
               <Activity mode={activeTab === 'tableau-de-bord' ? 'visible' : 'hidden'}>
                 <TableauDeBord />
               </Activity>
-              <Activity mode={activeTab === 'historique' ? 'visible' : 'hidden'}>
-                <Historique />
-              </Activity>
-              <Activity mode={activeTab === 'parametres' ? 'visible' : 'hidden'}>
-                <Parametres />
-              </Activity>
+              {canEdit && (
+                <Activity mode={activeTab === 'historique' ? 'visible' : 'hidden'}>
+                  <Historique />
+                </Activity>
+              )}
+              {isOwner && (
+                <Activity mode={activeTab === 'parametres' ? 'visible' : 'hidden'}>
+                  <Parametres />
+                </Activity>
+              )}
               <Activity mode={activeTab === 'formations' ? 'visible' : 'hidden'}>
                 <Formations />
               </Activity>

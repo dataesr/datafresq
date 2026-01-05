@@ -814,6 +814,16 @@ const workspacePrograms = new Elysia()
             },
           },
           { $set: { actorInfo: { $first: '$actorInfo' } } },
+          {
+            $lookup: {
+              from: 'users',
+              localField: 'details.targetUserId',
+              foreignField: 'id',
+              as: 'details.targetUserInfo',
+              pipeline: [{ $project: USER_LIGHT_PROJECTION }],
+            },
+          },
+          { $set: { 'details.targetUserInfo': { $first: '$details.targetUserInfo' } } },
           { $project: { _id: 0 } },
         ])
         .toArray();
