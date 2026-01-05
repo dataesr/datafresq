@@ -21,8 +21,10 @@ export const workspaceQueryKeys = {
 // API FUNCTIONS
 // =============================================================================
 
-async function getMyWorkspaces() {
-  const { data, error } = await api.me.workspaces.get();
+type WorkspaceFilter = 'all' | 'owned' | 'shared';
+
+async function getMyWorkspaces(filter: WorkspaceFilter = 'all') {
+  const { data, error } = await api.me.workspaces.get({ query: { filter } });
   if (error) throw new APIError(error);
   return data || [];
 }
@@ -170,14 +172,21 @@ async function getWorkspaceHistory(
 export function useWorkspaces() {
   return useSuspenseQuery({
     queryKey: workspaceQueryKeys.user,
-    queryFn: getMyWorkspaces,
+    queryFn: () => getMyWorkspaces('owned'),
   });
 }
 
-export function usePublicWorkspaces(query?: string) {
+export function useSharedWorkspaces() {
   return useSuspenseQuery({
-    queryKey: workspaceQueryKeys.public(query),
-    queryFn: () => getPublicWorkspaces(query),
+    queryKey: [...workspaceQueryKeys.user, 'shared'] as const,
+    queryFn: () => getMyWorkspaces('shared'),
+  });
+}
+
+export function usePublicWorkspaces() {
+  return useSuspenseQuery({
+    queryKey: workspaceQueryKeys.public(),
+    queryFn: () => getPublicWorkspaces(),
   });
 }
 

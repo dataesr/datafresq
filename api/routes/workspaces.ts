@@ -232,8 +232,23 @@ const workspaces = new Elysia()
   // List user's workspaces (owned or member)
   .get(
     '/me/workspaces',
-    async ({ user, query: { query } }) => {
-      const baseMatch = { $or: [{ owner: user.id }, { 'users.userId': user.id }] };
+    async ({ user, query: { query, filter = 'all' } }) => {
+      // Build base match based on filter
+      let baseMatch: Record<string, unknown>;
+      switch (filter) {
+        case 'owned':
+          baseMatch = { owner: user.id };
+          break;
+        case 'shared':
+          // Workspaces where user is a member but NOT the owner
+          baseMatch = { 'users.userId': user.id, owner: { $ne: user.id } };
+          break;
+        case 'all':
+        default:
+          baseMatch = { $or: [{ owner: user.id }, { 'users.userId': user.id }] };
+          break;
+      }
+
       const queryFilter = query
         ? {
             $and: [
@@ -259,6 +274,7 @@ const workspaces = new Elysia()
       query: t.Optional(
         t.Object({
           query: t.Optional(t.String()),
+          filter: t.Optional(t.Union([t.Literal('all'), t.Literal('owned'), t.Literal('shared')])),
         }),
       ),
       response: {
@@ -268,7 +284,11 @@ const workspaces = new Elysia()
       detail: {
         summary: "Lister les espaces de travail de l'utilisateur",
         description:
-          "**Permet à l'utilisateur connecté de lister les espaces de travail dont il est propriétaire ou membre.**",
+          "**Permet à l'utilisateur connecté de lister les espaces de travail dont il est propriétaire ou membre.**\n\n" +
+          'Filtres disponibles:\n' +
+          '- `all` (défaut): tous les espaces (propriétaire ou membre)\n' +
+          "- `owned`: uniquement les espaces dont l'utilisateur est propriétaire\n" +
+          "- `shared`: uniquement les espaces partagés avec l'utilisateur (pas propriétaire)",
         tags: ['Espaces de travail'],
       },
     },

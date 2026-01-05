@@ -1,8 +1,7 @@
 import cn from 'classnames';
 import { Activity, useState } from 'react';
 import { Link } from 'react-router';
-import { usePublicWorkspaces, useWorkspaces } from '@/api/workspaces';
-import { DebouncedInput } from '@/components/debounced-input';
+import { usePublicWorkspaces, useSharedWorkspaces, useWorkspaces } from '@/api/workspaces';
 import { AutoGrid } from '@/components/Grids/AutoGrid';
 import type { ReadWorkspace } from '~/schemas/workspaces';
 
@@ -169,10 +168,12 @@ function WorkspaceCardList({
   workspaces,
   isLoading,
   showCreateCard = false,
+  emptyMessage = 'Aucun espace de travail trouvé. Créez votre premier espace de travail pour commencer.',
 }: {
   workspaces: ReadWorkspace[] | undefined;
   isLoading: boolean;
   showCreateCard?: boolean;
+  emptyMessage?: string;
 }) {
   if (isLoading) return <WorkspaceSkeleton />;
 
@@ -180,9 +181,7 @@ function WorkspaceCardList({
     return (
       <div className="fr-callout">
         <h3 className="fr-callout__title">Aucun espace de travail</h3>
-        <p className="fr-callout__text">
-          Aucun espace de travail trouvé. Créez votre premier espace de travail pour commencer.
-        </p>
+        <p className="fr-callout__text">{emptyMessage}</p>
       </div>
     );
   }
@@ -203,23 +202,22 @@ function MyWorkspacesTab() {
   return <WorkspaceCardList workspaces={workspaces} isLoading={isLoading} showCreateCard />;
 }
 
-function PublicWorkspacesTab() {
-  const [query, setQuery] = useState('');
-  const { data: workspaces, isLoading } = usePublicWorkspaces(query);
+function SharedWorkspacesTab() {
+  const { data: workspaces, isLoading } = useSharedWorkspaces();
 
   return (
-    <>
-      <DebouncedInput
-        className="fr-mb-3w"
-        onChange={(value) => setQuery(value)}
-        placeholder="Rechercher des espaces publics..."
-        type="text"
-        size="md"
-        value={query}
-      />
-      <WorkspaceCardList workspaces={workspaces} isLoading={isLoading} />
-    </>
+    <WorkspaceCardList
+      workspaces={workspaces}
+      isLoading={isLoading}
+      emptyMessage="Aucun espace partagé avec vous pour le moment."
+    />
   );
+}
+
+function PublicWorkspacesTab() {
+  const { data: workspaces, isLoading } = usePublicWorkspaces();
+
+  return <WorkspaceCardList workspaces={workspaces} isLoading={isLoading} />;
 }
 
 export default function EspacesPage() {
@@ -304,7 +302,7 @@ export default function EspacesPage() {
         <MyWorkspacesTab />
       </Activity>
       <Activity mode={activeTab === 'shared' ? 'visible' : 'hidden'}>
-        <WorkspaceSkeleton />
+        <SharedWorkspacesTab />
       </Activity>
       <Activity mode={activeTab === 'public' ? 'visible' : 'hidden'}>
         <PublicWorkspacesTab />
