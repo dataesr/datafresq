@@ -130,7 +130,21 @@ export default function EspaceLayout() {
             >
               <div style={{ flex: 1 }}>
                 <Avatars users={allUsers} size={32} />
-                <h1 className="fr-h2 fr-mb-3v">{workspace.name}</h1>
+                <div
+                  className="fr-mt-1w fr-mb-2w"
+                  style={{
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                    alignItems: 'baseline',
+                    flexWrap: 'wrap',
+                  }}
+                >
+                  <h1 className="fr-h2 fr-mb-0">{workspace.name}</h1>
+                  <p className="fr-text-title--grey fr-mb-0">
+                    <span className="fr-icon-inbox-line fr-icon--sm fr-mr-1w" aria-hidden="true" />
+                    {workspace.programs.length} formation{workspace.programs.length > 1 ? 's' : ''}
+                  </p>
+                </div>
                 <div
                   style={{
                     height: '4px',
@@ -139,12 +153,10 @@ export default function EspaceLayout() {
                     marginBottom: '.75rem',
                   }}
                 />
-                <p className="fr-text--sm fr-text-mention--grey fr-mb-1w">
-                  <span className="fr-icon-inbox-line fr-icon--sm fr-mr-1w" aria-hidden="true" />
-                  {workspace.programs.length} formation{workspace.programs.length > 1 ? 's' : ''}
-                </p>
                 {workspace.description && (
-                  <p className="fr-text--sm fr-mb-0">{workspace.description}</p>
+                  <p className="fr-text--sm" style={{ maxWidth: '64rem' }}>
+                    {workspace.description}
+                  </p>
                 )}
               </div>
               {isMember && !isOwner && (
