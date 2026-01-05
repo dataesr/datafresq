@@ -192,3 +192,17 @@ button.fr-link {
   -webkit-box-orient: vertical;
   overflow: hidden;
 }
+
+.highlighted > STRONG {
+  color: var(--text-action-high-blue-france);
+}
+.fr-tooltip .highlighted-field:not(:last-child) {
+  border-bottom: 1px solid var(--border-default-grey);
+  padding: 0.5rem;
+}
+.highlighted-field {
+  padding: 0.5rem;
+}
+.highlighted-title {
+  font-weight: bold;
+}

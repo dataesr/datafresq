@@ -21,6 +21,7 @@ import {
   programsSearchResponseSchema,
   type SiseRecord,
 } from '~/schemas/programs';
+import { buildHighlightFields, buildSearchFields } from '~/utils/search';
 
 const fields = Object.keys(programSearchSchema.properties);
 
@@ -194,8 +195,10 @@ export const programsRoutes = new Elysia({ prefix: '/programs' })
         hasRomeInfos,
       } = query;
 
-      // Build the main query
-      const textQuery = q ? { query_string: { query: q } } : { match_all: {} };
+      // Build the main query with configured search fields
+      const textQuery = q
+        ? { query_string: { query: q, fields: buildSearchFields() } }
+        : { match_all: {} };
       const from = (page - 1) * pageSize;
 
       // Build filters array
@@ -232,13 +235,7 @@ export const programsRoutes = new Elysia({ prefix: '/programs' })
           track_scores: true,
           highlight: q
             ? {
-                fields: {
-                  label: {},
-                  'etablissements.name': {},
-                  'diploma.type': {},
-                  domains: {},
-                  mentionNormalized: {},
-                },
+                fields: buildHighlightFields(),
                 pre_tags: ['<strong>'],
                 post_tags: ['</strong>'],
                 number_of_fragments: 3,
@@ -298,8 +295,10 @@ export const programsRoutes = new Elysia({ prefix: '/programs' })
       // Limit max results to prevent abuse
       const effectiveMaxResults = Math.min(Number(maxResults), EXPORT_CONFIG.maxResults);
 
-      // Build the query
-      const textQuery = q ? { query_string: { query: q } } : { match_all: {} };
+      // Build the query with configured search fields
+      const textQuery = q
+        ? { query_string: { query: q, fields: buildSearchFields() } }
+        : { match_all: {} };
       const filters = buildFilters({
         cycle,
         diplomaType,
@@ -504,7 +503,9 @@ export const programsRoutes = new Elysia({ prefix: '/programs' })
         hasRomeInfos,
       } = query;
 
-      const textQuery = q ? { query_string: { query: q } } : { match_all: {} };
+      const textQuery = q
+        ? { query_string: { query: q, fields: buildSearchFields() } }
+        : { match_all: {} };
 
       const filters = buildFilters({
         cycle,

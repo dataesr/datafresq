@@ -3,6 +3,7 @@ import cn from 'classnames';
 import { useId } from 'react';
 import { Link } from 'react-router';
 import type { ProgramSearch } from '~/schemas/programs';
+import { getFieldDisplayName } from '~/utils/search';
 import { IndeterminateCheckbox } from '../IndeterminateCheckbox';
 
 /**
@@ -51,12 +52,12 @@ function HighlightTooltip({
       aria-hidden="true"
     >
       {Object.entries(highlight).map(([key, values]) => (
-        <div key={key}>
-          <span className="fr-mr-1w fr-text--sm">{key}</span>
+        <div key={key} className="highlighted-field">
+          <span className="fr-mr-1w fr-text--sm highlighted-title">{getFieldDisplayName(key)}</span>
           {values.map((v) => (
             <p
-              key={`${id}-${key}`}
-              className="fr-text--xs"
+              key={`${id}-${key}-${v}`}
+              className="fr-text--xs highlighted"
               // biome-ignore lint/security/noDangerouslySetInnerHtml: Highlights
               dangerouslySetInnerHTML={{ __html: v }}
             />
@@ -175,16 +176,19 @@ export function getProgramColumns(): Record<ProgramColumnId, ColumnDef<ProgramSe
       maxSize: 100,
       enableSorting: false,
       header: '',
-      cell: ({ row }) => (
-        <>
-          <div aria-describedby={row.original.highlight ? `tooltip-${row.id}` : undefined}>
-            <ScoreIndicator score={row.original.score ?? 0} />
+      cell: ({ row, table }) => {
+        const hasSearchQuery = (table.options.meta as { hasSearchQuery?: boolean })?.hasSearchQuery;
+        return (
+          <div style={{ visibility: hasSearchQuery ? 'visible' : 'hidden' }}>
+            <div aria-describedby={row.original.highlight ? `tooltip-${row.id}` : undefined}>
+              <ScoreIndicator score={row.original.score ?? 0} />
+            </div>
+            {row.original.highlight && (
+              <HighlightTooltip highlight={row.original.highlight} rowId={row.id} />
+            )}
           </div>
-          {row.original.highlight && (
-            <HighlightTooltip highlight={row.original.highlight} rowId={row.id} />
-          )}
-        </>
-      ),
+        );
+      },
     },
 
     /**

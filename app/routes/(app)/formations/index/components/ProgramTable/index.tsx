@@ -5,7 +5,7 @@ import {
   useReactTable,
   type VisibilityState,
 } from '@tanstack/react-table';
-import { Activity, useEffect, useMemo, useState } from 'react';
+import { Activity, useMemo, useState } from 'react';
 import { useProgramsSearch } from '@/api/programs';
 import AddToWorkspace from '@/components/AddToWorkspace';
 import {
@@ -100,15 +100,8 @@ export default function ProgramsTable({ selectedPrograms, onSelectionChange }: P
   const [columnVisibility, setColumnVisibility] =
     useState<VisibilityState>(defaultColumnVisibility);
 
-  // Update score column visibility when data changes (only show if scores exist)
-  useEffect(() => {
-    const hasScores = data.length > 0 && data[0]?.score !== undefined;
-    setColumnVisibility((prev) => ({
-      ...prev,
-      // Only auto-hide score if no scores exist; don't override user choice to show it
-      ...(hasScores ? {} : { [PROGRAM_COLUMN_IDS.score]: false }),
-    }));
-  }, [data]);
+  // Determine if score should be visible (only when there's a text search query)
+  const hasSearchQuery = Boolean(params.q && params.q.trim().length > 0);
 
   const table = useReactTable({
     columns,
@@ -123,6 +116,9 @@ export default function ProgramsTable({ selectedPrograms, onSelectionChange }: P
     state: {
       rowSelection,
       columnVisibility,
+    },
+    meta: {
+      hasSearchQuery,
     },
     enableColumnResizing: false,
     defaultColumn: {
