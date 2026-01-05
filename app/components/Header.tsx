@@ -53,7 +53,7 @@ export default function Header() {
                       ESR
                     </span>
                     <span className="fr-text--light"> - </span>
-                    <span className="fr-text--bold">Fresq visualisation</span>
+                    <span className="fr-text--bold">Data Fresq</span>
                   </p>
                 </Link>
                 <p className="fr-header__service-tagline fr-hidden fr-unhidden-md">

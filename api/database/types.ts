@@ -195,9 +195,9 @@ export interface WorkspaceCacheDoc {
   workspaceId: string;
   updatedAt: Date;
   programCount: number;
-  // SISE aggregations
-  aggregations: {
-    totalPrograms: number;
+  // SISE aggregations (student counts)
+  studentsAggregations: {
+    totalPrograms: number; // programs with SISE data for LAST_YEAR
     totalStudents: number;
     totalFemale: number;
     totalMale: number;
@@ -252,6 +252,40 @@ export interface WorkspaceCacheDoc {
       total: number;
       female: number;
       male: number;
+    }[];
+  };
+  // Program aggregations (program counts from programs collection)
+  programAggregations: {
+    byCycle: {
+      cycle: string;
+      count: number;
+    }[];
+    byAcademy: {
+      academy: string;
+      count: number;
+    }[];
+    byRegion: {
+      region: string;
+      count: number;
+    }[];
+    byDiploma: {
+      diploma: string;
+      diplomaLabel: string;
+      count: number;
+    }[];
+    byInstitution: {
+      uai: string;
+      name: string;
+      count: number;
+    }[];
+    byDiscipline: {
+      discipline: string;
+      count: number;
+    }[];
+    byRome: {
+      code: string;
+      label: string;
+      count: number;
     }[];
   };
 }

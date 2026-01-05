@@ -391,14 +391,16 @@ const workspaces = new Elysia()
       if (!cache) {
         return {
           programCount: 0,
-          aggregations: null,
+          studentsAggregations: null,
+          programAggregations: null,
           updatedAt: new Date(),
         };
       }
 
       return {
         programCount: cache.programCount,
-        aggregations: cache.aggregations,
+        studentsAggregations: cache.studentsAggregations,
+        programAggregations: cache.programAggregations,
         updatedAt: cache.updatedAt,
       };
     },
@@ -408,15 +410,17 @@ const workspaces = new Elysia()
       response: {
         200: t.Object({
           programCount: t.Number(),
-          aggregations: t.Nullable(t.Any()),
+          studentsAggregations: t.Nullable(t.Any()),
+          programAggregations: t.Nullable(t.Any()),
           updatedAt: t.Date(),
         }),
         403: errorResponseSchema,
         404: errorResponseSchema,
       },
       detail: {
-        summary: "Obtenir les agrégations SISE d'un espace de travail",
-        description: 'Retourne les agrégations pré-calculées depuis le cache',
+        summary: "Obtenir les agrégations d'un espace de travail",
+        description:
+          'Retourne les agrégations pré-calculées depuis le cache (SISE pour étudiants, programs pour formations)',
         tags: ['Espaces de travail'],
       },
     },

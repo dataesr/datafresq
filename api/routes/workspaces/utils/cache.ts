@@ -26,7 +26,7 @@ export async function updateWorkspaceCache(workspaceId: string): Promise<Workspa
       workspaceId,
       updatedAt: new Date(),
       programCount: 0,
-      aggregations: {
+      studentsAggregations: {
         totalPrograms: 0,
         totalStudents: 0,
         totalFemale: 0,
@@ -40,6 +40,15 @@ export async function updateWorkspaceCache(workspaceId: string): Promise<Workspa
         byDiscipline: [],
         byLargeDiscipline: [],
       },
+      programAggregations: {
+        byCycle: [],
+        byAcademy: [],
+        byRegion: [],
+        byDiploma: [],
+        byInstitution: [],
+        byDiscipline: [],
+        byRome: [],
+      },
     };
 
     await collections.workspaceCache.updateOne(
@@ -51,8 +60,8 @@ export async function updateWorkspaceCache(workspaceId: string): Promise<Workspa
     return emptyCache;
   }
 
-  // Run aggregation pipeline on SISE collection
-  const pipeline = [
+  // Run aggregation pipeline on SISE collection (for student counts)
+  const sisePipeline = [
     // Match documents where inf is in the workspace programs
     { $match: { inf: { $in: programIds } } },
 
@@ -114,7 +123,6 @@ export async function updateWorkspaceCache(workspaceId: string): Promise<Workspa
               total: { $sum: '$effectif' },
               female: { $sum: '$femmes' },
               male: { $sum: '$hommes' },
-              programCount: { $sum: 1 },
             },
           },
           { $sort: { total: -1 } },
@@ -125,7 +133,6 @@ export async function updateWorkspaceCache(workspaceId: string): Promise<Workspa
               total: 1,
               female: 1,
               male: 1,
-              programCount: 1,
             },
           },
         ],
@@ -139,7 +146,6 @@ export async function updateWorkspaceCache(workspaceId: string): Promise<Workspa
               total: { $sum: '$effectif' },
               female: { $sum: '$femmes' },
               male: { $sum: '$hommes' },
-              programCount: { $sum: 1 },
             },
           },
           { $sort: { total: -1 } },
@@ -150,7 +156,6 @@ export async function updateWorkspaceCache(workspaceId: string): Promise<Workspa
               total: 1,
               female: 1,
               male: 1,
-              programCount: 1,
             },
           },
         ],
@@ -164,7 +169,6 @@ export async function updateWorkspaceCache(workspaceId: string): Promise<Workspa
               total: { $sum: '$effectif' },
               female: { $sum: '$femmes' },
               male: { $sum: '$hommes' },
-              programCount: { $sum: 1 },
             },
           },
           { $sort: { total: -1 } },
@@ -175,7 +179,6 @@ export async function updateWorkspaceCache(workspaceId: string): Promise<Workspa
               total: 1,
               female: 1,
               male: 1,
-              programCount: 1,
             },
           },
         ],
@@ -189,7 +192,6 @@ export async function updateWorkspaceCache(workspaceId: string): Promise<Workspa
               total: { $sum: '$effectif' },
               female: { $sum: '$femmes' },
               male: { $sum: '$hommes' },
-              programCount: { $sum: 1 },
             },
           },
           { $sort: { total: -1 } },
@@ -201,7 +203,6 @@ export async function updateWorkspaceCache(workspaceId: string): Promise<Workspa
               total: 1,
               female: 1,
               male: 1,
-              programCount: 1,
             },
           },
         ],
@@ -215,7 +216,6 @@ export async function updateWorkspaceCache(workspaceId: string): Promise<Workspa
               total: { $sum: '$effectif' },
               female: { $sum: '$femmes' },
               male: { $sum: '$hommes' },
-              programCount: { $sum: 1 },
             },
           },
           { $sort: { total: -1 } },
@@ -228,7 +228,6 @@ export async function updateWorkspaceCache(workspaceId: string): Promise<Workspa
               total: 1,
               female: 1,
               male: 1,
-              programCount: 1,
             },
           },
         ],
@@ -245,7 +244,6 @@ export async function updateWorkspaceCache(workspaceId: string): Promise<Workspa
               total: { $sum: '$effectif' },
               female: { $sum: '$femmes' },
               male: { $sum: '$hommes' },
-              programCount: { $sum: 1 },
             },
           },
           { $sort: { total: -1 } },
@@ -258,7 +256,6 @@ export async function updateWorkspaceCache(workspaceId: string): Promise<Workspa
               total: 1,
               female: 1,
               male: 1,
-              programCount: 1,
             },
           },
         ],
@@ -273,7 +270,6 @@ export async function updateWorkspaceCache(workspaceId: string): Promise<Workspa
               total: { $sum: '$effectif' },
               female: { $sum: '$femmes' },
               male: { $sum: '$hommes' },
-              programCount: { $sum: 1 },
             },
           },
           { $sort: { total: -1 } },
@@ -286,7 +282,6 @@ export async function updateWorkspaceCache(workspaceId: string): Promise<Workspa
               total: 1,
               female: 1,
               male: 1,
-              programCount: 1,
             },
           },
         ],
@@ -294,32 +289,202 @@ export async function updateWorkspaceCache(workspaceId: string): Promise<Workspa
     },
   ];
 
-  const [result] = await collections.sise.aggregate(pipeline).toArray();
+  // Run aggregation pipeline on programs collection (for program counts)
+  const programsPipeline = [
+    // Match programs in the workspace
+    { $match: { inf: { $in: programIds } } },
+
+    // Compute all aggregations in a single pass using $facet
+    {
+      $facet: {
+        // By cycle
+        byCycle: [
+          {
+            $group: {
+              _id: '$cycle',
+              count: { $sum: 1 },
+            },
+          },
+          { $sort: { count: -1 } },
+          {
+            $project: {
+              _id: 0,
+              cycle: '$_id',
+              count: 1,
+            },
+          },
+        ],
+
+        // By academy (unwind etablissements first since it's an array)
+        byAcademy: [
+          { $unwind: '$etablissements' },
+          {
+            $group: {
+              _id: '$etablissements.academy',
+              // Use $addToSet to count unique programs, not etablissements
+              programs: { $addToSet: '$inf' },
+            },
+          },
+          {
+            $project: {
+              _id: 0,
+              academy: '$_id',
+              count: { $size: '$programs' },
+            },
+          },
+          { $sort: { count: -1 } },
+        ],
+
+        // By region (unwind etablissements first since it's an array)
+        byRegion: [
+          { $unwind: '$etablissements' },
+          {
+            $group: {
+              _id: '$etablissements.region',
+              // Use $addToSet to count unique programs, not etablissements
+              programs: { $addToSet: '$inf' },
+            },
+          },
+          {
+            $project: {
+              _id: 0,
+              region: '$_id',
+              count: { $size: '$programs' },
+            },
+          },
+          { $sort: { count: -1 } },
+        ],
+
+        // By diploma type
+        byDiploma: [
+          {
+            $group: {
+              _id: { diploma: '$diploma.code', diplomaLabel: '$diploma.type' },
+              count: { $sum: 1 },
+            },
+          },
+          { $sort: { count: -1 } },
+          {
+            $project: {
+              _id: 0,
+              diploma: '$_id.diploma',
+              diplomaLabel: '$_id.diplomaLabel',
+              count: 1,
+            },
+          },
+        ],
+
+        // By institution (unwind etablissements first since it's an array)
+        byInstitution: [
+          { $unwind: '$etablissements' },
+          {
+            $group: {
+              _id: { uai: '$etablissements.uai', name: '$etablissements.name' },
+              // Use $addToSet to count unique programs, not etablissements
+              programs: { $addToSet: '$inf' },
+            },
+          },
+          {
+            $project: {
+              _id: 0,
+              uai: '$_id.uai',
+              name: '$_id.name',
+              count: { $size: '$programs' },
+            },
+          },
+          { $sort: { count: -1 } },
+          { $limit: 50 }, // Limit to top 50 institutions
+        ],
+
+        // By disciplinary sector
+        byDiscipline: [
+          {
+            $match: { disciplinarySector: { $exists: true, $ne: null } },
+          },
+          {
+            $group: {
+              _id: '$disciplinarySector',
+              count: { $sum: 1 },
+            },
+          },
+          { $sort: { count: -1 } },
+          {
+            $project: {
+              _id: 0,
+              discipline: '$_id',
+              count: 1,
+            },
+          },
+        ],
+
+        // By ROME level1 (grands domaines métiers) - unwind romeInfos array
+        byRome: [
+          { $match: { romeInfos: { $exists: true, $ne: [] } } },
+          { $unwind: '$romeInfos' },
+          {
+            $group: {
+              _id: { code: '$romeInfos.idLevel1', label: '$romeInfos.level1' },
+              // Use $addToSet to count unique programs, not rome entries
+              programs: { $addToSet: '$inf' },
+            },
+          },
+          {
+            $project: {
+              _id: 0,
+              code: '$_id.code',
+              label: '$_id.label',
+              count: { $size: '$programs' },
+            },
+          },
+          { $sort: { count: -1 } },
+        ],
+      },
+    },
+  ];
+
+  // Run both aggregations in parallel
+  const [siseResults, programResults] = await Promise.all([
+    collections.sise.aggregate(sisePipeline).toArray(),
+    collections.programs.aggregate(programsPipeline).toArray(),
+  ]);
+
+  const siseResult = siseResults[0];
+  const programResult = programResults[0];
 
   // Extract totals (handle empty result)
-  const totals = result?.totals?.[0] || {
+  const totals = siseResult?.totals?.[0] || {
     totalStudents: 0,
     totalFemale: 0,
     totalMale: 0,
+    totalPrograms: 0,
   };
 
   const cacheDoc: WorkspaceCacheDoc = {
     workspaceId,
     updatedAt: new Date(),
     programCount: programIds.length,
-    aggregations: {
+    studentsAggregations: {
       totalStudents: totals.totalStudents || 0,
       totalFemale: totals.totalFemale || 0,
       totalMale: totals.totalMale || 0,
       totalPrograms: totals.totalPrograms || 0,
-      byYear: result?.byYear || [],
-      byCycle: result?.byCycle || [],
-      byAcademy: result?.byAcademy || [],
-      byRegion: result?.byRegion || [],
-      byDiploma: result?.byDiploma || [],
-      byInstitution: result?.byInstitution || [],
-      byDiscipline: result?.byDiscipline || [],
-      byLargeDiscipline: result?.byLargeDiscipline || [],
+      byYear: siseResult?.byYear || [],
+      byCycle: siseResult?.byCycle || [],
+      byAcademy: siseResult?.byAcademy || [],
+      byRegion: siseResult?.byRegion || [],
+      byDiploma: siseResult?.byDiploma || [],
+      byInstitution: siseResult?.byInstitution || [],
+      byDiscipline: siseResult?.byDiscipline || [],
+      byLargeDiscipline: siseResult?.byLargeDiscipline || [],
+    },
+    programAggregations: {
+      byCycle: programResult?.byCycle || [],
+      byAcademy: programResult?.byAcademy || [],
+      byRegion: programResult?.byRegion || [],
+      byDiploma: programResult?.byDiploma || [],
+      byInstitution: programResult?.byInstitution || [],
+      byDiscipline: programResult?.byDiscipline || [],
+      byRome: programResult?.byRome || [],
     },
   };
 

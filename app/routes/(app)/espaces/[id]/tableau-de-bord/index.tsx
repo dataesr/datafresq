@@ -87,7 +87,7 @@ export default function TableauDeBord() {
       </div>
     );
   }
-  if (!aggregations?.aggregations) {
+  if (!aggregations?.studentsAggregations && !aggregations?.programAggregations) {
     return (
       <div className="fr-my-12w">
         <p className="fr-text-mention--grey">
@@ -104,20 +104,51 @@ export default function TableauDeBord() {
     );
   }
 
-  const { aggregations: agg } = aggregations;
+  const { studentsAggregations: studentsAgg, programAggregations: progAgg } = aggregations;
+
+  // Students aggregations (from SISE collection)
   const {
     totalPrograms,
     totalStudents,
     totalFemale,
     totalMale,
     byYear,
-    byCycle,
-    byRegion,
-    byDiploma,
-    byDiscipline,
-    byAcademy,
+    byCycle: studentsByCycle,
+    byRegion: studentsByRegion,
+    byDiploma: studentsByDiploma,
+    byDiscipline: studentsByDiscipline,
+    byAcademy: studentsByAcademy,
     byLargeDiscipline,
-  } = agg;
+  } = studentsAgg || {
+    totalPrograms: 0,
+    totalStudents: 0,
+    totalFemale: 0,
+    totalMale: 0,
+    byYear: [],
+    byCycle: [],
+    byRegion: [],
+    byDiploma: [],
+    byDiscipline: [],
+    byAcademy: [],
+    byLargeDiscipline: [],
+  };
+
+  // Program aggregations (from programs collection)
+  const {
+    byCycle: progByCycle,
+    byRegion: progByRegion,
+    byDiploma: progByDiploma,
+    byAcademy: progByAcademy,
+    byDiscipline: progByDiscipline,
+    byRome: progByRome,
+  } = progAgg || {
+    byCycle: [],
+    byRegion: [],
+    byDiploma: [],
+    byAcademy: [],
+    byDiscipline: [],
+    byRome: [],
+  };
 
   // Helper to determine which value to use based on view
   const isStudentView = view === 'students';
@@ -132,64 +163,123 @@ export default function TableauDeBord() {
   const yearMaleData = sortedYears.map((item) => item.male);
 
   // Prepare data for cycle pie chart
-  const cycleData = byCycle
-    .filter(
-      (item: { cycle: string; total: number; programCount: number }) =>
-        item.cycle && (isStudentView ? item.total > 0 : item.programCount > 0),
-    )
-    .map((item: { cycle: string; total: number; programCount: number }, index: number) => ({
-      name: item.cycle || 'Non renseigné',
-      y: isStudentView ? item.total : item.programCount,
-      color: getChartColor(cycleColors[index % cycleColors.length]!),
-    }));
+  const cycleData = isStudentView
+    ? studentsByCycle
+        .filter((item: { cycle: string; total: number }) => item.cycle && item.total > 0)
+        .map((item: { cycle: string; total: number }, index: number) => ({
+          name: item.cycle || 'Non renseigné',
+          y: item.total,
+          color: getChartColor(cycleColors[index % cycleColors.length]!),
+        }))
+    : progByCycle
+        .filter((item: { cycle: string; count: number }) => item.cycle && item.count > 0)
+        .map((item: { cycle: string; count: number }, index: number) => ({
+          name: item.cycle || 'Non renseigné',
+          y: item.count,
+          color: getChartColor(cycleColors[index % cycleColors.length]!),
+        }));
 
   // Prepare data for diploma chart (top 8)
-  const topDiplomas = [...byDiploma]
-    .filter((d) => d.diplomaLabel)
-    .sort((a, b) => (isStudentView ? b.total - a.total : b.programCount - a.programCount))
-    .slice(0, 8);
-  const diplomaCategories = topDiplomas.map((d) => d.diplomaLabel || d.diploma || 'Non renseigné');
-  const diplomaData = topDiplomas.map((d) => ({
-    y: isStudentView ? d.total : d.programCount,
-    female: d.female,
-    male: d.male,
-  }));
+  const topDiplomas = isStudentView
+    ? [...studentsByDiploma]
+        .filter((d) => d.diplomaLabel)
+        .sort((a, b) => b.total - a.total)
+        .slice(0, 8)
+    : [...progByDiploma]
+        .filter((d: { diplomaLabel: string }) => d.diplomaLabel)
+        .sort((a: { count: number }, b: { count: number }) => b.count - a.count)
+        .slice(0, 8);
+  const diplomaCategories = topDiplomas.map(
+    (d: { diplomaLabel?: string; diploma?: string }) =>
+      d.diplomaLabel || d.diploma || 'Non renseigné',
+  );
+  const diplomaData = isStudentView
+    ? (topDiplomas as { total: number; female: number; male: number }[]).map((d) => ({
+        y: d.total,
+        female: d.female,
+        male: d.male,
+      }))
+    : (topDiplomas as { count: number }[]).map((d) => ({
+        y: d.count,
+        female: 0,
+        male: 0,
+      }));
 
   // Prepare data for discipline chart (top 10)
-  const topDisciplines = [...byDiscipline]
-    .filter((d) => d.label)
-    .sort((a, b) => (isStudentView ? b.total - a.total : b.programCount - a.programCount))
-    .slice(0, 10);
-  const disciplineCategories = topDisciplines.map((d) => d.label || 'Non renseigné');
-  const disciplineData = topDisciplines.map((d) => (isStudentView ? d.total : d.programCount));
+  const topDisciplines = isStudentView
+    ? [...studentsByDiscipline]
+        .filter((d) => d.label)
+        .sort((a, b) => b.total - a.total)
+        .slice(0, 10)
+    : [...progByDiscipline]
+        .filter((d: { discipline: string }) => d.discipline)
+        .sort((a: { count: number }, b: { count: number }) => b.count - a.count)
+        .slice(0, 10);
+  const disciplineCategories = isStudentView
+    ? topDisciplines.map((d: { label?: string }) => d.label || 'Non renseigné')
+    : topDisciplines.map((d: { discipline?: string }) => d.discipline || 'Non renseigné');
+  const disciplineData = isStudentView
+    ? (topDisciplines as { total: number }[]).map((d) => d.total)
+    : (topDisciplines as { count: number }[]).map((d) => d.count);
 
   // Prepare data for academy chart (top 10)
-  const topAcademies = [...byAcademy]
-    .filter((a) => a.academy)
-    .sort((a, b) => (isStudentView ? b.total - a.total : b.programCount - a.programCount))
-    .slice(0, 10);
-  const academyCategories = topAcademies.map((a) => a.academy || 'Non renseigné');
-  const academyData = topAcademies.map((a) => (isStudentView ? a.total : a.programCount));
-  const academyFemaleData = topAcademies.map((a) => a.female);
-  const academyMaleData = topAcademies.map((a) => a.male);
+  const topAcademies = isStudentView
+    ? [...studentsByAcademy]
+        .filter((a) => a.academy)
+        .sort((a, b) => b.total - a.total)
+        .slice(0, 10)
+    : [...progByAcademy]
+        .filter((a: { academy: string }) => a.academy)
+        .sort((a: { count: number }, b: { count: number }) => b.count - a.count)
+        .slice(0, 10);
+  const academyCategories = topAcademies.map(
+    (a: { academy?: string }) => a.academy || 'Non renseigné',
+  );
+  const academyData = isStudentView
+    ? (topAcademies as { total: number }[]).map((a) => a.total)
+    : (topAcademies as { count: number }[]).map((a) => a.count);
+  const academyFemaleData = isStudentView
+    ? (topAcademies as { female: number }[]).map((a) => a.female)
+    : [];
+  const academyMaleData = isStudentView
+    ? (topAcademies as { male: number }[]).map((a) => a.male)
+    : [];
 
-  // Prepare data for spider chart (large disciplines)
-  const spiderData = (byLargeDiscipline || [])
-    .filter((d: { label: string }) => d.label)
-    .slice(0, 8)
-    .map((d: { label: string; total: number; programCount: number }) => ({
-      name: d.label,
-      y: isStudentView ? d.total : d.programCount,
-    }));
+  // Prepare data for spider chart (large disciplines for students, ROME for programs)
+  const spiderData = isStudentView
+    ? (byLargeDiscipline || [])
+        .filter((d: { label: string }) => d.label)
+        .slice(0, 8)
+        .map((d: { label: string; total: number }) => ({
+          name: d.label,
+          y: d.total,
+        }))
+    : (progByRome || [])
+        .filter((d: { label: string }) => d.label)
+        .slice(0, 8)
+        .map((d: { label: string; count: number }) => ({
+          name: d.label,
+          y: d.count,
+        }));
+
+  const spiderTitle = isStudentView ? 'Grandes disciplines' : 'Métiers (codes ROME)';
 
   // Prepare data for choropleth map (all regions)
-  const choroplethData = byRegion
-    .filter((r: { region: string }) => r.region && regionToHcKey[r.region])
-    .map((r: { region: string; total: number; programCount: number }) => ({
-      'hc-key': regionToHcKey[r.region]!,
-      value: isStudentView ? r.total : r.programCount,
-      name: r.region,
-    }));
+  const choroplethData = isStudentView
+    ? studentsByRegion
+        .filter((r: { region: string }) => r.region && regionToHcKey[r.region])
+        .map((r: { region: string; total: number }) => ({
+          'hc-key': regionToHcKey[r.region]!,
+          value: r.total,
+          name: r.region,
+        }))
+    : progByRegion
+        .filter((r: { region: string }) => r.region && regionToHcKey[r.region])
+        .map((r: { region: string; count: number }) => ({
+          'hc-key': regionToHcKey[r.region]!,
+          value: r.count,
+          name: r.region,
+        }));
 
   return (
     <div className="fr-pb-4w">
@@ -293,19 +383,19 @@ export default function TableauDeBord() {
             color="purple-glycine"
           />
           <SimpleStatCard
-            value={byCycle.length}
+            value={progByCycle.length}
             label="Cycles LMD"
             icon="fr-icon-git-branch-fill"
             color="blue-cumulus"
           />
           <SimpleStatCard
-            value={byRegion.length}
+            value={progByRegion.length}
             label="Régions"
             icon="fr-icon-map-pin-2-fill"
             color="green-archipel"
           />
           <SimpleStatCard
-            value={byDiploma.length}
+            value={progByDiploma.length}
             label="Types de diplômes"
             icon="fr-icon-award-fill"
             color="yellow-tournesol"
@@ -423,6 +513,7 @@ export default function TableauDeBord() {
                 <XAxis type="category" categories={diplomaCategories} />
                 <YAxis
                   min={0}
+                  allowDecimals={false}
                   title={{
                     text: isStudentView ? "Nombre d'étudiants" : 'Nombre de formations',
                   }}
@@ -492,7 +583,7 @@ export default function TableauDeBord() {
                   <Legend enabled={false} />
                   <Tooltip valueSuffix=" formations" />
                   <XAxis type="category" categories={academyCategories} />
-                  <YAxis min={0} title={{ text: '' }} />
+                  <YAxis min={0} allowDecimals={false} title={{ text: '' }} />
                   <Bar.Series
                     data={academyData}
                     options={{
@@ -522,11 +613,11 @@ export default function TableauDeBord() {
               </div>
             </AnalyticsGraph>
           )}
-          {/* Spider Chart - Large Disciplines */}
+          {/* Spider Chart - Large Disciplines / ROME */}
           {spiderData.length > 0 && (
             <AnalyticsGraph
-              title={`Grandes disciplines (${valueLabel})`}
-              description={`Répartition ${isStudentView ? 'des étudiants' : 'des formations'} par grande discipline. ${dataSource}`}
+              title={`${spiderTitle} (${valueLabel})`}
+              description={`Répartition ${isStudentView ? 'des étudiants par grande discipline' : 'des formations par métier (codes ROME)'}. ${dataSource}`}
               chartRef={gdDisciplineChartRef}
             >
               <div style={{ width: '100%', minWidth: '300px', height: '400px' }}>
@@ -553,7 +644,7 @@ export default function TableauDeBord() {
                 <Legend enabled={false} />
                 <Tooltip valueSuffix={` ${valueLabel}`} />
                 <XAxis type="category" categories={disciplineCategories} />
-                <YAxis min={0} title={{ text: '' }} />
+                <YAxis min={0} allowDecimals={false} title={{ text: '' }} />
                 <Bar.Series
                   data={disciplineData}
                   options={{
