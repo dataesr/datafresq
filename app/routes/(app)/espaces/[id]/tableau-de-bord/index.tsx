@@ -17,6 +17,7 @@ import { SpiderChart } from '@/components/charts/SpiderChart';
 import { AutoGrid } from '@/components/Grids/AutoGrid';
 // Import highcharts config to ensure modules are loaded
 import '@/components/highcharts';
+import type { SHA512_256 } from 'bun';
 import {
   FeminizationRateCard,
   SimpleStatCard,
@@ -308,7 +309,7 @@ export default function TableauDeBord() {
               className={`fr-label ${view === 'programs' ? 'fr-icon-file-fill' : 'fr-icon-file-line'}`}
               htmlFor="view-programs"
             >
-              Offre de formations
+              Offre de formation
             </label>
           </div>
           <div
@@ -327,7 +328,7 @@ export default function TableauDeBord() {
               className={`fr-label ${view === 'custom' ? 'fr-icon-team-fill' : 'fr-icon-team-line'}`}
               htmlFor="view-students"
             >
-              Effectif étudiants
+              Effectifs étudiants
             </label>
           </div>
         </div>
@@ -339,10 +340,12 @@ export default function TableauDeBord() {
           <div style={{ display: 'flex', alignItems: 'start' }}>
             <span className="fr-icon-info-line fr-icon--sm fr-mr-1w" aria-hidden="true" />
             <p className="fr-text--sm fr-text--bold">
-              Les aggrégations d'étudiants ont été calculées sur {totalPrograms} formations qui
-              contiennent des données d'étudiants pour la dernière année dans la base de données. Il
-              y a {aggregations.programCount - totalPrograms} formations qui ne contiennent pas de
-              données d'étudiants pour la dernière année.
+              Les agrégations d'étudiants ont été calculées sur {totalPrograms} formations qui
+              contiennent des données d'effectifs étudiants pour la dernière année dans la base de
+              données. Il y a {aggregations.programCount - totalPrograms} formation
+              {aggregations.programCount - totalPrograms > 1 ? 's' : ''} qui ne contien
+              {aggregations.programCount - totalPrograms > 1 ? 'nen' : ''}t pas de données
+              d'effectifs étudiants pour la dernière année.
             </p>
           </div>
         </div>

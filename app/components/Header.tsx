@@ -57,7 +57,7 @@ export default function Header() {
                   </p>
                 </Link>
                 <p className="fr-header__service-tagline fr-hidden fr-unhidden-md">
-                  Les formations agréées de l'enseignement supérieur
+                  Les formations de l'enseignement supérieur reconnues de qualité
                 </p>
               </div>
             </div>
