@@ -92,6 +92,7 @@
   margin: 0;
   padding: 0;
   filter: drop-shadow(var(--overlap-shadow, 0 6px 18px rgba(0, 0, 18, 0.16)));
+  min-width: 100%;
 }
 
 /* Collapsed state */
@@ -119,7 +120,7 @@
    ----------------------------------------------------------------------------- */
 .fx-dropdown__content {
   /* Sizing */
-  width: 16rem;
+  min-width: max-content;
   max-width: calc(100vw - 2rem);
   pointer-events: auto;
 
