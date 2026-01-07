@@ -28,18 +28,34 @@ export function SimpleStatCard({
         flexDirection: 'column',
       }}
     >
-      <div style={{ padding: '1.5rem 1.75rem' }}>
-        <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between' }}>
+      <div style={{ padding: '1.25rem 1.5rem' }}>
+        <div style={{ display: 'flex', alignItems: 'flex-start', gap: '1rem' }}>
+          {icon && (
+            <div
+              className={icon}
+              aria-hidden="true"
+              style={{
+                width: '2.5rem',
+                height: '2.5rem',
+                minWidth: '2.5rem',
+                borderRadius: '0.375rem',
+                background: `${chartColor}20`,
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                color: chartColor,
+              }}
+            />
+          )}
           <div>
-            <p className="fr-text-mention--grey fr-text--sm fr-mb-1w">{label}</p>
             <p
-              className="fr-text--bold fr-text-title--grey"
-              style={{ marginBottom: '0.25rem', fontSize: '1.75rem' }}
+              className="fr-text--bold fr-text-title--grey fr-mb-0"
+              style={{ fontSize: '1.5rem', lineHeight: 1.2 }}
             >
               {typeof value === 'number' ? value.toLocaleString('fr-FR') : value}
             </p>
+            <p className="fr-text--sm fr-text-mention--grey fr-mb-0">{label}</p>
           </div>
-          {icon && <span className={icon} style={{ color: chartColor }} aria-hidden="true" />}
         </div>
       </div>
     </div>

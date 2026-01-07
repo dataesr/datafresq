@@ -306,9 +306,69 @@ export const siseRecordSchema = t.Object({
   city: t.String(),
 });
 
+const employmentRatesSchema = t.Object({
+  m6: t.Union([t.Number(), t.Null()]),
+  m12: t.Union([t.Number(), t.Null()]),
+  m18: t.Union([t.Number(), t.Null()]),
+  m24: t.Union([t.Number(), t.Null()]),
+  m30: t.Union([t.Number(), t.Null()]),
+});
+
+const insersupGenderStatsSchema = t.Object({
+  nbSortants: t.Number(),
+  canShowPercentages: t.Boolean(),
+  emploiSalFr: t.Union([employmentRatesSchema, t.Null()]),
+  emploiNonSal: t.Union([employmentRatesSchema, t.Null()]),
+  emploiStable: t.Union([employmentRatesSchema, t.Null()]),
+});
+
+const insersupYearStatsSchema = t.Object({
+  promo: t.String(),
+  nbEtudiants: t.Number(),
+  nbSortants: t.Number(),
+  nbPoursuivants: t.Number(),
+  canShowPercentages: t.Boolean(),
+  emploiSalFr: t.Union([employmentRatesSchema, t.Null()]),
+  emploiNonSal: t.Union([employmentRatesSchema, t.Null()]),
+  emploiStable: t.Union([employmentRatesSchema, t.Null()]),
+  byGender: t.Union([
+    t.Object({
+      femme: t.Union([insersupGenderStatsSchema, t.Null()]),
+      homme: t.Union([insersupGenderStatsSchema, t.Null()]),
+    }),
+    t.Null(),
+  ]),
+});
+
+const insersupStatsSchema = t.Object({
+  totalSortants: t.Number(),
+  totalEtudiants: t.Number(),
+  totalPoursuivants: t.Number(),
+  totalSortantsFrancais: t.Number(),
+  totalSortantsEtrangers: t.Number(),
+  canShowPercentages: t.Boolean(),
+  byYear: t.Array(insersupYearStatsSchema),
+  globalRates: t.Union([
+    t.Object({
+      emploiSalFr: t.Union([employmentRatesSchema, t.Null()]),
+      emploiNonSal: t.Union([employmentRatesSchema, t.Null()]),
+      emploiStable: t.Union([employmentRatesSchema, t.Null()]),
+    }),
+    t.Null(),
+  ]),
+  globalRatesByGender: t.Union([
+    t.Object({
+      femme: t.Union([insersupGenderStatsSchema, t.Null()]),
+      homme: t.Union([insersupGenderStatsSchema, t.Null()]),
+    }),
+    t.Null(),
+  ]),
+});
+
 export const programDetailResponseSchema = t.Object({
   program: programSchema,
   sise: t.Array(siseRecordSchema),
+  insersup: insersupStatsSchema,
 });
 
 // ============================================================================

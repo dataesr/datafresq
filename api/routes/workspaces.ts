@@ -393,6 +393,7 @@ const workspaces = new Elysia()
           programCount: 0,
           studentsAggregations: null,
           programAggregations: null,
+          insersupAggregations: null,
           updatedAt: new Date(),
         };
       }
@@ -401,6 +402,7 @@ const workspaces = new Elysia()
         programCount: cache.programCount,
         studentsAggregations: cache.studentsAggregations,
         programAggregations: cache.programAggregations,
+        insersupAggregations: cache.insersupAggregations,
         updatedAt: cache.updatedAt,
       };
     },
@@ -412,6 +414,7 @@ const workspaces = new Elysia()
           programCount: t.Number(),
           studentsAggregations: t.Nullable(t.Any()),
           programAggregations: t.Nullable(t.Any()),
+          insersupAggregations: t.Nullable(t.Any()),
           updatedAt: t.Date(),
         }),
         403: errorResponseSchema,

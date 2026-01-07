@@ -93,3 +93,49 @@ a[href].table-link {
   text-overflow: ellipsis;
   word-break: break-word;
 }
+
+/* Skeleton loading styles */
+.skeleton-text {
+  display: inline-block;
+  height: 1em;
+  min-width: 60px;
+  background: linear-gradient(
+    90deg,
+    var(--background-alt-grey) 25%,
+    var(--background-contrast-grey) 50%,
+    var(--background-alt-grey) 75%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite ease-in-out;
+  border-radius: 4px;
+  vertical-align: middle;
+}
+
+.skeleton-text--sm {
+  width: 40px;
+}
+
+.skeleton-text--md {
+  width: 80px;
+}
+
+.skeleton-text--lg {
+  width: 120px;
+}
+
+.skeleton-text--xl {
+  width: 200px;
+}
+
+.skeleton-text--full {
+  width: 100%;
+}
+
+/* Table loading state */
+table.table--loading tbody tr {
+  pointer-events: none;
+}
+
+table.table--loading tbody td {
+  color: transparent;
+}

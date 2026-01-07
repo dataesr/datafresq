@@ -2,7 +2,7 @@ import { QueryClientProvider } from '@tanstack/react-query';
 import { NuqsAdapter } from 'nuqs/adapters/react-router/v7';
 import { StrictMode, useEffect } from 'react';
 import { createRoot } from 'react-dom/client';
-import { BrowserRouter } from 'react-router';
+import { BrowserRouter, useLocation } from 'react-router';
 import { queryClient } from '@/api/query-client';
 import { ToastContextProvider } from '@/hooks/useToast';
 import AppRouter from '@/routes';
@@ -20,6 +20,16 @@ function DSFRInitializer({ children }: { children: React.ReactNode }) {
   return <>{children}</>;
 }
 
+function ScrollToTop() {
+  const { pathname } = useLocation();
+
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [pathname]);
+
+  return null;
+}
+
 const elem = document.getElementById('root');
 if (!elem) throw new Error('Root element not found');
 
@@ -30,6 +40,7 @@ const app = (
         <QueryClientProvider client={queryClient}>
           <DSFRInitializer>
             <ToastContextProvider>
+              <ScrollToTop />
               <AppRouter />
             </ToastContextProvider>
           </DSFRInitializer>

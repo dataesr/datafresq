@@ -84,9 +84,16 @@ export function AnalyticsGraph({
   };
 
   return (
-    <div className="fr-card fr-card--shadow">
-      <div className="fr-card__body">
-        <div className="fr-card__content">
+    <div
+      className="fr-card fr-card--shadow"
+      style={{ height: '100%', display: 'flex', flexDirection: 'column' }}
+    >
+      <div className="fr-card__body" style={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
+        <div
+          className="fr-card__content"
+          style={{ flex: 1, display: 'flex', flexDirection: 'column' }}
+        >
+          {/* Header with title and menu */}
           <div style={{ display: 'flex' }}>
             <div className="fr-mb-3w" style={{ flexGrow: 1 }}>
               <h3 id={titleId} className="fr-h6 fr-m-0">
@@ -157,14 +164,17 @@ export function AnalyticsGraph({
             )}
           </div>
 
+          {/* Chart content area - grows to fill available space */}
           <div
             role="img"
             aria-labelledby={titleId}
             aria-describedby={description ? descriptionId : undefined}
+            style={{ flex: 1 }}
           >
             {children}
           </div>
 
+          {/* Details section (optional) */}
           {details && (
             <div className="fr-mt-2w fr-p-2w">
               <div className="fr-text--sm" style={{ display: 'flex', gap: '0.5rem' }}>
@@ -178,10 +188,14 @@ export function AnalyticsGraph({
             </div>
           )}
 
+          {/* Source section - pushed to bottom with marginTop: auto */}
           {source && (
             <div
-              className="fr-mt-2w fr-pt-2w"
-              style={{ borderTop: '1px solid var(--border-default-grey)' }}
+              className="fr-pt-2w"
+              style={{
+                borderTop: '1px solid var(--border-default-grey)',
+                marginTop: 'auto',
+              }}
             >
               <p
                 className="fr-text--xs fr-text-mention--grey fr-mb-0"
@@ -193,6 +207,7 @@ export function AnalyticsGraph({
             </div>
           )}
 
+          {/* Modal for table view */}
           {showMenu && (
             <Modal {...modalProps}>
               <div className="fr-container fr-container--fluid fr-container-md">

@@ -1,182 +1,113 @@
-import type { HighchartsReactRefObject } from '@highcharts/react';
-import { Chart, Credits, Legend, Tooltip, XAxis, YAxis } from '@highcharts/react';
+import {
+  Chart,
+  Credits,
+  type HighchartsReactRefObject,
+  Legend,
+  Tooltip,
+  XAxis,
+  YAxis,
+} from '@highcharts/react';
 import { Column, Line } from '@highcharts/react/series';
 import { useRef, useState } from 'react';
 import { AnalyticsGraph } from '@/components/AnalyticsGraph';
 import { SimpleStatCard } from '@/components/cards/StatCards';
 import { getChartColor, getColorForSeries } from '@/components/highcharts';
-import PillsTitle from '@/components/PillsTitle';
+import type { InsersupViewProps, InsersupYearStats } from './types';
+import { COHORT_COLORS, MONTHS, ratesToArray, ratesToArrayWithTrailingNulls } from './utils';
 
-// Types
-interface EmploymentRates {
-  m6: number | null;
-  m12: number | null;
-  m18: number | null;
-  m24: number | null;
-  m30: number | null;
-}
+export function InsersupView({ aggregations, programCount }: InsersupViewProps) {
+  const [selectedInsersupYear, setSelectedInsersupYear] = useState<string | null>(null);
 
-interface InsersupGenderStats {
-  nbSortants: number;
-  canShowPercentages: boolean;
-  emploiSalFr: EmploymentRates | null;
-  emploiNonSal: EmploymentRates | null;
-  emploiStable: EmploymentRates | null;
-}
-
-interface InsersupYearStats {
-  promo: string;
-  nbEtudiants: number;
-  nbSortants: number;
-  nbPoursuivants: number;
-  canShowPercentages: boolean;
-  emploiSalFr: EmploymentRates | null;
-  emploiNonSal: EmploymentRates | null;
-  emploiStable: EmploymentRates | null;
-  byGender: {
-    femme: InsersupGenderStats | null;
-    homme: InsersupGenderStats | null;
-  } | null;
-}
-
-interface InsersupStats {
-  totalSortants: number;
-  totalEtudiants: number;
-  totalPoursuivants: number;
-  totalSortantsFrancais: number;
-  totalSortantsEtrangers: number;
-  canShowPercentages: boolean;
-  byYear: InsersupYearStats[];
-  globalRates: {
-    emploiSalFr: EmploymentRates | null;
-    emploiNonSal: EmploymentRates | null;
-    emploiStable: EmploymentRates | null;
-  } | null;
-  globalRatesByGender: {
-    femme: InsersupGenderStats | null;
-    homme: InsersupGenderStats | null;
-  } | null;
-}
-
-interface InsersupProps {
-  insersupData: InsersupStats;
-}
-
-// Constants
-const MONTHS = ['6 mois', '12 mois', '18 mois', '24 mois', '30 mois'];
-
-const COHORT_COLORS = [
-  'green-archipel',
-  'blue-cumulus',
-  'purple-glycine',
-  'pink-macaron',
-  'yellow-tournesol',
-  'orange-terre-battue',
-  'brown-caramel',
-  'beige-gris-galet',
-] as const;
-
-// Utility functions
-function ratesToArray(rates: EmploymentRates | null): (number | null)[] {
-  if (!rates) return [null, null, null, null, null];
-  return [rates.m6, rates.m12, rates.m18, rates.m24, rates.m30];
-}
-
-function ratesToArrayWithTrailingNulls(rates: EmploymentRates | null): (number | null)[] {
-  if (!rates) return [null, null, null, null, null];
-  const values = [rates.m6, rates.m12, rates.m18, rates.m24, rates.m30];
-  let lastValidIndex = -1;
-  for (let i = values.length - 1; i >= 0; i--) {
-    if (values[i] !== null && values[i] !== 0) {
-      lastValidIndex = i;
-      break;
-    }
-  }
-  if (lastValidIndex === -1) return [null, null, null, null, null];
-  return values.map((v, i) => (i <= lastValidIndex ? v : null));
-}
-
-// Component
-export default function Insersup({ insersupData }: InsersupProps) {
-  const employmentChartRef = useRef<HighchartsReactRefObject | null>(null);
-  const evolutionChartRef = useRef<HighchartsReactRefObject | null>(null);
-  const genderChartRef = useRef<HighchartsReactRefObject | null>(null);
-  const cohortChartRef = useRef<HighchartsReactRefObject | null>(null);
+  const insersupChartRef = useRef<HighchartsReactRefObject | null>(null);
+  const insersupEvolutionChartRef = useRef<HighchartsReactRefObject | null>(null);
+  const insersupGenderChartRef = useRef<HighchartsReactRefObject | null>(null);
+  const insersupCohortChartRef = useRef<HighchartsReactRefObject | null>(null);
   const cohortYearChartRef = useRef<HighchartsReactRefObject | null>(null);
-  const [selectedYear, setSelectedYear] = useState<string | null>(null);
 
-  const hasData = insersupData.byYear.length > 0;
-
-  if (!hasData) {
+  if (!aggregations || aggregations.byYear.length === 0) {
     return (
-      <section id="insersup" className="formation-section">
-        <PillsTitle as="h2" icon="fr-icon-briefcase-line">
-          Insertion professionnelle
-        </PillsTitle>
-        <div className="fr-py-2w fr-px-3v fr-background-alt--grey fx-radius--sm">
-          <p className="fr-text--sm fr-mb-0 fr-text-mention--grey">
-            Aucune donnée d'insertion professionnelle disponible pour cette formation.
-          </p>
-        </div>
-      </section>
+      <div className="fr-py-2w fr-px-3v fr-background-alt--grey fx-radius--sm">
+        <p className="fr-text--sm fr-mb-0 fr-text-mention--grey">
+          Aucune donnée d'insertion professionnelle disponible pour les formations de cet espace.
+        </p>
+      </div>
     );
   }
 
+  const insersupAgg = aggregations;
+
   // Year selection logic
-  const years = insersupData.byYear.map((y) => y.promo).sort((a, b) => b.localeCompare(a));
-  const currentYear = selectedYear || years[0] || null;
-  const currentYearData = insersupData.byYear.find((y) => y.promo === currentYear);
+  const insersupYears = insersupAgg.byYear.map((y) => y.promo).sort((a, b) => b.localeCompare(a));
+  const currentInsersupYear = selectedInsersupYear || insersupYears[0] || null;
+  const currentInsersupYearData = insersupAgg.byYear.find((y) => y.promo === currentInsersupYear);
 
   // Sorted data for charts
-  const sortedByYear = [...insersupData.byYear].sort((a, b) => a.promo.localeCompare(b.promo));
-  const yearCategories = sortedByYear.map((y) => y.promo);
-  const sortantsTrend = sortedByYear.map((y) => y.nbSortants);
-  const poursuivantsTrend = sortedByYear.map((y) => y.nbPoursuivants);
+  const insersupSortedByYear = [...insersupAgg.byYear].sort((a, b) =>
+    a.promo.localeCompare(b.promo),
+  );
+  const insersupYearCategories = insersupSortedByYear.map((y) => y.promo);
+  const insersupSortantsTrend = insersupSortedByYear.map((y) => y.nbSortants);
+  const insersupPoursuivantsTrend = insersupSortedByYear.map((y) => y.nbPoursuivants);
 
   // Calculated stats
-  const pursuitRate =
-    insersupData.totalSortants + insersupData.totalPoursuivants > 0
+  const insersupPursuitRate =
+    insersupAgg.totalSortants + insersupAgg.totalPoursuivants > 0
       ? Math.round(
-          (insersupData.totalPoursuivants /
-            (insersupData.totalSortants + insersupData.totalPoursuivants)) *
+          (insersupAgg.totalPoursuivants /
+            (insersupAgg.totalSortants + insersupAgg.totalPoursuivants)) *
             100,
         )
       : 0;
 
-  const totalNationality = insersupData.totalSortantsFrancais + insersupData.totalSortantsEtrangers;
-  const francaisRate =
-    totalNationality > 0
-      ? Math.round((insersupData.totalSortantsFrancais / totalNationality) * 100)
+  const insersupTotalNationality =
+    (insersupAgg.totalSortantsFrancais || 0) + (insersupAgg.totalSortantsEtrangers || 0);
+  const insersupFrancaisRate =
+    insersupTotalNationality > 0
+      ? Math.round(((insersupAgg.totalSortantsFrancais || 0) / insersupTotalNationality) * 100)
       : 0;
 
-  const globalFemme = insersupData.globalRatesByGender?.femme;
-  const globalHomme = insersupData.globalRatesByGender?.homme;
+  const insersupGlobalFemme = insersupAgg.globalRatesByGender?.femme;
+  const insersupGlobalHomme = insersupAgg.globalRatesByGender?.homme;
 
   // Calculate feminization rate for sortants
-  const totalGenderSortants = (globalFemme?.nbSortants ?? 0) + (globalHomme?.nbSortants ?? 0);
+  const totalGenderSortants =
+    (insersupGlobalFemme?.nbSortants ?? 0) + (insersupGlobalHomme?.nbSortants ?? 0);
   const femalePercent =
     totalGenderSortants > 0
-      ? Math.round(((globalFemme?.nbSortants ?? 0) / totalGenderSortants) * 100)
+      ? Math.round(((insersupGlobalFemme?.nbSortants ?? 0) / totalGenderSortants) * 100)
       : 0;
 
-  const cohortsWithData = insersupData.byYear
+  const insersupCohortsWithData = insersupAgg.byYear
     .filter((y) => y.canShowPercentages && y.emploiSalFr)
     .sort((a, b) => b.promo.localeCompare(a.promo));
 
   // Check if gender comparison chart can be shown
   const canShowGenderChart =
-    globalFemme?.canShowPercentages &&
-    globalHomme?.canShowPercentages &&
-    globalFemme.emploiSalFr &&
-    globalHomme.emploiSalFr;
+    insersupGlobalFemme?.canShowPercentages &&
+    insersupGlobalHomme?.canShowPercentages &&
+    insersupGlobalFemme.emploiSalFr &&
+    insersupGlobalHomme.emploiSalFr;
 
   return (
-    <section id="insersup" className="formation-section">
-      <PillsTitle as="h2" icon="fr-icon-briefcase-line">
-        Insertion professionnelle
-      </PillsTitle>
+    <>
+      {/* Notice about program count */}
+      {insersupAgg.totalPrograms < programCount && (
+        <div className="fr-notice fr-notice--info fr-mb-3w fr-px-2w">
+          <div style={{ display: 'flex', alignItems: 'start' }}>
+            <span className="fr-icon-info-line fr-icon--sm fr-mr-1w" aria-hidden="true" />
+            <p className="fr-text--sm fr-text--bold">
+              Les agrégations d'insertion ont été calculées sur {insersupAgg.totalPrograms}{' '}
+              formations qui contiennent des données InserSup. Il y a{' '}
+              {programCount - insersupAgg.totalPrograms} formation
+              {programCount - insersupAgg.totalPrograms > 1 ? 's' : ''} qui ne contien
+              {programCount - insersupAgg.totalPrograms > 1 ? 'nen' : ''}t pas de données
+              d'insertion professionnelle.
+            </p>
+          </div>
+        </div>
+      )}
 
-      {/* Key Metrics Cards - includes GenderRatioCard */}
+      {/* Key Metrics Cards - now includes GenderRatioCard */}
       <div
         style={{
           display: 'grid',
@@ -186,39 +117,39 @@ export default function Insersup({ insersupData }: InsersupProps) {
         }}
       >
         <SimpleStatCard
-          value={insersupData.totalEtudiants}
+          value={insersupAgg.totalEtudiants}
           label="Diplômés suivis"
           icon="fr-icon-user-fill"
           color="blue-cumulus"
         />
         <SimpleStatCard
-          value={insersupData.totalSortants}
+          value={insersupAgg.totalSortants}
           label="Sortants (entrée sur le marché)"
           icon="fr-icon-arrow-right-up-line"
           color="green-archipel"
         />
         <SimpleStatCard
-          value={insersupData.totalPoursuivants}
+          value={insersupAgg.totalPoursuivants}
           label="Poursuivants (études)"
           icon="fr-icon-book-2-fill"
           color="purple-glycine"
         />
         <SimpleStatCard
-          value={`${pursuitRate}%`}
+          value={`${insersupPursuitRate}%`}
           label="Taux de poursuite d'études"
           icon="fr-icon-git-merge-line"
           color="yellow-tournesol"
         />
         <SimpleStatCard
-          value={`${francaisRate}%`}
+          value={`${insersupFrancaisRate}%`}
           label="Français parmi les sortants"
           icon="fr-icon-france-line"
           color="blue-ecume"
         />
         {/* Feminization ratio */}
-        {globalFemme && (
+        {insersupGlobalFemme && (
           <SimpleStatCard
-            value={`${femalePercent}% (${globalFemme.nbSortants.toLocaleString('fr-FR')})`}
+            value={`${femalePercent}% (${insersupGlobalFemme.nbSortants.toLocaleString('fr-FR')})`}
             label="Ratio de femmes sortantes"
             icon="fr-icon-user-line"
             color="pink-macaron"
@@ -238,13 +169,13 @@ export default function Insersup({ insersupData }: InsersupProps) {
         {/* Cohort Evolution Chart */}
         <AnalyticsGraph
           title="Évolution des cohortes"
-          description={`Répartition sortants/poursuivants sur ${yearCategories.length} promotions`}
-          chartRef={evolutionChartRef}
+          description={`Répartition sortants/poursuivants sur ${insersupYearCategories.length} promotions`}
+          chartRef={insersupEvolutionChartRef}
           source="InserSup (MESR)"
         >
-          {yearCategories.length > 1 ? (
+          {insersupYearCategories.length > 1 ? (
             <Chart
-              ref={evolutionChartRef}
+              ref={insersupEvolutionChartRef}
               containerProps={{
                 style: { width: '100%', minWidth: '300px', height: '350px' },
               }}
@@ -252,10 +183,10 @@ export default function Insersup({ insersupData }: InsersupProps) {
               <Credits enabled={false} />
               <Legend align="center" />
               <Tooltip shared />
-              <XAxis categories={yearCategories} title={{ text: 'Promotion' }} />
+              <XAxis categories={insersupYearCategories} title={{ text: 'Promotion' }} />
               <YAxis min={0} title={{ text: 'Effectif' }} />
               <Column.Series
-                data={sortantsTrend}
+                data={insersupSortantsTrend}
                 options={{
                   name: 'Sortants',
                   color: getChartColor('green-archipel'),
@@ -263,7 +194,7 @@ export default function Insersup({ insersupData }: InsersupProps) {
                 }}
               />
               <Column.Series
-                data={poursuivantsTrend}
+                data={insersupPoursuivantsTrend}
                 options={{
                   name: 'Poursuivants',
                   color: getChartColor('purple-glycine'),
@@ -292,12 +223,12 @@ export default function Insersup({ insersupData }: InsersupProps) {
         <AnalyticsGraph
           title="Taux d'emploi global"
           description="Évolution du taux d'emploi après l'obtention du diplôme (toutes promotions confondues)"
-          chartRef={employmentChartRef}
+          chartRef={insersupChartRef}
           source="InserSup (MESR)"
         >
-          {insersupData.canShowPercentages && insersupData.globalRates ? (
+          {insersupAgg.canShowPercentages && insersupAgg.globalRates ? (
             <Chart
-              ref={employmentChartRef}
+              ref={insersupChartRef}
               containerProps={{
                 style: { width: '100%', minWidth: '300px', height: '350px' },
               }}
@@ -308,7 +239,7 @@ export default function Insersup({ insersupData }: InsersupProps) {
               <XAxis categories={MONTHS} title={{ text: 'Temps après diplôme' }} />
               <YAxis min={0} max={100} title={{ text: "Taux d'emploi (%)" }} />
               <Line.Series
-                data={ratesToArray(insersupData.globalRates.emploiSalFr)}
+                data={ratesToArray(insersupAgg.globalRates.emploiSalFr)}
                 options={{
                   name: 'Emploi salarié en France',
                   color: getChartColor('green-archipel'),
@@ -316,7 +247,7 @@ export default function Insersup({ insersupData }: InsersupProps) {
                 }}
               />
               <Line.Series
-                data={ratesToArray(insersupData.globalRates.emploiNonSal)}
+                data={ratesToArray(insersupAgg.globalRates.emploiNonSal)}
                 options={{
                   name: 'Emploi non salarié',
                   color: getChartColor('blue-cumulus'),
@@ -324,7 +255,7 @@ export default function Insersup({ insersupData }: InsersupProps) {
                 }}
               />
               <Line.Series
-                data={ratesToArray(insersupData.globalRates.emploiStable)}
+                data={ratesToArray(insersupAgg.globalRates.emploiStable)}
                 options={{
                   name: 'Emploi stable (CDI/fonctionnaire)',
                   color: getChartColor('purple-glycine'),
@@ -343,7 +274,7 @@ export default function Insersup({ insersupData }: InsersupProps) {
               >
                 <span className="fr-icon-lock-line fr-mr-1w" aria-hidden="true" />
                 Les taux d'emploi ne peuvent pas être affichés car le nombre total de sortants (
-                {insersupData.totalSortants}) est inférieur à 20.
+                {insersupAgg.totalSortants}) est inférieur à 20.
               </p>
             </div>
           )}
@@ -353,12 +284,12 @@ export default function Insersup({ insersupData }: InsersupProps) {
         <AnalyticsGraph
           title="Comparaison des taux d'emploi par genre"
           description="Évolution du taux d'emploi salarié en France, comparaison femmes-hommes"
-          chartRef={genderChartRef}
+          chartRef={insersupGenderChartRef}
           source="InserSup (MESR)"
         >
           {canShowGenderChart ? (
             <Chart
-              ref={genderChartRef}
+              ref={insersupGenderChartRef}
               containerProps={{
                 style: { width: '100%', minWidth: '300px', height: '350px' },
               }}
@@ -369,7 +300,7 @@ export default function Insersup({ insersupData }: InsersupProps) {
               <XAxis categories={MONTHS} title={{ text: 'Temps après diplôme' }} />
               <YAxis min={0} max={100} title={{ text: "Taux d'emploi salarié (%)" }} />
               <Line.Series
-                data={ratesToArray(globalFemme?.emploiSalFr ?? null)}
+                data={ratesToArray(insersupGlobalFemme?.emploiSalFr ?? null)}
                 options={{
                   name: 'Femmes',
                   color: getColorForSeries('femmes'),
@@ -377,7 +308,7 @@ export default function Insersup({ insersupData }: InsersupProps) {
                 }}
               />
               <Line.Series
-                data={ratesToArray(globalHomme?.emploiSalFr ?? null)}
+                data={ratesToArray(insersupGlobalHomme?.emploiSalFr ?? null)}
                 options={{
                   name: 'Hommes',
                   color: getColorForSeries('hommes'),
@@ -396,8 +327,8 @@ export default function Insersup({ insersupData }: InsersupProps) {
               >
                 <span className="fr-icon-lock-line fr-mr-1w" aria-hidden="true" />
                 Les taux d'emploi par genre ne peuvent pas être comparés car l'effectif est
-                insuffisant (femmes: {globalFemme?.nbSortants ?? 0}, hommes:{' '}
-                {globalHomme?.nbSortants ?? 0}).
+                insuffisant (femmes: {insersupGlobalFemme?.nbSortants ?? 0}, hommes:{' '}
+                {insersupGlobalHomme?.nbSortants ?? 0}).
               </p>
             </div>
           )}
@@ -407,12 +338,12 @@ export default function Insersup({ insersupData }: InsersupProps) {
         <AnalyticsGraph
           title="Comparaison des cohortes"
           description="Taux d'emploi salarié en France par promotion, évolution dans le temps après diplôme"
-          chartRef={cohortChartRef}
+          chartRef={insersupCohortChartRef}
           source="InserSup (MESR)"
         >
-          {cohortsWithData.length > 1 ? (
+          {insersupCohortsWithData.length > 1 ? (
             <Chart
-              ref={cohortChartRef}
+              ref={insersupCohortChartRef}
               containerProps={{
                 style: { width: '100%', minWidth: '300px', height: '350px' },
               }}
@@ -422,7 +353,7 @@ export default function Insersup({ insersupData }: InsersupProps) {
               <Tooltip shared valueSuffix="%" />
               <XAxis categories={MONTHS} title={{ text: 'Temps après diplôme' }} />
               <YAxis min={0} max={100} title={{ text: "Taux d'emploi salarié (%)" }} />
-              {cohortsWithData.map((cohort, index) => (
+              {insersupCohortsWithData.map((cohort: InsersupYearStats, index: number) => (
                 <Line.Series
                   key={cohort.promo}
                   data={ratesToArrayWithTrailingNulls(cohort.emploiSalFr)}
@@ -446,7 +377,7 @@ export default function Insersup({ insersupData }: InsersupProps) {
                 style={{ textAlign: 'center' }}
               >
                 <span className="fr-icon-information-line fr-mr-1w" aria-hidden="true" />
-                {cohortsWithData.length === 0
+                {insersupCohortsWithData.length === 0
                   ? "Aucune cohorte n'a un effectif suffisant pour afficher les taux d'emploi."
                   : 'Une seule cohorte disponible. Le graphique de comparaison nécessite au moins 2 cohortes.'}
               </p>
@@ -456,25 +387,25 @@ export default function Insersup({ insersupData }: InsersupProps) {
       </div>
 
       {/* Detail by Year Section - with cards and chart instead of tables */}
-      {years.length > 0 && (
+      {insersupYears.length > 0 && (
         <div className="fr-mb-3w">
           <h3 className="fr-text--md fr-text--bold fr-mb-2w">Détail par promotion</h3>
 
           {/* Year Selector */}
-          {years.length > 1 && (
+          {insersupYears.length > 1 && (
             <fieldset className="fr-segmented fr-mb-3w">
               <div className="fr-segmented__elements">
-                {years.map((year) => (
+                {insersupYears.map((year: string) => (
                   <div key={year} className="fr-segmented__element">
                     <input
-                      checked={year === currentYear}
+                      checked={year === currentInsersupYear}
                       value={year}
                       type="radio"
-                      id={`segmented-insersup-${year}`}
-                      name="segmented-insersup"
-                      onChange={() => setSelectedYear(year)}
+                      id={`segmented-insersup-ws-${year}`}
+                      name="segmented-insersup-ws"
+                      onChange={() => setSelectedInsersupYear(year)}
                     />
-                    <label className="fr-label" htmlFor={`segmented-insersup-${year}`}>
+                    <label className="fr-label" htmlFor={`segmented-insersup-ws-${year}`}>
                       {year}
                     </label>
                   </div>
@@ -483,7 +414,7 @@ export default function Insersup({ insersupData }: InsersupProps) {
             </fieldset>
           )}
 
-          {currentYearData && (
+          {currentInsersupYearData && (
             <>
               {/* Cohort Stats Cards */}
               <div
@@ -495,29 +426,30 @@ export default function Insersup({ insersupData }: InsersupProps) {
                 }}
               >
                 <SimpleStatCard
-                  value={currentYearData.nbEtudiants}
+                  value={currentInsersupYearData.nbEtudiants}
                   label="Diplômés suivis"
                   icon="fr-icon-user-fill"
                   color="blue-cumulus"
                 />
                 <SimpleStatCard
-                  value={currentYearData.nbSortants}
+                  value={currentInsersupYearData.nbSortants}
                   label="Sortants"
                   icon="fr-icon-arrow-right-up-line"
                   color="green-archipel"
                 />
                 <SimpleStatCard
-                  value={currentYearData.nbPoursuivants}
+                  value={currentInsersupYearData.nbPoursuivants}
                   label="Poursuivants"
                   icon="fr-icon-book-2-fill"
                   color="purple-glycine"
                 />
                 <SimpleStatCard
                   value={
-                    currentYearData.nbSortants + currentYearData.nbPoursuivants > 0
+                    currentInsersupYearData.nbSortants + currentInsersupYearData.nbPoursuivants > 0
                       ? `${Math.round(
-                          (currentYearData.nbPoursuivants /
-                            (currentYearData.nbSortants + currentYearData.nbPoursuivants)) *
+                          (currentInsersupYearData.nbPoursuivants /
+                            (currentInsersupYearData.nbSortants +
+                              currentInsersupYearData.nbPoursuivants)) *
                             100,
                         )}%`
                       : '-'
@@ -530,12 +462,13 @@ export default function Insersup({ insersupData }: InsersupProps) {
 
               {/* Year Employment Rates Chart */}
               <AnalyticsGraph
-                title={`Taux d'emploi - Promotion ${currentYear}`}
+                title={`Taux d'emploi - Promotion ${currentInsersupYear}`}
                 description="Évolution du taux d'emploi après l'obtention du diplôme pour cette promotion"
                 chartRef={cohortYearChartRef}
                 source="InserSup (MESR)"
               >
-                {currentYearData.canShowPercentages && currentYearData.emploiSalFr ? (
+                {currentInsersupYearData.canShowPercentages &&
+                currentInsersupYearData.emploiSalFr ? (
                   <Chart
                     ref={cohortYearChartRef}
                     containerProps={{
@@ -548,16 +481,16 @@ export default function Insersup({ insersupData }: InsersupProps) {
                     <XAxis categories={MONTHS} title={{ text: 'Temps après diplôme' }} />
                     <YAxis min={0} max={100} title={{ text: "Taux d'emploi (%)" }} />
                     <Line.Series
-                      data={ratesToArrayWithTrailingNulls(currentYearData.emploiSalFr)}
+                      data={ratesToArrayWithTrailingNulls(currentInsersupYearData.emploiSalFr)}
                       options={{
                         name: 'Emploi salarié en France',
                         color: getChartColor('green-archipel'),
                         marker: { enabled: true },
                       }}
                     />
-                    {currentYearData.emploiNonSal && (
+                    {currentInsersupYearData.emploiNonSal && (
                       <Line.Series
-                        data={ratesToArrayWithTrailingNulls(currentYearData.emploiNonSal)}
+                        data={ratesToArrayWithTrailingNulls(currentInsersupYearData.emploiNonSal)}
                         options={{
                           name: 'Emploi non salarié',
                           color: getChartColor('blue-cumulus'),
@@ -565,9 +498,9 @@ export default function Insersup({ insersupData }: InsersupProps) {
                         }}
                       />
                     )}
-                    {currentYearData.emploiStable && (
+                    {currentInsersupYearData.emploiStable && (
                       <Line.Series
-                        data={ratesToArrayWithTrailingNulls(currentYearData.emploiStable)}
+                        data={ratesToArrayWithTrailingNulls(currentInsersupYearData.emploiStable)}
                         options={{
                           name: 'Emploi stable (CDI/fonctionnaire)',
                           color: getChartColor('purple-glycine'),
@@ -587,7 +520,7 @@ export default function Insersup({ insersupData }: InsersupProps) {
                     >
                       <span className="fr-icon-lock-line fr-mr-1w" aria-hidden="true" />
                       Les taux d'emploi ne peuvent pas être affichés pour cette promotion car le
-                      nombre de sortants ({currentYearData.nbSortants}) est inférieur à 20.
+                      nombre de sortants ({currentInsersupYearData.nbSortants}) est inférieur à 20.
                     </p>
                   </div>
                 )}
@@ -596,6 +529,6 @@ export default function Insersup({ insersupData }: InsersupProps) {
           )}
         </div>
       )}
-    </section>
+    </>
   );
 }

@@ -39,7 +39,7 @@ export default function FormationPage() {
 
         <Effectifs siseData={siseData} />
 
-        <Insersup />
+        <Insersup insersupData={data.insersup} />
 
         <Debouches romeInfos={Array.isArray(formation?.romeInfos) ? formation.romeInfos : []} />
 

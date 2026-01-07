@@ -190,6 +190,97 @@ export interface RateLimitDoc {
   expiresAt: Date; // Require a TTL index
 }
 
+export interface InsersupDoc {
+  type_diplome: string;
+  type_diplome_long: string;
+  diplome: string;
+  libelle_diplome: string;
+  etablissement: string;
+  denomination_principale: string;
+  id_paysage: string;
+  uo_lib: string;
+  id_paysage_actuel: string;
+  uo_lib_actuel: string;
+  com_code: string;
+  promo: string;
+  genre: string;
+  obtention_diplome: string;
+  nationalite: string;
+  regime_inscription: string;
+  nb_etudiants: number;
+  nb_sortants: number;
+  nb_poursuivants: number;
+  nb_sortants_en_emploi_non_sal_6: number;
+  nb_sortants_en_emploi_non_sal_12: number;
+  nb_sortants_en_emploi_non_sal_18: number;
+  nb_sortants_en_emploi_non_sal_24: number;
+  nb_sortants_en_emploi_non_sal_30: number;
+  nb_sortants_en_emploi_sal_fr_6: number;
+  nb_sortants_en_emploi_sal_fr_12: number;
+  nb_sortants_en_emploi_sal_fr_18: number;
+  nb_sortants_en_emploi_sal_fr_24: number;
+  nb_sortants_en_emploi_sal_fr_30: number;
+  nb_sortants_en_emploi_stable_6: number;
+  nb_sortants_en_emploi_stable_12: number;
+  nb_sortants_en_emploi_stable_18: number;
+  nb_sortants_en_emploi_stable_24: number;
+  nb_sortants_en_emploi_stable_30: number;
+  etablissement_id_paysage_actuel: string;
+  diplom: string;
+  uai_fresq: string;
+  inf: string;
+}
+
+export interface EmploymentRates {
+  m6: number | null;
+  m12: number | null;
+  m18: number | null;
+  m24: number | null;
+  m30: number | null;
+}
+
+export interface InsersupGenderStats {
+  nbSortants: number;
+  canShowPercentages: boolean;
+  emploiSalFr: EmploymentRates | null;
+  emploiNonSal: EmploymentRates | null;
+  emploiStable: EmploymentRates | null;
+}
+
+export interface InsersupYearStats {
+  promo: string;
+  nbEtudiants: number;
+  nbSortants: number;
+  nbPoursuivants: number;
+  canShowPercentages: boolean;
+  emploiSalFr: EmploymentRates | null;
+  emploiNonSal: EmploymentRates | null;
+  emploiStable: EmploymentRates | null;
+  byGender: {
+    femme: InsersupGenderStats | null;
+    homme: InsersupGenderStats | null;
+  } | null;
+}
+
+export interface InsersupStats {
+  totalSortants: number;
+  totalEtudiants: number;
+  totalPoursuivants: number;
+  totalSortantsFrancais: number;
+  totalSortantsEtrangers: number;
+  canShowPercentages: boolean;
+  byYear: InsersupYearStats[];
+  globalRates: {
+    emploiSalFr: EmploymentRates | null;
+    emploiNonSal: EmploymentRates | null;
+    emploiStable: EmploymentRates | null;
+  } | null;
+  globalRatesByGender: {
+    femme: InsersupGenderStats | null;
+    homme: InsersupGenderStats | null;
+  } | null;
+}
+
 // Aggregation data cached for workspace dashboard
 export interface WorkspaceCacheDoc {
   workspaceId: string;
@@ -287,5 +378,24 @@ export interface WorkspaceCacheDoc {
       label: string;
       count: number;
     }[];
+  };
+  insersupAggregations: {
+    totalPrograms: number;
+    totalSortants: number;
+    totalEtudiants: number;
+    totalPoursuivants: number;
+    totalSortantsFrancais: number;
+    totalSortantsEtrangers: number;
+    canShowPercentages: boolean;
+    byYear: InsersupYearStats[];
+    globalRates: {
+      emploiSalFr: EmploymentRates | null;
+      emploiNonSal: EmploymentRates | null;
+      emploiStable: EmploymentRates | null;
+    } | null;
+    globalRatesByGender: {
+      femme: InsersupGenderStats | null;
+      homme: InsersupGenderStats | null;
+    } | null;
   };
 }

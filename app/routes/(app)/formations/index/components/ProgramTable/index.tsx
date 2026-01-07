@@ -5,6 +5,7 @@ import {
   useReactTable,
   type VisibilityState,
 } from '@tanstack/react-table';
+import cn from 'classnames';
 import { Activity, useMemo, useState } from 'react';
 import { useProgramsSearch } from '@/api/programs';
 import AddToWorkspace from '@/components/AddToWorkspace';
@@ -59,7 +60,7 @@ const TOGGLEABLE_COLUMNS: ProgramColumnId[] = [
 
 export default function ProgramsTable({ selectedPrograms, onSelectionChange }: ProgramsTableProps) {
   const { params, currentFilters, handlePageChange, handlePageSizeChange } = useProgramsFilters();
-  const { programs, totalCount } = useProgramsSearch({
+  const { programs, totalCount, isFetching } = useProgramsSearch({
     query: params.q,
     page: params.page,
     pageSize: Number(params.pageSize),
@@ -119,6 +120,7 @@ export default function ProgramsTable({ selectedPrograms, onSelectionChange }: P
     },
     meta: {
       hasSearchQuery,
+      isLoading: isFetching,
     },
     enableColumnResizing: false,
     defaultColumn: {
@@ -160,7 +162,10 @@ export default function ProgramsTable({ selectedPrograms, onSelectionChange }: P
         </div>
       </div>
       <div style={{ overflowX: 'auto' }}>
-        <table className="fr-table fr-my-1w" style={{ width: '100%' }}>
+        <table
+          className={cn('fr-table fr-my-1w', { 'table--loading': isFetching })}
+          style={{ width: '100%' }}
+        >
           <thead>
             {table.getHeaderGroups().map((headerGroup) => (
               <tr key={headerGroup.id}>
@@ -201,9 +206,35 @@ export default function ProgramsTable({ selectedPrograms, onSelectionChange }: P
                       width: cell.column.id === 'officialTitle' ? 'auto' : cell.column.getSize(),
                       minWidth: cell.column.columnDef.minSize,
                       maxWidth: cell.column.columnDef.maxSize,
+                      position: 'relative',
                     }}
                   >
-                    {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                    {isFetching && cell.column.id !== 'select' ? (
+                      cell.column.id === 'officialTitle' ? (
+                        <div
+                          className="fr-py-1v"
+                          style={{ display: 'flex', flexDirection: 'column', gap: '.75rem' }}
+                        >
+                          <span className="skeleton-text skeleton-text--xl" />
+                          <span
+                            className="skeleton-text skeleton-text--lg"
+                            style={{ height: '.75rem' }}
+                          />
+                        </div>
+                      ) : (
+                        <span
+                          className={cn('skeleton-text', {
+                            'skeleton-text--lg': cell.column.id === 'degreeTypeCode',
+                            'skeleton-text--md': !['degreeTypeCode', 'score'].includes(
+                              cell.column.id,
+                            ),
+                            'skeleton-text--sm': cell.column.id === 'score',
+                          })}
+                        />
+                      )
+                    ) : (
+                      flexRender(cell.column.columnDef.cell, cell.getContext())
+                    )}
                   </td>
                 ))}
               </tr>

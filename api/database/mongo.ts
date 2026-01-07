@@ -2,6 +2,7 @@
 import { type Collection, type Db, MongoClient } from 'mongodb';
 import { config } from '~/config';
 import type {
+  InsersupDoc,
   ProgramDoc,
   RateLimitDoc,
   SessionDoc,
@@ -19,6 +20,7 @@ export type Collections = {
   tokens: Collection<TokenDoc>;
   sessions: Collection<SessionDoc>;
   sise: Collection<SiseDoc>;
+  insersup: Collection<InsersupDoc>;
   workspaces: Collection<WorkspaceDoc>;
   workspaceEvents: Collection<WorkspaceEventDoc>;
   workspaceCache: Collection<WorkspaceCacheDoc>;
@@ -54,6 +56,7 @@ export async function connect(): Promise<Collections> {
     tokens: db.collection<TokenDoc>('tokens'),
     sessions: db.collection<SessionDoc>('sessions'),
     sise: db.collection<SiseDoc>('sise'),
+    insersup: db.collection<InsersupDoc>('insersup'),
     workspaces: db.collection<WorkspaceDoc>('workspaces'),
     workspaceEvents: db.collection<WorkspaceEventDoc>('workspace_events'),
     workspaceCache: db.collection<WorkspaceCacheDoc>('workspace_cache'),
@@ -119,4 +122,8 @@ async function ensureIndexes(cols: Collections): Promise<void> {
 
   // === SISE ===
   await cols.sise.createIndex({ inf: 1, annee: 1 });
+
+  // === INSERSUP ===
+  await cols.insersup.createIndex({ inf: 1, promo: 1 });
+  await cols.insersup.createIndex({ inf: 1 });
 }
