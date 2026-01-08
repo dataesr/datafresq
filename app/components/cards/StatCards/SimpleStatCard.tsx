@@ -19,43 +19,33 @@ export function SimpleStatCard({
   const chartColor = getChartColor(color);
 
   return (
-    <div
-      className="fr-card fr-card--shadow"
-      style={{
-        padding: 0,
-        overflow: 'hidden',
-        display: 'flex',
-        flexDirection: 'column',
-      }}
-    >
-      <div style={{ padding: '1.25rem 1.5rem' }}>
-        <div style={{ display: 'flex', alignItems: 'flex-start', gap: '1rem' }}>
-          {icon && (
-            <div
-              className={icon}
-              aria-hidden="true"
-              style={{
-                width: '2.5rem',
-                height: '2.5rem',
-                minWidth: '2.5rem',
-                borderRadius: '0.375rem',
-                background: `${chartColor}20`,
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                color: chartColor,
-              }}
-            />
-          )}
-          <div>
-            <p
-              className="fr-text--bold fr-text-title--grey fr-mb-0"
-              style={{ fontSize: '1.5rem', lineHeight: 1.2 }}
-            >
-              {typeof value === 'number' ? value.toLocaleString('fr-FR') : value}
-            </p>
-            <p className="fr-text--sm fr-text-mention--grey fr-mb-0">{label}</p>
-          </div>
+    <div className="fr-card fr-card--shadow fr-px-5v fr-py-3w" style={{ overflow: 'hidden' }}>
+      <div style={{ display: 'flex', alignItems: 'flex-start', gap: '1rem' }}>
+        {icon && (
+          <div
+            className={icon}
+            aria-hidden="true"
+            style={{
+              width: '2.5rem',
+              height: '2.5rem',
+              minWidth: '2.5rem',
+              borderRadius: '0.375rem',
+              background: `${chartColor}20`,
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              color: chartColor,
+            }}
+          />
+        )}
+        <div>
+          <p
+            className="fr-text--bold fr-text-title--grey fr-mb-0"
+            style={{ fontSize: '1.5rem', lineHeight: 1.2 }}
+          >
+            {typeof value === 'number' ? value.toLocaleString('fr-FR') : value}
+          </p>
+          <p className="fr-text--sm fr-text-mention--grey fr-mb-0">{label}</p>
         </div>
       </div>
     </div>

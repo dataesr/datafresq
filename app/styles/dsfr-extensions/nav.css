@@ -1,0 +1,157 @@
+/* ============================================================================
+   Colored Navigation Extensions
+   All DSFR colors for fr-nav--{color} variants
+   ============================================================================ */
+
+/* Green Tilleul Verveine */
+.fr-nav--green-tilleul-verveine .fr-nav__link[aria-current]:not([aria-current="false"]) {
+  color: var(--artwork-major-green-tilleul-verveine) !important;
+}
+
+.fr-nav--green-tilleul-verveine .fr-nav__link[aria-current]:not([aria-current="false"])::before {
+  background-color: var(--artwork-major-green-tilleul-verveine) !important;
+}
+
+/* Green Bourgeon */
+.fr-nav--green-bourgeon .fr-nav__link[aria-current]:not([aria-current="false"]) {
+  color: var(--artwork-major-green-bourgeon) !important;
+}
+
+.fr-nav--green-bourgeon .fr-nav__link[aria-current]:not([aria-current="false"])::before {
+  background-color: var(--artwork-major-green-bourgeon) !important;
+}
+
+/* Green Emeraude */
+.fr-nav--green-emeraude .fr-nav__link[aria-current]:not([aria-current="false"]) {
+  color: var(--artwork-major-green-emeraude) !important;
+}
+
+.fr-nav--green-emeraude .fr-nav__link[aria-current]:not([aria-current="false"])::before {
+  background-color: var(--artwork-major-green-emeraude) !important;
+}
+
+/* Green Menthe */
+.fr-nav--green-menthe .fr-nav__link[aria-current]:not([aria-current="false"]) {
+  color: var(--artwork-major-green-menthe) !important;
+}
+
+.fr-nav--green-menthe .fr-nav__link[aria-current]:not([aria-current="false"])::before {
+  background-color: var(--artwork-major-green-menthe) !important;
+}
+
+/* Green Archipel */
+.fr-nav--green-archipel .fr-nav__link[aria-current]:not([aria-current="false"]) {
+  color: var(--artwork-major-green-archipel) !important;
+}
+
+.fr-nav--green-archipel .fr-nav__link[aria-current]:not([aria-current="false"])::before {
+  background-color: var(--artwork-major-green-archipel) !important;
+}
+
+/* Blue Ecume */
+.fr-nav--blue-ecume .fr-nav__link[aria-current]:not([aria-current="false"]) {
+  color: var(--artwork-major-blue-ecume) !important;
+}
+
+.fr-nav--blue-ecume .fr-nav__link[aria-current]:not([aria-current="false"])::before {
+  background-color: var(--artwork-major-blue-ecume) !important;
+}
+
+/* Blue Cumulus */
+.fr-nav--blue-cumulus .fr-nav__link[aria-current]:not([aria-current="false"]) {
+  color: var(--artwork-major-blue-cumulus) !important;
+}
+
+.fr-nav--blue-cumulus .fr-nav__link[aria-current]:not([aria-current="false"])::before {
+  background-color: var(--artwork-major-blue-cumulus) !important;
+}
+
+/* Purple Glycine */
+.fr-nav--purple-glycine .fr-nav__link[aria-current]:not([aria-current="false"]) {
+  color: var(--artwork-major-purple-glycine) !important;
+}
+
+.fr-nav--purple-glycine .fr-nav__link[aria-current]:not([aria-current="false"])::before {
+  background-color: var(--artwork-major-purple-glycine) !important;
+}
+
+/* Pink Macaron */
+.fr-nav--pink-macaron .fr-nav__link[aria-current]:not([aria-current="false"]) {
+  color: var(--artwork-major-pink-macaron) !important;
+}
+
+.fr-nav--pink-macaron .fr-nav__link[aria-current]:not([aria-current="false"])::before {
+  background-color: var(--artwork-major-pink-macaron) !important;
+}
+
+/* Pink Tuile */
+.fr-nav--pink-tuile .fr-nav__link[aria-current]:not([aria-current="false"]) {
+  color: var(--artwork-major-pink-tuile) !important;
+}
+
+.fr-nav--pink-tuile .fr-nav__link[aria-current]:not([aria-current="false"])::before {
+  background-color: var(--artwork-major-pink-tuile) !important;
+}
+
+/* Yellow Tournesol */
+.fr-nav--yellow-tournesol .fr-nav__link[aria-current]:not([aria-current="false"]) {
+  color: var(--artwork-major-yellow-tournesol) !important;
+}
+
+.fr-nav--yellow-tournesol .fr-nav__link[aria-current]:not([aria-current="false"])::before {
+  background-color: var(--artwork-major-yellow-tournesol) !important;
+}
+
+/* Yellow Moutarde */
+.fr-nav--yellow-moutarde .fr-nav__link[aria-current]:not([aria-current="false"]) {
+  color: var(--artwork-major-yellow-moutarde) !important;
+}
+
+.fr-nav--yellow-moutarde .fr-nav__link[aria-current]:not([aria-current="false"])::before {
+  background-color: var(--artwork-major-yellow-moutarde) !important;
+}
+
+/* Orange Terre Battue */
+.fr-nav--orange-terre-battue .fr-nav__link[aria-current]:not([aria-current="false"]) {
+  color: var(--artwork-major-orange-terre-battue) !important;
+}
+
+.fr-nav--orange-terre-battue .fr-nav__link[aria-current]:not([aria-current="false"])::before {
+  background-color: var(--artwork-major-orange-terre-battue) !important;
+}
+
+/* Brown Cafe Creme */
+.fr-nav--brown-cafe-creme .fr-nav__link[aria-current]:not([aria-current="false"]) {
+  color: var(--artwork-major-brown-cafe-creme) !important;
+}
+
+.fr-nav--brown-cafe-creme .fr-nav__link[aria-current]:not([aria-current="false"])::before {
+  background-color: var(--artwork-major-brown-cafe-creme) !important;
+}
+
+/* Brown Caramel */
+.fr-nav--brown-caramel .fr-nav__link[aria-current]:not([aria-current="false"]) {
+  color: var(--artwork-major-brown-caramel) !important;
+}
+
+.fr-nav--brown-caramel .fr-nav__link[aria-current]:not([aria-current="false"])::before {
+  background-color: var(--artwork-major-brown-caramel) !important;
+}
+
+/* Brown Opera */
+.fr-nav--brown-opera .fr-nav__link[aria-current]:not([aria-current="false"]) {
+  color: var(--artwork-major-brown-opera) !important;
+}
+
+.fr-nav--brown-opera .fr-nav__link[aria-current]:not([aria-current="false"])::before {
+  background-color: var(--artwork-major-brown-opera) !important;
+}
+
+/* Beige Gris Galet */
+.fr-nav--beige-gris-galet .fr-nav__link[aria-current]:not([aria-current="false"]) {
+  color: var(--artwork-major-beige-gris-galet) !important;
+}
+
+.fr-nav--beige-gris-galet .fr-nav__link[aria-current]:not([aria-current="false"])::before {
+  background-color: var(--artwork-major-beige-gris-galet) !important;
+}

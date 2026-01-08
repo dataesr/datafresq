@@ -561,7 +561,7 @@ export default function Parametres() {
   }
 
   return (
-    <div>
+    <div className="fr-pb-4w fr-pt-4w">
       <GeneralSettings key={`general-${workspaceId}`} workspace={workspace} />
       <hr />
       <UsersSettings key={`users-${workspaceId}`} workspace={workspace} />

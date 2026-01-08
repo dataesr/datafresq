@@ -51,12 +51,8 @@ export function InsersupView({ aggregations, programCount }: InsersupViewProps) 
 
   // Calculated stats
   const insersupPursuitRate =
-    insersupAgg.totalSortants + insersupAgg.totalPoursuivants > 0
-      ? Math.round(
-          (insersupAgg.totalPoursuivants /
-            (insersupAgg.totalSortants + insersupAgg.totalPoursuivants)) *
-            100,
-        )
+    insersupAgg.totalEtudiants > 0 && insersupAgg.totalPoursuivants > 0
+      ? Math.round((insersupAgg.totalPoursuivants / insersupAgg.totalEtudiants) * 100)
       : 0;
 
   const insersupTotalNationality =
@@ -445,11 +441,9 @@ export function InsersupView({ aggregations, programCount }: InsersupViewProps) 
                 />
                 <SimpleStatCard
                   value={
-                    currentInsersupYearData.nbSortants + currentInsersupYearData.nbPoursuivants > 0
+                    currentInsersupYearData.nbEtudiants > 0 && currentInsersupYearData.nbPoursuivants > 0
                       ? `${Math.round(
-                          (currentInsersupYearData.nbPoursuivants /
-                            (currentInsersupYearData.nbSortants +
-                              currentInsersupYearData.nbPoursuivants)) *
+                          (currentInsersupYearData.nbPoursuivants / currentInsersupYearData.nbEtudiants) *
                             100,
                         )}%`
                       : '-'
