@@ -31,12 +31,11 @@
   padding: 0;
   display: flex;
   align-items: center;
-
-  .avatar-box {
-    border: 2px solid var(--background-default-grey);
-  }
-
   .avatar {
+    .avatar-box {
+      box-shadow: inset 0 0 0 2px var(--background-default-grey);
+    }
+    padding: 0;
     -webkit-transition: 0.2s ease;
     transition: 0.2s ease;
 

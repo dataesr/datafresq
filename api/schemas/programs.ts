@@ -306,7 +306,8 @@ export const siseRecordSchema = t.Object({
   city: t.String(),
 });
 
-const employmentRatesSchema = t.Object({
+// Employment counts (raw counts, not percentages)
+const employmentCountsSchema = t.Object({
   m6: t.Union([t.Number(), t.Null()]),
   m12: t.Union([t.Number(), t.Null()]),
   m18: t.Union([t.Number(), t.Null()]),
@@ -314,12 +315,29 @@ const employmentRatesSchema = t.Object({
   m30: t.Union([t.Number(), t.Null()]),
 });
 
+// Salary quartile data for a single month
+const salaryMonthSchema = t.Object({
+  count: t.Union([t.Number(), t.Null()]),
+  q1: t.Union([t.Number(), t.Null()]),
+  median: t.Union([t.Number(), t.Null()]),
+  q3: t.Union([t.Number(), t.Null()]),
+});
+
+// Salary quartiles across all months
+const salaryQuartilesSchema = t.Object({
+  m6: salaryMonthSchema,
+  m12: salaryMonthSchema,
+  m18: salaryMonthSchema,
+  m24: salaryMonthSchema,
+  m30: salaryMonthSchema,
+});
+
 const insersupGenderStatsSchema = t.Object({
   nbSortants: t.Number(),
-  canShowPercentages: t.Boolean(),
-  emploiSalFr: t.Union([employmentRatesSchema, t.Null()]),
-  emploiNonSal: t.Union([employmentRatesSchema, t.Null()]),
-  emploiStable: t.Union([employmentRatesSchema, t.Null()]),
+  emploiSalFr: t.Union([employmentCountsSchema, t.Null()]),
+  emploiNonSal: t.Union([employmentCountsSchema, t.Null()]),
+  emploiStable: t.Union([employmentCountsSchema, t.Null()]),
+  salaires: t.Union([salaryQuartilesSchema, t.Null()]),
 });
 
 const insersupYearStatsSchema = t.Object({
@@ -327,17 +345,14 @@ const insersupYearStatsSchema = t.Object({
   nbEtudiants: t.Number(),
   nbSortants: t.Number(),
   nbPoursuivants: t.Number(),
-  canShowPercentages: t.Boolean(),
-  emploiSalFr: t.Union([employmentRatesSchema, t.Null()]),
-  emploiNonSal: t.Union([employmentRatesSchema, t.Null()]),
-  emploiStable: t.Union([employmentRatesSchema, t.Null()]),
-  byGender: t.Union([
-    t.Object({
-      femme: t.Union([insersupGenderStatsSchema, t.Null()]),
-      homme: t.Union([insersupGenderStatsSchema, t.Null()]),
-    }),
-    t.Null(),
-  ]),
+  emploiSalFr: t.Union([employmentCountsSchema, t.Null()]),
+  emploiNonSal: t.Union([employmentCountsSchema, t.Null()]),
+  emploiStable: t.Union([employmentCountsSchema, t.Null()]),
+  salaires: t.Union([salaryQuartilesSchema, t.Null()]),
+  byGender: t.Object({
+    femme: t.Union([insersupGenderStatsSchema, t.Null()]),
+    homme: t.Union([insersupGenderStatsSchema, t.Null()]),
+  }),
 });
 
 const insersupStatsSchema = t.Object({
@@ -346,23 +361,7 @@ const insersupStatsSchema = t.Object({
   totalPoursuivants: t.Number(),
   totalSortantsFrancais: t.Number(),
   totalSortantsEtrangers: t.Number(),
-  canShowPercentages: t.Boolean(),
   byYear: t.Array(insersupYearStatsSchema),
-  globalRates: t.Union([
-    t.Object({
-      emploiSalFr: t.Union([employmentRatesSchema, t.Null()]),
-      emploiNonSal: t.Union([employmentRatesSchema, t.Null()]),
-      emploiStable: t.Union([employmentRatesSchema, t.Null()]),
-    }),
-    t.Null(),
-  ]),
-  globalRatesByGender: t.Union([
-    t.Object({
-      femme: t.Union([insersupGenderStatsSchema, t.Null()]),
-      homme: t.Union([insersupGenderStatsSchema, t.Null()]),
-    }),
-    t.Null(),
-  ]),
 });
 
 export const programDetailResponseSchema = t.Object({
@@ -399,3 +398,9 @@ export type ProgramsFacetsResponse = typeof programsFacetsResponseSchema.static;
 export type ProgramsSearchResponse = typeof programsSearchResponseSchema.static;
 export type SiseRecord = typeof siseRecordSchema.static;
 export type ProgramDetailResponse = typeof programDetailResponseSchema.static;
+export type InsersupStats = typeof insersupStatsSchema.static;
+export type InsersupYearStats = typeof insersupYearStatsSchema.static;
+export type InsersupGenderStats = typeof insersupGenderStatsSchema.static;
+export type EmploymentCounts = typeof employmentCountsSchema.static;
+export type SalaryQuartiles = typeof salaryQuartilesSchema.static;
+export type SalaryMonth = typeof salaryMonthSchema.static;

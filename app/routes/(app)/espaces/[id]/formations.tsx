@@ -160,7 +160,7 @@ export default function Formations() {
   const totalPages = table.getPageCount();
 
   return (
-    <div className="fr-py-4w">
+    <div className="fr-pb-4w">
       <div className="fx-spacer">
         <div>
           <Activity mode={selectedPrograms.length && canEdit ? 'visible' : 'hidden'}>

@@ -64,7 +64,7 @@ export default function Historique() {
   }
 
   return (
-    <div className="fr-py-4w">
+    <div className="fr-pb-4w">
       <ul style={{ listStyle: 'none', padding: 0, margin: 0 }}>
         {history.data.map((event) => (
           <li

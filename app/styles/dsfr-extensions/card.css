@@ -11,6 +11,16 @@
   border: 1px solid var(--border-default-grey);
   padding: 1.5rem;
 }
+
+.fx-card--shadow {
+  --idle: transparent;
+  --hover: var(--background-raised-grey-hover);
+  --active: var(--background-raised-grey-active);
+  background-color: var(--background-raised-grey);
+  filter: drop-shadow(var(--raised-shadow));
+  z-index: calc(var(--ground) + 500);
+}
+
 .fx-card--no-border {
   border: none !important;
 }

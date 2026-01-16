@@ -1,174 +1,69 @@
-import type { HighchartsReactRefObject } from '@highcharts/react';
-import { Chart, Credits, Legend, Tooltip, XAxis, YAxis } from '@highcharts/react';
-import { Column, Line } from '@highcharts/react/series';
-import { useRef, useState } from 'react';
-import { AnalyticsGraph } from '@/components/AnalyticsGraph';
-import { SimpleStatCard } from '@/components/cards/StatCards';
-import { getChartColor, getColorForSeries } from '@/components/highcharts';
+import { Activity, useMemo, useState } from 'react';
+import { AutoGrid } from '@/components/Grids/AutoGrid';
+import {
+  EmploymentRateByGenderChart,
+  EmploymentRateChart,
+  EmploymentRateEvolutionChart,
+  EmploymentStabilityChart,
+  EmploymentStabilityEvolutionChart,
+  EmptyState,
+  PRIVACY_THRESHOLD,
+  YearSelector,
+} from '@/components/insersup';
+import { NoDataMessage } from '@/components/NoDataMessage';
 import PillsTitle from '@/components/PillsTitle';
-
-// Types
-interface EmploymentRates {
-  m6: number | null;
-  m12: number | null;
-  m18: number | null;
-  m24: number | null;
-  m30: number | null;
-}
-
-interface InsersupGenderStats {
-  nbSortants: number;
-  canShowPercentages: boolean;
-  emploiSalFr: EmploymentRates | null;
-  emploiNonSal: EmploymentRates | null;
-  emploiStable: EmploymentRates | null;
-}
-
-interface InsersupYearStats {
-  promo: string;
-  nbEtudiants: number;
-  nbSortants: number;
-  nbPoursuivants: number;
-  canShowPercentages: boolean;
-  emploiSalFr: EmploymentRates | null;
-  emploiNonSal: EmploymentRates | null;
-  emploiStable: EmploymentRates | null;
-  byGender: {
-    femme: InsersupGenderStats | null;
-    homme: InsersupGenderStats | null;
-  } | null;
-}
-
-interface InsersupStats {
-  totalSortants: number;
-  totalEtudiants: number;
-  totalPoursuivants: number;
-  totalSortantsFrancais: number;
-  totalSortantsEtrangers: number;
-  canShowPercentages: boolean;
-  byYear: InsersupYearStats[];
-  globalRates: {
-    emploiSalFr: EmploymentRates | null;
-    emploiNonSal: EmploymentRates | null;
-    emploiStable: EmploymentRates | null;
-  } | null;
-  globalRatesByGender: {
-    femme: InsersupGenderStats | null;
-    homme: InsersupGenderStats | null;
-  } | null;
-}
+import type { InsersupStats, InsersupYearStats } from '~/schemas/programs';
+import { InsersupStatsCards } from './components/InsersupStatsCards';
+import { SalaryByGenderChart } from './components/SalaryByGenderChart';
+import { SalaryChart } from './components/SalaryChart';
+import { SalaryEvolutionChart } from './components/SalaryEvolutionChart';
 
 interface InsersupProps {
   insersupData: InsersupStats;
 }
 
-// Constants
-const MONTHS = ['6 mois', '12 mois', '18 mois', '24 mois', '30 mois'];
-
-const COHORT_COLORS = [
-  'green-archipel',
-  'blue-cumulus',
-  'purple-glycine',
-  'pink-macaron',
-  'yellow-tournesol',
-  'orange-terre-battue',
-  'brown-caramel',
-  'beige-gris-galet',
-] as const;
-
-// Utility functions
-function ratesToArray(rates: EmploymentRates | null): (number | null)[] {
-  if (!rates) return [null, null, null, null, null];
-  return [rates.m6, rates.m12, rates.m18, rates.m24, rates.m30];
+function useCanShowEvolution(sortedByYear: InsersupYearStats[]) {
+  return useMemo(() => {
+    const cohortsWithData = sortedByYear.filter(
+      (y) => y.emploiSalFr !== null && y.nbSortants >= PRIVACY_THRESHOLD,
+    );
+    return cohortsWithData.length >= 2;
+  }, [sortedByYear]);
 }
 
-function ratesToArrayWithTrailingNulls(rates: EmploymentRates | null): (number | null)[] {
-  if (!rates) return [null, null, null, null, null];
-  const values = [rates.m6, rates.m12, rates.m18, rates.m24, rates.m30];
-  let lastValidIndex = -1;
-  for (let i = values.length - 1; i >= 0; i--) {
-    if (values[i] !== null && values[i] !== 0) {
-      lastValidIndex = i;
-      break;
-    }
-  }
-  if (lastValidIndex === -1) return [null, null, null, null, null];
-  return values.map((v, i) => (i <= lastValidIndex ? v : null));
-}
-
-// Component
 export default function Insersup({ insersupData }: InsersupProps) {
-  const employmentChartRef = useRef<HighchartsReactRefObject | null>(null);
-  const evolutionChartRef = useRef<HighchartsReactRefObject | null>(null);
-  const genderChartRef = useRef<HighchartsReactRefObject | null>(null);
-  const cohortChartRef = useRef<HighchartsReactRefObject | null>(null);
-  const cohortYearChartRef = useRef<HighchartsReactRefObject | null>(null);
-  const [selectedYear, setSelectedYear] = useState<string | null>(null);
+  const availableYears = useMemo(
+    () => insersupData.byYear.map((y) => y.promo).sort((a, b) => b.localeCompare(a)),
+    [insersupData.byYear],
+  );
 
-  const hasData = insersupData.byYear.length > 0;
+  const yearDataMap = useMemo(() => {
+    const map = new Map<string, InsersupYearStats>();
+    for (const yearStats of insersupData.byYear) {
+      map.set(yearStats.promo, yearStats);
+    }
+    return map;
+  }, [insersupData.byYear]);
 
-  if (!hasData) {
+  const sortedByYear = useMemo(
+    () => [...insersupData.byYear].sort((a, b) => a.promo.localeCompare(b.promo)),
+    [insersupData.byYear],
+  );
+
+  const canShowEvolution = useCanShowEvolution(sortedByYear);
+
+  const [selectedYear, setSelectedYear] = useState<string | null>(() => availableYears[0] || null);
+
+  if (!insersupData || insersupData.byYear.length === 0) {
     return (
       <section id="insersup" className="formation-section">
         <PillsTitle as="h2" icon="fr-icon-briefcase-line">
           Insertion professionnelle
         </PillsTitle>
-        <div className="fr-py-2w fr-px-3v fr-background-alt--grey fx-radius--sm">
-          <p className="fr-text--sm fr-mb-0 fr-text-mention--grey">
-            Aucune donnée d'insertion professionnelle disponible pour cette formation.
-          </p>
-        </div>
+        <EmptyState />
       </section>
     );
   }
-
-  // Year selection logic
-  const years = insersupData.byYear.map((y) => y.promo).sort((a, b) => b.localeCompare(a));
-  const currentYear = selectedYear || years[0] || null;
-  const currentYearData = insersupData.byYear.find((y) => y.promo === currentYear);
-
-  // Sorted data for charts
-  const sortedByYear = [...insersupData.byYear].sort((a, b) => a.promo.localeCompare(b.promo));
-  const yearCategories = sortedByYear.map((y) => y.promo);
-  const sortantsTrend = sortedByYear.map((y) => y.nbSortants);
-  const poursuivantsTrend = sortedByYear.map((y) => y.nbPoursuivants);
-
-  // Calculated stats
-  const pursuitRate =
-    insersupData.totalSortants + insersupData.totalPoursuivants > 0
-      ? Math.round(
-          (insersupData.totalPoursuivants /
-            (insersupData.totalSortants + insersupData.totalPoursuivants)) *
-            100,
-        )
-      : 0;
-
-  const totalNationality = insersupData.totalSortantsFrancais + insersupData.totalSortantsEtrangers;
-  const francaisRate =
-    totalNationality > 0
-      ? Math.round((insersupData.totalSortantsFrancais / totalNationality) * 100)
-      : 0;
-
-  const globalFemme = insersupData.globalRatesByGender?.femme;
-  const globalHomme = insersupData.globalRatesByGender?.homme;
-
-  // Calculate feminization rate for sortants
-  const totalGenderSortants = (globalFemme?.nbSortants ?? 0) + (globalHomme?.nbSortants ?? 0);
-  const femalePercent =
-    totalGenderSortants > 0
-      ? Math.round(((globalFemme?.nbSortants ?? 0) / totalGenderSortants) * 100)
-      : 0;
-
-  const cohortsWithData = insersupData.byYear
-    .filter((y) => y.canShowPercentages && y.emploiSalFr)
-    .sort((a, b) => b.promo.localeCompare(a.promo));
-
-  // Check if gender comparison chart can be shown
-  const canShowGenderChart =
-    globalFemme?.canShowPercentages &&
-    globalHomme?.canShowPercentages &&
-    globalFemme.emploiSalFr &&
-    globalHomme.emploiSalFr;
 
   return (
     <section id="insersup" className="formation-section">
@@ -176,426 +71,56 @@ export default function Insersup({ insersupData }: InsersupProps) {
         Insertion professionnelle
       </PillsTitle>
 
-      {/* Key Metrics Cards - includes GenderRatioCard */}
-      <div
-        style={{
-          display: 'grid',
-          gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 280px), 1fr))',
-          gap: '1rem',
-          marginBottom: '2rem',
-        }}
-      >
-        <SimpleStatCard
-          value={insersupData.totalEtudiants}
-          label="Diplômés suivis"
-          icon="fr-icon-user-fill"
-          color="blue-cumulus"
+      <div>
+        <YearSelector
+          availableYears={availableYears}
+          selectedYear={selectedYear}
+          onYearChange={setSelectedYear}
+          disableEvolution={!canShowEvolution}
+          disableEvolutionTooltip="Pas assez de cohortes pour afficher l'évolution (minimum 2 requises)"
         />
-        <SimpleStatCard
-          value={insersupData.totalSortants}
-          label="Sortants (entrée sur le marché)"
-          icon="fr-icon-arrow-right-up-line"
-          color="green-archipel"
-        />
-        <SimpleStatCard
-          value={insersupData.totalPoursuivants}
-          label="Poursuivants (études)"
-          icon="fr-icon-book-2-fill"
-          color="purple-glycine"
-        />
-        <SimpleStatCard
-          value={`${pursuitRate}%`}
-          label="Taux de poursuite d'études"
-          icon="fr-icon-git-merge-line"
-          color="yellow-tournesol"
-        />
-        <SimpleStatCard
-          value={`${francaisRate}%`}
-          label="Français parmi les sortants"
-          icon="fr-icon-france-line"
-          color="blue-ecume"
-        />
-        {/* Feminization ratio */}
-        {globalFemme && (
-          <SimpleStatCard
-            value={`${femalePercent}% (${globalFemme.nbSortants.toLocaleString('fr-FR')})`}
-            label="Ratio de femmes sortantes"
-            icon="fr-icon-user-line"
-            color="pink-macaron"
-          />
-        )}
+
+        {availableYears.map((year) => {
+          const yearData = yearDataMap.get(year);
+          if (!yearData) return null;
+
+          return (
+            <Activity key={year} mode={selectedYear === year ? 'visible' : 'hidden'}>
+              <InsersupStatsCards yearData={yearData} />
+              {yearData.nbSortants < PRIVACY_THRESHOLD ? (
+                <NoDataMessage
+                  icon="fr-icon-lock-line"
+                  message={`Les taux d'emploi ne peuvent pas être affichés pour cette promotion car le nombre de sortants (${yearData.nbSortants}) est inférieur à 20.`}
+                />
+              ) : (
+                <>
+                  <AutoGrid min={600}>
+                    <EmploymentRateChart yearData={yearData} year={year} />
+                  </AutoGrid>
+
+                  <AutoGrid>
+                    <EmploymentStabilityChart yearData={yearData} year={year} />
+                    <EmploymentRateByGenderChart yearData={yearData} year={year} />
+                  </AutoGrid>
+
+                  <AutoGrid>
+                    <SalaryChart yearData={yearData} year={year} />
+                    <SalaryByGenderChart yearData={yearData} year={year} />
+                  </AutoGrid>
+                </>
+              )}
+            </Activity>
+          );
+        })}
+
+        <Activity mode={selectedYear ? 'hidden' : 'visible'}>
+          <AutoGrid min={600}>
+            <EmploymentRateEvolutionChart sortedByYear={sortedByYear} />
+            <EmploymentStabilityEvolutionChart sortedByYear={sortedByYear} />
+            <SalaryEvolutionChart sortedByYear={sortedByYear} />
+          </AutoGrid>
+        </Activity>
       </div>
-
-      {/* Charts Grid - 4 charts, 2 per row at 500px */}
-      <div
-        style={{
-          display: 'grid',
-          gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 500px), 1fr))',
-          gap: '1.5rem',
-          marginBottom: '2rem',
-        }}
-      >
-        {/* Cohort Evolution Chart */}
-        <AnalyticsGraph
-          title="Évolution des cohortes"
-          description={`Répartition sortants/poursuivants sur ${yearCategories.length} promotions`}
-          chartRef={evolutionChartRef}
-          source="InserSup (MESR)"
-        >
-          {yearCategories.length > 1 ? (
-            <Chart
-              ref={evolutionChartRef}
-              containerProps={{
-                style: { width: '100%', minWidth: '300px', height: '350px' },
-              }}
-            >
-              <Credits enabled={false} />
-              <Legend align="center" />
-              <Tooltip shared />
-              <XAxis categories={yearCategories} title={{ text: 'Promotion' }} />
-              <YAxis min={0} title={{ text: 'Effectif' }} />
-              <Column.Series
-                data={sortantsTrend}
-                options={{
-                  name: 'Sortants',
-                  color: getChartColor('green-archipel'),
-                  stacking: 'normal',
-                }}
-              />
-              <Column.Series
-                data={poursuivantsTrend}
-                options={{
-                  name: 'Poursuivants',
-                  color: getChartColor('purple-glycine'),
-                  stacking: 'normal',
-                }}
-              />
-            </Chart>
-          ) : (
-            <div
-              className="fr-py-4w fr-px-3v fr-background-alt--grey"
-              style={{ borderRadius: '0.25rem' }}
-            >
-              <p
-                className="fr-text--sm fr-mb-0 fr-text-mention--grey"
-                style={{ textAlign: 'center' }}
-              >
-                <span className="fr-icon-information-line fr-mr-1w" aria-hidden="true" />
-                Une seule promotion disponible. Le graphique d'évolution nécessite au moins 2
-                promotions.
-              </p>
-            </div>
-          )}
-        </AnalyticsGraph>
-
-        {/* Global Employment Rates Chart */}
-        <AnalyticsGraph
-          title="Taux d'emploi global"
-          description="Évolution du taux d'emploi après l'obtention du diplôme (toutes promotions confondues)"
-          chartRef={employmentChartRef}
-          source="InserSup (MESR)"
-        >
-          {insersupData.canShowPercentages && insersupData.globalRates ? (
-            <Chart
-              ref={employmentChartRef}
-              containerProps={{
-                style: { width: '100%', minWidth: '300px', height: '350px' },
-              }}
-            >
-              <Credits enabled={false} />
-              <Legend align="center" />
-              <Tooltip shared valueSuffix="%" />
-              <XAxis categories={MONTHS} title={{ text: 'Temps après diplôme' }} />
-              <YAxis min={0} max={100} title={{ text: "Taux d'emploi (%)" }} />
-              <Line.Series
-                data={ratesToArray(insersupData.globalRates.emploiSalFr)}
-                options={{
-                  name: 'Emploi salarié en France',
-                  color: getChartColor('green-archipel'),
-                  marker: { enabled: true },
-                }}
-              />
-              <Line.Series
-                data={ratesToArray(insersupData.globalRates.emploiNonSal)}
-                options={{
-                  name: 'Emploi non salarié',
-                  color: getChartColor('blue-cumulus'),
-                  marker: { enabled: true },
-                }}
-              />
-              <Line.Series
-                data={ratesToArray(insersupData.globalRates.emploiStable)}
-                options={{
-                  name: 'Emploi stable (CDI/fonctionnaire)',
-                  color: getChartColor('purple-glycine'),
-                  marker: { enabled: true },
-                }}
-              />
-            </Chart>
-          ) : (
-            <div
-              className="fr-py-4w fr-px-3v fr-background-alt--grey"
-              style={{ borderRadius: '0.25rem' }}
-            >
-              <p
-                className="fr-text--sm fr-mb-0 fr-text-mention--grey"
-                style={{ textAlign: 'center' }}
-              >
-                <span className="fr-icon-lock-line fr-mr-1w" aria-hidden="true" />
-                Les taux d'emploi ne peuvent pas être affichés car le nombre total de sortants (
-                {insersupData.totalSortants}) est inférieur à 20.
-              </p>
-            </div>
-          )}
-        </AnalyticsGraph>
-
-        {/* Gender Comparison Chart */}
-        <AnalyticsGraph
-          title="Comparaison des taux d'emploi par genre"
-          description="Évolution du taux d'emploi salarié en France, comparaison femmes-hommes"
-          chartRef={genderChartRef}
-          source="InserSup (MESR)"
-        >
-          {canShowGenderChart ? (
-            <Chart
-              ref={genderChartRef}
-              containerProps={{
-                style: { width: '100%', minWidth: '300px', height: '350px' },
-              }}
-            >
-              <Credits enabled={false} />
-              <Legend align="center" />
-              <Tooltip shared valueSuffix="%" />
-              <XAxis categories={MONTHS} title={{ text: 'Temps après diplôme' }} />
-              <YAxis min={0} max={100} title={{ text: "Taux d'emploi salarié (%)" }} />
-              <Line.Series
-                data={ratesToArray(globalFemme?.emploiSalFr ?? null)}
-                options={{
-                  name: 'Femmes',
-                  color: getColorForSeries('femmes'),
-                  marker: { enabled: true },
-                }}
-              />
-              <Line.Series
-                data={ratesToArray(globalHomme?.emploiSalFr ?? null)}
-                options={{
-                  name: 'Hommes',
-                  color: getColorForSeries('hommes'),
-                  marker: { enabled: true },
-                }}
-              />
-            </Chart>
-          ) : (
-            <div
-              className="fr-py-4w fr-px-3v fr-background-alt--grey"
-              style={{ borderRadius: '0.25rem' }}
-            >
-              <p
-                className="fr-text--sm fr-mb-0 fr-text-mention--grey"
-                style={{ textAlign: 'center' }}
-              >
-                <span className="fr-icon-lock-line fr-mr-1w" aria-hidden="true" />
-                Les taux d'emploi par genre ne peuvent pas être comparés car l'effectif est
-                insuffisant (femmes: {globalFemme?.nbSortants ?? 0}, hommes:{' '}
-                {globalHomme?.nbSortants ?? 0}).
-              </p>
-            </div>
-          )}
-        </AnalyticsGraph>
-
-        {/* Cohort Comparison Chart */}
-        <AnalyticsGraph
-          title="Comparaison des cohortes"
-          description="Taux d'emploi salarié en France par promotion, évolution dans le temps après diplôme"
-          chartRef={cohortChartRef}
-          source="InserSup (MESR)"
-        >
-          {cohortsWithData.length > 1 ? (
-            <Chart
-              ref={cohortChartRef}
-              containerProps={{
-                style: { width: '100%', minWidth: '300px', height: '350px' },
-              }}
-            >
-              <Credits enabled={false} />
-              <Legend align="center" />
-              <Tooltip shared valueSuffix="%" />
-              <XAxis categories={MONTHS} title={{ text: 'Temps après diplôme' }} />
-              <YAxis min={0} max={100} title={{ text: "Taux d'emploi salarié (%)" }} />
-              {cohortsWithData.map((cohort, index) => (
-                <Line.Series
-                  key={cohort.promo}
-                  data={ratesToArrayWithTrailingNulls(cohort.emploiSalFr)}
-                  options={{
-                    name: `Promo ${cohort.promo}`,
-                    color: getChartColor(
-                      COHORT_COLORS[index % COHORT_COLORS.length] || 'green-archipel',
-                    ),
-                    marker: { enabled: true },
-                  }}
-                />
-              ))}
-            </Chart>
-          ) : (
-            <div
-              className="fr-py-4w fr-px-3v fr-background-alt--grey"
-              style={{ borderRadius: '0.25rem' }}
-            >
-              <p
-                className="fr-text--sm fr-mb-0 fr-text-mention--grey"
-                style={{ textAlign: 'center' }}
-              >
-                <span className="fr-icon-information-line fr-mr-1w" aria-hidden="true" />
-                {cohortsWithData.length === 0
-                  ? "Aucune cohorte n'a un effectif suffisant pour afficher les taux d'emploi."
-                  : 'Une seule cohorte disponible. Le graphique de comparaison nécessite au moins 2 cohortes.'}
-              </p>
-            </div>
-          )}
-        </AnalyticsGraph>
-      </div>
-
-      {/* Detail by Year Section - with cards and chart instead of tables */}
-      {years.length > 0 && (
-        <div className="fr-mb-3w">
-          <h3 className="fr-text--md fr-text--bold fr-mb-2w">Détail par promotion</h3>
-
-          {/* Year Selector */}
-          {years.length > 1 && (
-            <fieldset className="fr-segmented fr-mb-3w">
-              <div className="fr-segmented__elements">
-                {years.map((year) => (
-                  <div key={year} className="fr-segmented__element">
-                    <input
-                      checked={year === currentYear}
-                      value={year}
-                      type="radio"
-                      id={`segmented-insersup-${year}`}
-                      name="segmented-insersup"
-                      onChange={() => setSelectedYear(year)}
-                    />
-                    <label className="fr-label" htmlFor={`segmented-insersup-${year}`}>
-                      {year}
-                    </label>
-                  </div>
-                ))}
-              </div>
-            </fieldset>
-          )}
-
-          {currentYearData && (
-            <>
-              {/* Cohort Stats Cards */}
-              <div
-                style={{
-                  display: 'grid',
-                  gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 200px), 1fr))',
-                  gap: '1rem',
-                  marginBottom: '1.5rem',
-                }}
-              >
-                <SimpleStatCard
-                  value={currentYearData.nbEtudiants}
-                  label="Diplômés suivis"
-                  icon="fr-icon-user-fill"
-                  color="blue-cumulus"
-                />
-                <SimpleStatCard
-                  value={currentYearData.nbSortants}
-                  label="Sortants"
-                  icon="fr-icon-arrow-right-up-line"
-                  color="green-archipel"
-                />
-                <SimpleStatCard
-                  value={currentYearData.nbPoursuivants}
-                  label="Poursuivants"
-                  icon="fr-icon-book-2-fill"
-                  color="purple-glycine"
-                />
-                <SimpleStatCard
-                  value={
-                    currentYearData.nbSortants + currentYearData.nbPoursuivants > 0
-                      ? `${Math.round(
-                          (currentYearData.nbPoursuivants /
-                            (currentYearData.nbSortants + currentYearData.nbPoursuivants)) *
-                            100,
-                        )}%`
-                      : '-'
-                  }
-                  label="Taux de poursuite"
-                  icon="fr-icon-git-merge-line"
-                  color="yellow-tournesol"
-                />
-              </div>
-
-              {/* Year Employment Rates Chart */}
-              <AnalyticsGraph
-                title={`Taux d'emploi - Promotion ${currentYear}`}
-                description="Évolution du taux d'emploi après l'obtention du diplôme pour cette promotion"
-                chartRef={cohortYearChartRef}
-                source="InserSup (MESR)"
-              >
-                {currentYearData.canShowPercentages && currentYearData.emploiSalFr ? (
-                  <Chart
-                    ref={cohortYearChartRef}
-                    containerProps={{
-                      style: { width: '100%', minWidth: '300px', height: '350px' },
-                    }}
-                  >
-                    <Credits enabled={false} />
-                    <Legend align="center" />
-                    <Tooltip shared valueSuffix="%" />
-                    <XAxis categories={MONTHS} title={{ text: 'Temps après diplôme' }} />
-                    <YAxis min={0} max={100} title={{ text: "Taux d'emploi (%)" }} />
-                    <Line.Series
-                      data={ratesToArrayWithTrailingNulls(currentYearData.emploiSalFr)}
-                      options={{
-                        name: 'Emploi salarié en France',
-                        color: getChartColor('green-archipel'),
-                        marker: { enabled: true },
-                      }}
-                    />
-                    {currentYearData.emploiNonSal && (
-                      <Line.Series
-                        data={ratesToArrayWithTrailingNulls(currentYearData.emploiNonSal)}
-                        options={{
-                          name: 'Emploi non salarié',
-                          color: getChartColor('blue-cumulus'),
-                          marker: { enabled: true },
-                        }}
-                      />
-                    )}
-                    {currentYearData.emploiStable && (
-                      <Line.Series
-                        data={ratesToArrayWithTrailingNulls(currentYearData.emploiStable)}
-                        options={{
-                          name: 'Emploi stable (CDI/fonctionnaire)',
-                          color: getChartColor('purple-glycine'),
-                          marker: { enabled: true },
-                        }}
-                      />
-                    )}
-                  </Chart>
-                ) : (
-                  <div
-                    className="fr-py-4w fr-px-3v fr-background-alt--grey"
-                    style={{ borderRadius: '0.25rem' }}
-                  >
-                    <p
-                      className="fr-text--sm fr-mb-0 fr-text-mention--grey"
-                      style={{ textAlign: 'center' }}
-                    >
-                      <span className="fr-icon-lock-line fr-mr-1w" aria-hidden="true" />
-                      Les taux d'emploi ne peuvent pas être affichés pour cette promotion car le
-                      nombre de sortants ({currentYearData.nbSortants}) est inférieur à 20.
-                    </p>
-                  </div>
-                )}
-              </AnalyticsGraph>
-            </>
-          )}
-        </div>
-      )}
     </section>
   );
 }

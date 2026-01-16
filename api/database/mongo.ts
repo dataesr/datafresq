@@ -124,6 +124,14 @@ async function ensureIndexes(cols: Collections): Promise<void> {
   await cols.sise.createIndex({ inf: 1, annee: 1 });
 
   // === INSERSUP ===
-  await cols.insersup.createIndex({ inf: 1, promo: 1 });
+  // Primary lookup by program
   await cols.insersup.createIndex({ inf: 1 });
+  // Compound index for the common query pattern in cache.ts
+  await cols.insersup.createIndex({
+    inf: 1,
+    genre: 1,
+    obtention_diplome: 1,
+    nationalite: 1,
+    regime_inscription: 1,
+  });
 }

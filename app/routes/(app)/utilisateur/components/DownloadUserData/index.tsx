@@ -11,7 +11,8 @@ export default function DownloadUserDataCard() {
         <div className="settings-card__header">
           <p className="fr-h6 fr-mb-0">Télécharger mes données</p>
           <p className="fr-text--sm fr-mb-0">
-            Vous pouvez télécharger toutes les données personnelles associées à votre compte au format ZIP.
+            Vous pouvez télécharger toutes les données personnelles associées à votre compte au
+            format ZIP.
           </p>
         </div>
       </div>

@@ -2,12 +2,40 @@ import { Elysia, t } from 'elysia';
 import type { Document } from 'mongodb';
 import * as XLSX from 'xlsx';
 import { collections } from '~/database/mongo';
-import type {
-  EmploymentRates,
-  InsersupGenderStats,
-  InsersupStats,
-  InsersupYearStats,
-} from '~/database/types';
+import type { EmploymentCounts, SalaryQuartiles } from '~/schemas/aggregations';
+
+// Program-level insersup types (using counts, not rates)
+interface ProgramInsersupGenderStats {
+  nbSortants: number;
+  emploiSalFr: EmploymentCounts | null;
+  emploiNonSal: EmploymentCounts | null;
+  emploiStable: EmploymentCounts | null;
+  salaires: SalaryQuartiles | null;
+}
+
+interface ProgramInsersupYearStats {
+  promo: string;
+  nbEtudiants: number;
+  nbSortants: number;
+  nbPoursuivants: number;
+  emploiSalFr: EmploymentCounts | null;
+  emploiNonSal: EmploymentCounts | null;
+  emploiStable: EmploymentCounts | null;
+  salaires: SalaryQuartiles | null;
+  byGender: {
+    femme: ProgramInsersupGenderStats | null;
+    homme: ProgramInsersupGenderStats | null;
+  };
+}
+
+interface ProgramInsersupStats {
+  totalSortants: number;
+  totalEtudiants: number;
+  totalPoursuivants: number;
+  totalSortantsFrancais: number;
+  totalSortantsEtrangers: number;
+  byYear: ProgramInsersupYearStats[];
+}
 
 interface InsersupAggResult extends Document {
   _id: string;
@@ -29,6 +57,27 @@ interface InsersupAggResult extends Document {
   emploiStable18: number;
   emploiStable24: number;
   emploiStable30: number;
+  // Salary data
+  nbSalaires6: number | null;
+  nbSalaires12: number | null;
+  nbSalaires18: number | null;
+  nbSalaires24: number | null;
+  nbSalaires30: number | null;
+  salaireQ1_6: number | null;
+  salaireQ1_12: number | null;
+  salaireQ1_18: number | null;
+  salaireQ1_24: number | null;
+  salaireQ1_30: number | null;
+  salaireQ2_6: number | null;
+  salaireQ2_12: number | null;
+  salaireQ2_18: number | null;
+  salaireQ2_24: number | null;
+  salaireQ2_30: number | null;
+  salaireQ3_6: number | null;
+  salaireQ3_12: number | null;
+  salaireQ3_18: number | null;
+  salaireQ3_24: number | null;
+  salaireQ3_30: number | null;
 }
 
 interface InsersupGenderAggResult extends Document {
@@ -49,6 +98,27 @@ interface InsersupGenderAggResult extends Document {
   emploiStable18: number;
   emploiStable24: number;
   emploiStable30: number;
+  // Salary data
+  nbSalaires6: number | null;
+  nbSalaires12: number | null;
+  nbSalaires18: number | null;
+  nbSalaires24: number | null;
+  nbSalaires30: number | null;
+  salaireQ1_6: number | null;
+  salaireQ1_12: number | null;
+  salaireQ1_18: number | null;
+  salaireQ1_24: number | null;
+  salaireQ1_30: number | null;
+  salaireQ2_6: number | null;
+  salaireQ2_12: number | null;
+  salaireQ2_18: number | null;
+  salaireQ2_24: number | null;
+  salaireQ2_30: number | null;
+  salaireQ3_6: number | null;
+  salaireQ3_12: number | null;
+  salaireQ3_18: number | null;
+  salaireQ3_24: number | null;
+  salaireQ3_30: number | null;
 }
 
 interface InsersupNationalityAggResult extends Document {
@@ -688,6 +758,27 @@ export const programsRoutes = new Elysia({ prefix: '/programs' })
               emploiStable18: { $sum: '$nb_sortants_en_emploi_stable_18' },
               emploiStable24: { $sum: '$nb_sortants_en_emploi_stable_24' },
               emploiStable30: { $sum: '$nb_sortants_en_emploi_stable_30' },
+              // Salary data - use $max since there's one record per promo for this program
+              nbSalaires6: { $max: '$nb_salaires_6' },
+              nbSalaires12: { $max: '$nb_salaires_12' },
+              nbSalaires18: { $max: '$nb_salaires_18' },
+              nbSalaires24: { $max: '$nb_salaires_24' },
+              nbSalaires30: { $max: '$nb_salaires_30' },
+              salaireQ1_6: { $max: '$salaire_q1_6' },
+              salaireQ1_12: { $max: '$salaire_q1_12' },
+              salaireQ1_18: { $max: '$salaire_q1_18' },
+              salaireQ1_24: { $max: '$salaire_q1_24' },
+              salaireQ1_30: { $max: '$salaire_q1_30' },
+              salaireQ2_6: { $max: '$salaire_q2_6' },
+              salaireQ2_12: { $max: '$salaire_q2_12' },
+              salaireQ2_18: { $max: '$salaire_q2_18' },
+              salaireQ2_24: { $max: '$salaire_q2_24' },
+              salaireQ2_30: { $max: '$salaire_q2_30' },
+              salaireQ3_6: { $max: '$salaire_q3_6' },
+              salaireQ3_12: { $max: '$salaire_q3_12' },
+              salaireQ3_18: { $max: '$salaire_q3_18' },
+              salaireQ3_24: { $max: '$salaire_q3_24' },
+              salaireQ3_30: { $max: '$salaire_q3_30' },
             },
           },
           { $sort: { _id: -1 } },
@@ -724,6 +815,27 @@ export const programsRoutes = new Elysia({ prefix: '/programs' })
               emploiStable18: { $sum: '$nb_sortants_en_emploi_stable_18' },
               emploiStable24: { $sum: '$nb_sortants_en_emploi_stable_24' },
               emploiStable30: { $sum: '$nb_sortants_en_emploi_stable_30' },
+              // Salary data for gender
+              nbSalaires6: { $max: '$nb_salaires_6' },
+              nbSalaires12: { $max: '$nb_salaires_12' },
+              nbSalaires18: { $max: '$nb_salaires_18' },
+              nbSalaires24: { $max: '$nb_salaires_24' },
+              nbSalaires30: { $max: '$nb_salaires_30' },
+              salaireQ1_6: { $max: '$salaire_q1_6' },
+              salaireQ1_12: { $max: '$salaire_q1_12' },
+              salaireQ1_18: { $max: '$salaire_q1_18' },
+              salaireQ1_24: { $max: '$salaire_q1_24' },
+              salaireQ1_30: { $max: '$salaire_q1_30' },
+              salaireQ2_6: { $max: '$salaire_q2_6' },
+              salaireQ2_12: { $max: '$salaire_q2_12' },
+              salaireQ2_18: { $max: '$salaire_q2_18' },
+              salaireQ2_24: { $max: '$salaire_q2_24' },
+              salaireQ2_30: { $max: '$salaire_q2_30' },
+              salaireQ3_6: { $max: '$salaire_q3_6' },
+              salaireQ3_12: { $max: '$salaire_q3_12' },
+              salaireQ3_18: { $max: '$salaire_q3_18' },
+              salaireQ3_24: { $max: '$salaire_q3_24' },
+              salaireQ3_30: { $max: '$salaire_q3_30' },
             },
           },
         ])
@@ -762,8 +874,90 @@ export const programsRoutes = new Elysia({ prefix: '/programs' })
         throw new NotFoundError('Program not found');
       }
 
-      const computeRates = (
-        sortants: number,
+      const SALARY_MIN_COUNT = 5;
+
+      // Build salary quartiles from raw aggregation data
+      const buildSalaryQuartiles = (data: {
+        nbSalaires6: number | null;
+        nbSalaires12: number | null;
+        nbSalaires18: number | null;
+        nbSalaires24: number | null;
+        nbSalaires30: number | null;
+        salaireQ1_6: number | null;
+        salaireQ1_12: number | null;
+        salaireQ1_18: number | null;
+        salaireQ1_24: number | null;
+        salaireQ1_30: number | null;
+        salaireQ2_6: number | null;
+        salaireQ2_12: number | null;
+        salaireQ2_18: number | null;
+        salaireQ2_24: number | null;
+        salaireQ2_30: number | null;
+        salaireQ3_6: number | null;
+        salaireQ3_12: number | null;
+        salaireQ3_18: number | null;
+        salaireQ3_24: number | null;
+        salaireQ3_30: number | null;
+      }): SalaryQuartiles | null => {
+        const hasAnyData = [
+          data.nbSalaires6,
+          data.nbSalaires12,
+          data.nbSalaires18,
+          data.nbSalaires24,
+          data.nbSalaires30,
+        ].some((n) => n !== null && n >= SALARY_MIN_COUNT);
+
+        if (!hasAnyData) return null;
+
+        const buildMonthData = (
+          count: number | null,
+          q1: number | null,
+          median: number | null,
+          q3: number | null,
+        ) => {
+          if (count === null || count < SALARY_MIN_COUNT) {
+            return { count: null, q1: null, median: null, q3: null };
+          }
+          return { count, q1, median, q3 };
+        };
+
+        return {
+          m6: buildMonthData(
+            data.nbSalaires6,
+            data.salaireQ1_6,
+            data.salaireQ2_6,
+            data.salaireQ3_6,
+          ),
+          m12: buildMonthData(
+            data.nbSalaires12,
+            data.salaireQ1_12,
+            data.salaireQ2_12,
+            data.salaireQ3_12,
+          ),
+          m18: buildMonthData(
+            data.nbSalaires18,
+            data.salaireQ1_18,
+            data.salaireQ2_18,
+            data.salaireQ3_18,
+          ),
+          m24: buildMonthData(
+            data.nbSalaires24,
+            data.salaireQ1_24,
+            data.salaireQ2_24,
+            data.salaireQ3_24,
+          ),
+          m30: buildMonthData(
+            data.nbSalaires30,
+            data.salaireQ1_30,
+            data.salaireQ2_30,
+            data.salaireQ3_30,
+          ),
+        };
+      };
+
+      // Build employment counts (raw counts, null if below threshold)
+      const buildEmploymentCounts = (
+        nbSortants: number,
         data: {
           sal6: number;
           sal12: number;
@@ -782,53 +976,42 @@ export const programsRoutes = new Elysia({ prefix: '/programs' })
           stable30: number;
         },
       ): {
-        emploiSalFr: EmploymentRates;
-        emploiNonSal: EmploymentRates;
-        emploiStable: EmploymentRates;
-      } => {
-        const pct = (val: number) =>
-          sortants > 0 ? Math.round((val / sortants) * 1000) / 10 : null;
+        emploiSalFr: EmploymentCounts;
+        emploiNonSal: EmploymentCounts;
+        emploiStable: EmploymentCounts;
+      } | null => {
+        if (nbSortants < PRIVACY_THRESHOLD) return null;
         return {
           emploiSalFr: {
-            m6: pct(data.sal6),
-            m12: pct(data.sal12),
-            m18: pct(data.sal18),
-            m24: pct(data.sal24),
-            m30: pct(data.sal30),
+            m6: data.sal6,
+            m12: data.sal12,
+            m18: data.sal18,
+            m24: data.sal24,
+            m30: data.sal30,
           },
           emploiNonSal: {
-            m6: pct(data.nonSal6),
-            m12: pct(data.nonSal12),
-            m18: pct(data.nonSal18),
-            m24: pct(data.nonSal24),
-            m30: pct(data.nonSal30),
+            m6: data.nonSal6,
+            m12: data.nonSal12,
+            m18: data.nonSal18,
+            m24: data.nonSal24,
+            m30: data.nonSal30,
           },
           emploiStable: {
-            m6: pct(data.stable6),
-            m12: pct(data.stable12),
-            m18: pct(data.stable18),
-            m24: pct(data.stable24),
-            m30: pct(data.stable30),
+            m6: data.stable6,
+            m12: data.stable12,
+            m18: data.stable18,
+            m24: data.stable24,
+            m30: data.stable30,
           },
         };
       };
 
       const buildGenderStats = (
         genderData: InsersupGenderAggResult | undefined,
-      ): InsersupGenderStats | null => {
+      ): ProgramInsersupGenderStats | null => {
         if (!genderData) return null;
         const nbSortants = genderData.nbSortants;
-        const canShow = nbSortants >= PRIVACY_THRESHOLD;
-        if (!canShow) {
-          return {
-            nbSortants,
-            canShowPercentages: false,
-            emploiSalFr: null,
-            emploiNonSal: null,
-            emploiStable: null,
-          };
-        }
-        const rates = computeRates(nbSortants, {
+        const empCounts = buildEmploymentCounts(nbSortants, {
           sal6: genderData.emploiSalFr6,
           sal12: genderData.emploiSalFr12,
           sal18: genderData.emploiSalFr18,
@@ -845,12 +1028,34 @@ export const programsRoutes = new Elysia({ prefix: '/programs' })
           stable24: genderData.emploiStable24,
           stable30: genderData.emploiStable30,
         });
+        const salaryQuartiles = buildSalaryQuartiles({
+          nbSalaires6: genderData.nbSalaires6,
+          nbSalaires12: genderData.nbSalaires12,
+          nbSalaires18: genderData.nbSalaires18,
+          nbSalaires24: genderData.nbSalaires24,
+          nbSalaires30: genderData.nbSalaires30,
+          salaireQ1_6: genderData.salaireQ1_6,
+          salaireQ1_12: genderData.salaireQ1_12,
+          salaireQ1_18: genderData.salaireQ1_18,
+          salaireQ1_24: genderData.salaireQ1_24,
+          salaireQ1_30: genderData.salaireQ1_30,
+          salaireQ2_6: genderData.salaireQ2_6,
+          salaireQ2_12: genderData.salaireQ2_12,
+          salaireQ2_18: genderData.salaireQ2_18,
+          salaireQ2_24: genderData.salaireQ2_24,
+          salaireQ2_30: genderData.salaireQ2_30,
+          salaireQ3_6: genderData.salaireQ3_6,
+          salaireQ3_12: genderData.salaireQ3_12,
+          salaireQ3_18: genderData.salaireQ3_18,
+          salaireQ3_24: genderData.salaireQ3_24,
+          salaireQ3_30: genderData.salaireQ3_30,
+        });
         return {
           nbSortants,
-          canShowPercentages: true,
-          emploiSalFr: rates.emploiSalFr,
-          emploiNonSal: rates.emploiNonSal,
-          emploiStable: rates.emploiStable,
+          emploiSalFr: empCounts?.emploiSalFr ?? null,
+          emploiNonSal: empCounts?.emploiNonSal ?? null,
+          emploiStable: empCounts?.emploiStable ?? null,
+          salaires: salaryQuartiles,
         };
       };
 
@@ -876,101 +1081,11 @@ export const programsRoutes = new Elysia({ prefix: '/programs' })
       const totalSortantsEtrangers =
         insersupNationalityRaw.find((n) => n._id === 'étranger')?.nbSortants || 0;
 
-      let globalFemmeSortants = 0;
-      let globalHommeSortants = 0;
-      const globalFemmeData = {
-        sal6: 0,
-        sal12: 0,
-        sal18: 0,
-        sal24: 0,
-        sal30: 0,
-        nonSal6: 0,
-        nonSal12: 0,
-        nonSal18: 0,
-        nonSal24: 0,
-        nonSal30: 0,
-        stable6: 0,
-        stable12: 0,
-        stable18: 0,
-        stable24: 0,
-        stable30: 0,
-      };
-      const globalHommeData = {
-        sal6: 0,
-        sal12: 0,
-        sal18: 0,
-        sal24: 0,
-        sal30: 0,
-        nonSal6: 0,
-        nonSal12: 0,
-        nonSal18: 0,
-        nonSal24: 0,
-        nonSal30: 0,
-        stable6: 0,
-        stable12: 0,
-        stable18: 0,
-        stable24: 0,
-        stable30: 0,
-      };
-
-      for (const g of insersupGenderRaw) {
-        if (g._id.genre === 'femme') {
-          globalFemmeSortants += g.nbSortants;
-          globalFemmeData.sal6 += g.emploiSalFr6;
-          globalFemmeData.sal12 += g.emploiSalFr12;
-          globalFemmeData.sal18 += g.emploiSalFr18;
-          globalFemmeData.sal24 += g.emploiSalFr24;
-          globalFemmeData.sal30 += g.emploiSalFr30;
-          globalFemmeData.nonSal6 += g.emploiNonSal6;
-          globalFemmeData.nonSal12 += g.emploiNonSal12;
-          globalFemmeData.nonSal18 += g.emploiNonSal18;
-          globalFemmeData.nonSal24 += g.emploiNonSal24;
-          globalFemmeData.nonSal30 += g.emploiNonSal30;
-          globalFemmeData.stable6 += g.emploiStable6;
-          globalFemmeData.stable12 += g.emploiStable12;
-          globalFemmeData.stable18 += g.emploiStable18;
-          globalFemmeData.stable24 += g.emploiStable24;
-          globalFemmeData.stable30 += g.emploiStable30;
-        } else if (g._id.genre === 'homme') {
-          globalHommeSortants += g.nbSortants;
-          globalHommeData.sal6 += g.emploiSalFr6;
-          globalHommeData.sal12 += g.emploiSalFr12;
-          globalHommeData.sal18 += g.emploiSalFr18;
-          globalHommeData.sal24 += g.emploiSalFr24;
-          globalHommeData.sal30 += g.emploiSalFr30;
-          globalHommeData.nonSal6 += g.emploiNonSal6;
-          globalHommeData.nonSal12 += g.emploiNonSal12;
-          globalHommeData.nonSal18 += g.emploiNonSal18;
-          globalHommeData.nonSal24 += g.emploiNonSal24;
-          globalHommeData.nonSal30 += g.emploiNonSal30;
-          globalHommeData.stable6 += g.emploiStable6;
-          globalHommeData.stable12 += g.emploiStable12;
-          globalHommeData.stable18 += g.emploiStable18;
-          globalHommeData.stable24 += g.emploiStable24;
-          globalHommeData.stable30 += g.emploiStable30;
-        }
-      }
-
       let totalSortants = 0;
       let totalEtudiants = 0;
       let totalPoursuivants = 0;
-      let globalSal6 = 0,
-        globalSal12 = 0,
-        globalSal18 = 0,
-        globalSal24 = 0,
-        globalSal30 = 0;
-      let globalNonSal6 = 0,
-        globalNonSal12 = 0,
-        globalNonSal18 = 0,
-        globalNonSal24 = 0,
-        globalNonSal30 = 0;
-      let globalStable6 = 0,
-        globalStable12 = 0,
-        globalStable18 = 0,
-        globalStable24 = 0,
-        globalStable30 = 0;
 
-      const byYear: InsersupYearStats[] = insersupRaw.map((row) => {
+      const byYear: ProgramInsersupYearStats[] = insersupRaw.map((row) => {
         const nbSortants = row.nbSortants;
         const nbEtudiants = row.nbEtudiants;
         const nbPoursuivants = row.nbPoursuivants;
@@ -979,132 +1094,73 @@ export const programsRoutes = new Elysia({ prefix: '/programs' })
         totalEtudiants += nbEtudiants;
         totalPoursuivants += nbPoursuivants;
 
-        globalSal6 += row.emploiSalFr6;
-        globalSal12 += row.emploiSalFr12;
-        globalSal18 += row.emploiSalFr18;
-        globalSal24 += row.emploiSalFr24;
-        globalSal30 += row.emploiSalFr30;
-        globalNonSal6 += row.emploiNonSal6;
-        globalNonSal12 += row.emploiNonSal12;
-        globalNonSal18 += row.emploiNonSal18;
-        globalNonSal24 += row.emploiNonSal24;
-        globalNonSal30 += row.emploiNonSal30;
-        globalStable6 += row.emploiStable6;
-        globalStable12 += row.emploiStable12;
-        globalStable18 += row.emploiStable18;
-        globalStable24 += row.emploiStable24;
-        globalStable30 += row.emploiStable30;
-
-        const canShowPercentages = nbSortants >= PRIVACY_THRESHOLD;
-
         const genderData = genderByPromo.get(row._id);
         const femmeStats = buildGenderStats(genderData?.femme);
         const hommeStats = buildGenderStats(genderData?.homme);
 
-        if (canShowPercentages) {
-          const rates = computeRates(nbSortants, {
-            sal6: row.emploiSalFr6,
-            sal12: row.emploiSalFr12,
-            sal18: row.emploiSalFr18,
-            sal24: row.emploiSalFr24,
-            sal30: row.emploiSalFr30,
-            nonSal6: row.emploiNonSal6,
-            nonSal12: row.emploiNonSal12,
-            nonSal18: row.emploiNonSal18,
-            nonSal24: row.emploiNonSal24,
-            nonSal30: row.emploiNonSal30,
-            stable6: row.emploiStable6,
-            stable12: row.emploiStable12,
-            stable18: row.emploiStable18,
-            stable24: row.emploiStable24,
-            stable30: row.emploiStable30,
-          });
-          return {
-            promo: row._id,
-            nbEtudiants,
-            nbSortants,
-            nbPoursuivants,
-            canShowPercentages: true,
-            emploiSalFr: rates.emploiSalFr,
-            emploiNonSal: rates.emploiNonSal,
-            emploiStable: rates.emploiStable,
-            byGender: { femme: femmeStats, homme: hommeStats },
-          };
-        }
+        // Build employment counts for this year
+        const empCounts = buildEmploymentCounts(nbSortants, {
+          sal6: row.emploiSalFr6,
+          sal12: row.emploiSalFr12,
+          sal18: row.emploiSalFr18,
+          sal24: row.emploiSalFr24,
+          sal30: row.emploiSalFr30,
+          nonSal6: row.emploiNonSal6,
+          nonSal12: row.emploiNonSal12,
+          nonSal18: row.emploiNonSal18,
+          nonSal24: row.emploiNonSal24,
+          nonSal30: row.emploiNonSal30,
+          stable6: row.emploiStable6,
+          stable12: row.emploiStable12,
+          stable18: row.emploiStable18,
+          stable24: row.emploiStable24,
+          stable30: row.emploiStable30,
+        });
+
+        // Build salary quartiles for this year
+        const salaryQuartiles = buildSalaryQuartiles({
+          nbSalaires6: row.nbSalaires6,
+          nbSalaires12: row.nbSalaires12,
+          nbSalaires18: row.nbSalaires18,
+          nbSalaires24: row.nbSalaires24,
+          nbSalaires30: row.nbSalaires30,
+          salaireQ1_6: row.salaireQ1_6,
+          salaireQ1_12: row.salaireQ1_12,
+          salaireQ1_18: row.salaireQ1_18,
+          salaireQ1_24: row.salaireQ1_24,
+          salaireQ1_30: row.salaireQ1_30,
+          salaireQ2_6: row.salaireQ2_6,
+          salaireQ2_12: row.salaireQ2_12,
+          salaireQ2_18: row.salaireQ2_18,
+          salaireQ2_24: row.salaireQ2_24,
+          salaireQ2_30: row.salaireQ2_30,
+          salaireQ3_6: row.salaireQ3_6,
+          salaireQ3_12: row.salaireQ3_12,
+          salaireQ3_18: row.salaireQ3_18,
+          salaireQ3_24: row.salaireQ3_24,
+          salaireQ3_30: row.salaireQ3_30,
+        });
 
         return {
           promo: row._id,
           nbEtudiants,
           nbSortants,
           nbPoursuivants,
-          canShowPercentages: false,
-          emploiSalFr: null,
-          emploiNonSal: null,
-          emploiStable: null,
+          emploiSalFr: empCounts?.emploiSalFr ?? null,
+          emploiNonSal: empCounts?.emploiNonSal ?? null,
+          emploiStable: empCounts?.emploiStable ?? null,
+          salaires: salaryQuartiles,
           byGender: { femme: femmeStats, homme: hommeStats },
         };
       });
 
-      const globalCanShow = totalSortants >= PRIVACY_THRESHOLD;
-
-      const globalFemmeCanShow = globalFemmeSortants >= PRIVACY_THRESHOLD;
-      const globalHommeCanShow = globalHommeSortants >= PRIVACY_THRESHOLD;
-
-      const insersup: InsersupStats = {
+      const insersup: ProgramInsersupStats = {
         totalSortants,
         totalEtudiants,
         totalPoursuivants,
         totalSortantsFrancais,
         totalSortantsEtrangers,
-        canShowPercentages: globalCanShow,
         byYear,
-        globalRates: globalCanShow
-          ? computeRates(totalSortants, {
-              sal6: globalSal6,
-              sal12: globalSal12,
-              sal18: globalSal18,
-              sal24: globalSal24,
-              sal30: globalSal30,
-              nonSal6: globalNonSal6,
-              nonSal12: globalNonSal12,
-              nonSal18: globalNonSal18,
-              nonSal24: globalNonSal24,
-              nonSal30: globalNonSal30,
-              stable6: globalStable6,
-              stable12: globalStable12,
-              stable18: globalStable18,
-              stable24: globalStable24,
-              stable30: globalStable30,
-            })
-          : null,
-        globalRatesByGender: {
-          femme: globalFemmeCanShow
-            ? {
-                nbSortants: globalFemmeSortants,
-                canShowPercentages: true,
-                ...computeRates(globalFemmeSortants, globalFemmeData),
-              }
-            : {
-                nbSortants: globalFemmeSortants,
-                canShowPercentages: false,
-                emploiSalFr: null,
-                emploiNonSal: null,
-                emploiStable: null,
-              },
-          homme: globalHommeCanShow
-            ? {
-                nbSortants: globalHommeSortants,
-                canShowPercentages: true,
-                ...computeRates(globalHommeSortants, globalHommeData),
-              }
-            : {
-                nbSortants: globalHommeSortants,
-                canShowPercentages: false,
-                emploiSalFr: null,
-                emploiNonSal: null,
-                emploiStable: null,
-              },
-        },
       };
 
       return { program, sise, insersup };

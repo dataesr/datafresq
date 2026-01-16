@@ -94,38 +94,6 @@ button.fr-link {
   text-wrap: nowrap;
 }
 
-.xfr-nav--horizontal {
-  .fr-nav__list {
-    display: flex;
-    flex-direction: row;
-    flex-wrap: nowrap;
-    overflow-x: scroll;
-    .fr-nav__item {
-      align-items: flex-start;
-      position: static;
-      .fr-nav__link {
-        font-weight: 400;
-        height: 100%;
-        margin: 0;
-        width: auto;
-        font-size: 0.875rem;
-        line-height: 1.5rem;
-        min-height: 2.5rem;
-        text-wrap: nowrap;
-      }
-      .fr-nav__link::before {
-        bottom: 0;
-        height: 2px;
-        left: 0;
-        margin-top: 0;
-        position: absolute;
-        top: auto;
-        width: 100%;
-      }
-    }
-  }
-}
-
 .fr-input.xfr-input-otp {
   width: 2.5rem !important;
   height: 2.5rem !important;

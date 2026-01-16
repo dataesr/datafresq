@@ -1,3 +1,8 @@
+import type {
+  InsersupAggregations,
+  ProgramAggregations,
+  SiseAggregations,
+} from '~/schemas/aggregations';
 import type { programSchema } from '~/schemas/programs';
 
 // Workspace user role
@@ -225,177 +230,51 @@ export interface InsersupDoc {
   nb_sortants_en_emploi_stable_18: number;
   nb_sortants_en_emploi_stable_24: number;
   nb_sortants_en_emploi_stable_30: number;
+  // Salary data
+  nb_salaires_6: number | null;
+  nb_salaires_12: number | null;
+  nb_salaires_18: number | null;
+  nb_salaires_24: number | null;
+  nb_salaires_30: number | null;
+  salaire_q1_6: number | null;
+  salaire_q1_12: number | null;
+  salaire_q1_18: number | null;
+  salaire_q1_24: number | null;
+  salaire_q1_30: number | null;
+  salaire_q2_6: number | null;
+  salaire_q2_12: number | null;
+  salaire_q2_18: number | null;
+  salaire_q2_24: number | null;
+  salaire_q2_30: number | null;
+  salaire_q3_6: number | null;
+  salaire_q3_12: number | null;
+  salaire_q3_18: number | null;
+  salaire_q3_24: number | null;
+  salaire_q3_30: number | null;
+  // Additional fields
+  aca_id: string;
+  aca_nom: string;
+  reg_id: string;
+  reg_nom: string;
+  dom: string;
+  dom_lib: string;
+  discipli: string;
+  discipli_lib: string;
+  sectdis: string;
+  sectdis_lib: string;
   etablissement_id_paysage_actuel: string;
   diplom: string;
   uai_fresq: string;
   inf: string;
 }
 
-export interface EmploymentRates {
-  m6: number | null;
-  m12: number | null;
-  m18: number | null;
-  m24: number | null;
-  m30: number | null;
-}
-
-export interface InsersupGenderStats {
-  nbSortants: number;
-  canShowPercentages: boolean;
-  emploiSalFr: EmploymentRates | null;
-  emploiNonSal: EmploymentRates | null;
-  emploiStable: EmploymentRates | null;
-}
-
-export interface InsersupYearStats {
-  promo: string;
-  nbEtudiants: number;
-  nbSortants: number;
-  nbPoursuivants: number;
-  canShowPercentages: boolean;
-  emploiSalFr: EmploymentRates | null;
-  emploiNonSal: EmploymentRates | null;
-  emploiStable: EmploymentRates | null;
-  byGender: {
-    femme: InsersupGenderStats | null;
-    homme: InsersupGenderStats | null;
-  } | null;
-}
-
-export interface InsersupStats {
-  totalSortants: number;
-  totalEtudiants: number;
-  totalPoursuivants: number;
-  totalSortantsFrancais: number;
-  totalSortantsEtrangers: number;
-  canShowPercentages: boolean;
-  byYear: InsersupYearStats[];
-  globalRates: {
-    emploiSalFr: EmploymentRates | null;
-    emploiNonSal: EmploymentRates | null;
-    emploiStable: EmploymentRates | null;
-  } | null;
-  globalRatesByGender: {
-    femme: InsersupGenderStats | null;
-    homme: InsersupGenderStats | null;
-  } | null;
-}
-
-// Aggregation data cached for workspace dashboard
+// Workspace cache document stored in MongoDB
+// Uses types from ~/schemas/aggregations.ts as the source of truth
 export interface WorkspaceCacheDoc {
   workspaceId: string;
   updatedAt: Date;
   programCount: number;
-  // SISE aggregations (student counts)
-  studentsAggregations: {
-    totalPrograms: number; // programs with SISE data for LAST_YEAR
-    totalStudents: number;
-    totalFemale: number;
-    totalMale: number;
-    byYear: {
-      year: string;
-      total: number;
-      female: number;
-      male: number;
-    }[];
-    byCycle: {
-      cycle: string;
-      total: number;
-      female: number;
-      male: number;
-    }[];
-    byAcademy: {
-      academy: string;
-      total: number;
-      female: number;
-      male: number;
-    }[];
-    byRegion: {
-      region: string;
-      total: number;
-      female: number;
-      male: number;
-    }[];
-    byDiploma: {
-      diploma: string;
-      diplomaLabel: string;
-      total: number;
-      female: number;
-      male: number;
-    }[];
-    byInstitution: {
-      id: string;
-      name: string;
-      total: number;
-      female: number;
-      male: number;
-    }[];
-    byDiscipline: {
-      discipline: string;
-      disciplineLabel: string;
-      total: number;
-      female: number;
-      male: number;
-    }[];
-    byLargeDiscipline: {
-      largeDiscipline: string;
-      largeDisciplineLabel: string;
-      total: number;
-      female: number;
-      male: number;
-    }[];
-  };
-  // Program aggregations (program counts from programs collection)
-  programAggregations: {
-    byCycle: {
-      cycle: string;
-      count: number;
-    }[];
-    byAcademy: {
-      academy: string;
-      count: number;
-    }[];
-    byRegion: {
-      region: string;
-      count: number;
-    }[];
-    byDiploma: {
-      diploma: string;
-      diplomaLabel: string;
-      count: number;
-    }[];
-    byInstitution: {
-      uai: string;
-      name: string;
-      count: number;
-    }[];
-    byDiscipline: {
-      discipline: string;
-      count: number;
-    }[];
-    byRome: {
-      code: string;
-      label: string;
-      count: number;
-    }[];
-  };
-  insersupAggregations: {
-    totalPrograms: number;
-    totalSortants: number;
-    totalEtudiants: number;
-    totalPoursuivants: number;
-    totalSortantsFrancais: number;
-    totalSortantsEtrangers: number;
-    canShowPercentages: boolean;
-    byYear: InsersupYearStats[];
-    globalRates: {
-      emploiSalFr: EmploymentRates | null;
-      emploiNonSal: EmploymentRates | null;
-      emploiStable: EmploymentRates | null;
-    } | null;
-    globalRatesByGender: {
-      femme: InsersupGenderStats | null;
-      homme: InsersupGenderStats | null;
-    } | null;
-  };
+  studentsAggregations: SiseAggregations;
+  programAggregations: ProgramAggregations;
+  insersupAggregations: InsersupAggregations;
 }

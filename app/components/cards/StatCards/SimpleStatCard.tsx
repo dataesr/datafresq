@@ -4,7 +4,7 @@ import type { colorFamily } from '@/components/highcharts/colors';
 type ColorName = (typeof colorFamily)[number];
 
 export interface SimpleStatCardProps {
-  value: string | number;
+  value: string | number | React.ReactNode;
   label: string;
   icon?: string;
   color?: ColorName;

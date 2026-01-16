@@ -12,15 +12,9 @@ import ParcoursOrganisation from './components/Parcours';
 
 export default function FormationPage() {
   const { inf } = useParams<{ inf: string }>();
-
   const { data } = useProgram(inf!);
-
   if (!data) return null;
-
   const { program: formation } = data;
-
-  // SISE stats (enrollment data)
-  const siseData = data.sise || [];
 
   return (
     <section className="page">
@@ -37,7 +31,7 @@ export default function FormationPage() {
           locations={formation.locations}
         />
 
-        <Effectifs siseData={siseData} />
+        <Effectifs siseData={data.sise} />
 
         <Insersup insersupData={data.insersup} />
 

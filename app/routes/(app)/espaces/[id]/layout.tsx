@@ -6,6 +6,27 @@ import { Avatars } from '@/components/Avatar';
 import ErrorBoundary from '@/components/errors/ErrorBoundary';
 import FullPageLoader from '@/components/FullPageLoader';
 import { useToast } from '@/hooks/useToast';
+
+interface TabErrorFallbackProps {
+  tabName: string;
+  resetError: () => void;
+}
+
+function TabErrorFallback({ tabName, resetError }: TabErrorFallbackProps) {
+  return (
+    <div className="fr-callout fr-callout--red-marianne fr-my-4w">
+      <h3 className="fr-callout__title">Erreur dans l'onglet {tabName}</h3>
+      <p className="fr-callout__text">
+        Une erreur s'est produite lors du chargement de cet onglet. Les autres onglets restent
+        accessibles.
+      </p>
+      <button type="button" className="fr-btn fr-btn--secondary fr-mt-2w" onClick={resetError}>
+        Réessayer
+      </button>
+    </div>
+  );
+}
+
 import EffectifsEtudiants from './effectifs-etudiants';
 import Formations from './formations';
 import Historique from './historique';
@@ -25,7 +46,6 @@ export default function EspaceLayout() {
   const { isOwner, isMember, canEdit } = useWorkspacePermissions(workspaceId);
   const leaveWorkspace = useLeaveWorkspace();
 
-  // Handle leave
   const handleLeave = () => {
     leaveWorkspace.mutate(workspaceId, {
       onSuccess: () => {
@@ -66,7 +86,6 @@ export default function EspaceLayout() {
     lastName?: string | null;
   }[];
 
-  // Navigation tabs - formations has grow to push historique/parametres to the right
   const tabs = [
     {
       id: 'offre-de-formation',
@@ -85,13 +104,13 @@ export default function EspaceLayout() {
       label: 'Insertion professionnelle',
       iconLine: 'fr-icon-briefcase-line',
       iconFill: 'fr-icon-briefcase-fill',
+      grow: true,
     },
     {
       id: 'formations',
-      label: 'Liste des formations',
+      label: 'Formations',
       iconLine: 'fr-icon-list-unordered',
       iconFill: 'fr-icon-list-unordered',
-      grow: true,
       count: workspace.programs.length,
     },
     {
@@ -148,43 +167,45 @@ export default function EspaceLayout() {
             </div>
           </nav>
 
-          {/* Header with workspace info */}
-          <div className="fr-mb-4w">
-            <Avatars users={allUsers} size={32} />
+          <div>
             <div
-              className="fr-mt-1w fr-mb-2w"
+              className="fr-mb-1w"
               style={{
                 display: 'flex',
-                justifyContent: 'space-between',
+                justifyContent: 'flex-start',
                 alignItems: 'center',
                 flexWrap: 'wrap',
                 gap: '1rem',
               }}
             >
-              <h1 className="fr-h2 fr-mb-0">{workspace.name}</h1>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-                {isMember && !isOwner && (
-                  <button
-                    type="button"
-                    className="fr-btn fr-btn--sm fr-btn--tertiary fr-icon-logout-box-r-line fr-btn--icon-left"
-                    onClick={handleLeave}
-                    disabled={leaveWorkspace.isPending}
-                  >
-                    Quitter l'espace
-                  </button>
-                )}
-              </div>
+              <h1 className="fr-h3 fr-mb-0" style={{ flexGrow: 1 }}>
+                {workspace.name}
+              </h1>
+              <Avatars users={allUsers} size={32} />
+              {isMember && !isOwner && (
+                <button
+                  type="button"
+                  className="fr-btn fr-btn--sm fr-btn--tertiary fr-btn--error fr-icon-logout-box-r-line fr-btn--icon-left"
+                  onClick={handleLeave}
+                  disabled={leaveWorkspace.isPending}
+                >
+                  Quitter l'espace
+                </button>
+              )}
             </div>
             {workspace.description && (
-              <p className="fr-text--sm clamp-3" style={{ maxWidth: '64rem' }}>
+              <p className="fr-text--sm clamp-3 fr-mb-0" style={{ maxWidth: '64rem' }}>
                 {workspace.description}
               </p>
             )}
           </div>
-
-          {/* Colored navigation */}
           <nav
-            className={cn('fr-nav', 'xfr-nav--horizontal', `fr-nav--${workspace.color}`)}
+            className={cn(
+              'fr-nav',
+              'fx-nav--horizontal',
+              'fx-nav--sticky',
+              `fr-nav--${workspace.color}`,
+            )}
             aria-label="Navigation de l'espace"
           >
             <ul className="fr-nav__list">
@@ -217,34 +238,66 @@ export default function EspaceLayout() {
             </ul>
           </nav>
 
-          <hr className="fr-mt-0" />
-
-          <ErrorBoundary>
-            <Suspense fallback={<FullPageLoader />}>
-              <Activity mode={activeTab === 'offre-de-formation' ? 'visible' : 'hidden'}>
+          <Suspense fallback={<FullPageLoader />}>
+            <Activity mode={activeTab === 'offre-de-formation' ? 'visible' : 'hidden'}>
+              <ErrorBoundary
+                fallback={({ resetError }) => (
+                  <TabErrorFallback tabName="Offre de formation" resetError={resetError} />
+                )}
+              >
                 <OffreDeFormation />
-              </Activity>
-              <Activity mode={activeTab === 'effectifs-etudiants' ? 'visible' : 'hidden'}>
+              </ErrorBoundary>
+            </Activity>
+            <Activity mode={activeTab === 'effectifs-etudiants' ? 'visible' : 'hidden'}>
+              <ErrorBoundary
+                fallback={({ resetError }) => (
+                  <TabErrorFallback tabName="Effectifs étudiants" resetError={resetError} />
+                )}
+              >
                 <EffectifsEtudiants />
-              </Activity>
-              <Activity mode={activeTab === 'insertion-professionnelle' ? 'visible' : 'hidden'}>
+              </ErrorBoundary>
+            </Activity>
+            <Activity mode={activeTab === 'insertion-professionnelle' ? 'visible' : 'hidden'}>
+              <ErrorBoundary
+                fallback={({ resetError }) => (
+                  <TabErrorFallback tabName="Insertion professionnelle" resetError={resetError} />
+                )}
+              >
                 <InsertionProfessionnelle />
-              </Activity>
-              <Activity mode={activeTab === 'formations' ? 'visible' : 'hidden'}>
+              </ErrorBoundary>
+            </Activity>
+            <Activity mode={activeTab === 'formations' ? 'visible' : 'hidden'}>
+              <ErrorBoundary
+                fallback={({ resetError }) => (
+                  <TabErrorFallback tabName="Formations" resetError={resetError} />
+                )}
+              >
                 <Formations />
-              </Activity>
-              {canEdit && (
-                <Activity mode={activeTab === 'historique' ? 'visible' : 'hidden'}>
+              </ErrorBoundary>
+            </Activity>
+            {canEdit && (
+              <Activity mode={activeTab === 'historique' ? 'visible' : 'hidden'}>
+                <ErrorBoundary
+                  fallback={({ resetError }) => (
+                    <TabErrorFallback tabName="Historique" resetError={resetError} />
+                  )}
+                >
                   <Historique />
-                </Activity>
-              )}
-              {isOwner && (
-                <Activity mode={activeTab === 'parametres' ? 'visible' : 'hidden'}>
+                </ErrorBoundary>
+              </Activity>
+            )}
+            {isOwner && (
+              <Activity mode={activeTab === 'parametres' ? 'visible' : 'hidden'}>
+                <ErrorBoundary
+                  fallback={({ resetError }) => (
+                    <TabErrorFallback tabName="Paramètres" resetError={resetError} />
+                  )}
+                >
                   <Parametres />
-                </Activity>
-              )}
-            </Suspense>
-          </ErrorBoundary>
+                </ErrorBoundary>
+              </Activity>
+            )}
+          </Suspense>
         </div>
       </Suspense>
     </ErrorBoundary>
