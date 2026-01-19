@@ -65,7 +65,7 @@ export function AcademyDistributionChart({
     >
       <Chart
         ref={chartRef}
-        containerProps={{ style: { width: '100%', minWidth: '300px', height: '400px' } }}
+        containerProps={{ style: { width: '100%', minWidth: '200px', height: '400px' } }}
       >
         <Credits enabled={false} />
         <Legend enabled={false} />

@@ -1,7 +1,7 @@
 import { useMemo } from 'react';
 import { AnalyticsGraph } from '@/components/AnalyticsGraph';
-import { regionToHcKey } from '@/components/effectifs';
 import { ChoroplethMap } from '@/components/charts/MapChart';
+import { regionToHcKey } from '@/components/effectifs';
 import { FRESQ_SOURCE } from '../constants';
 
 interface RegionData {
@@ -46,7 +46,7 @@ export function RegionChoroplethMap({ data }: RegionChoroplethMapProps) {
       description="Répartition géographique des formations par région."
       source={FRESQ_SOURCE}
     >
-      <div style={{ width: '100%', minWidth: '300px', height: '400px' }}>
+      <div style={{ width: '100%', minWidth: '200px', height: '400px' }}>
         <ChoroplethMap
           data={choroplethData}
           tooltipPointFormat="<b>{point.name}</b>: {point.value} formations"

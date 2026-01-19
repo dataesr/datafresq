@@ -50,7 +50,7 @@ export function CycleDistributionChart({ data }: CycleDistributionChartProps) {
     >
       <Chart
         ref={chartRef}
-        containerProps={{ style: { width: '100%', minWidth: '300px', height: '350px' } }}
+        containerProps={{ style: { width: '100%', minWidth: '200px', height: '350px' } }}
       >
         <Credits enabled={false} />
         <Legend align="center" />

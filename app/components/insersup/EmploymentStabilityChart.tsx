@@ -78,7 +78,7 @@ export function EmploymentStabilityChart({ yearData, year }: EmploymentStability
         <Chart
           ref={chartRef}
           containerProps={{
-            style: { width: '100%', minWidth: '300px', height: '350px' },
+            style: { width: '100%', minWidth: '200px', height: '350px' },
           }}
         >
           <Credits enabled={false} />

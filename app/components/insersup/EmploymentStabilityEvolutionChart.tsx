@@ -91,7 +91,7 @@ export function EmploymentStabilityEvolutionChart({
         <Chart
           ref={chartRef}
           containerProps={{
-            style: { width: '100%', minWidth: '300px', height: '500px' },
+            style: { width: '100%', minWidth: '200px', height: '500px' },
           }}
         >
           <Credits enabled={false} />

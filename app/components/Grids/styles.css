@@ -1,13 +1,13 @@
 .fx-grid--auto-fit {
   --fx-grid-min: 400px;
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(var(--fx-grid-min), 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, var(--fx-grid-min)), 1fr));
   align-items: stretch;
 }
 .fx-grid--auto-fill {
   --fx-grid-min: 400px;
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(var(--fx-grid-min), 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, var(--fx-grid-min)), 1fr));
   align-items: stretch;
 }
 

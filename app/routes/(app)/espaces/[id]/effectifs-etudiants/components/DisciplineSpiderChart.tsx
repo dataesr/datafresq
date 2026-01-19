@@ -53,7 +53,7 @@ export function DisciplineSpiderChart({ data, limit = 8 }: DisciplineSpiderChart
       chartRef={chartRef}
       source={SISE_SOURCE_SHORT}
     >
-      <div style={{ width: '100%', minWidth: '300px', height: '400px' }}>
+      <div style={{ width: '100%', minWidth: '200px', height: '400px' }}>
         <SpiderChart data={spiderData} seriesName="Étudiants" />
       </div>
     </AnalyticsGraph>
