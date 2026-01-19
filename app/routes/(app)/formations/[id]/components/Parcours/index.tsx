@@ -1,7 +1,7 @@
 import { Map as MapLibre, Marker } from '@vis.gl/react-maplibre';
 import { useMemo, useState } from 'react';
 import 'maplibre-gl/dist/maplibre-gl.css';
-import PillsTitle from '@/components/PillsTitle';
+import { YearSelector } from '@/components/YearSelector';
 import type { Etape, Location, Parcours, Program } from '~/schemas/programs';
 import './styles.css';
 
@@ -119,12 +119,13 @@ function aggregateParcoursData(
   };
 }
 
-function MiniMap({ locations }: { locations: Location[] }) {
+function MiniMap({ locations, isVisible }: { locations: Location[]; isVisible: boolean }) {
   const validLocations = locations.filter(
     (loc) => loc.geo?.coordinates && loc.geo.coordinates.length === 2,
   );
 
   if (validLocations.length === 0) return null;
+  if (!isVisible) return <div style={{ width: '180px', height: '140px', flexShrink: 0 }} />;
 
   const firstLoc = validLocations[0];
   const theme =
@@ -167,7 +168,7 @@ function MiniMap({ locations }: { locations: Location[] }) {
   );
 }
 
-function EtapeCard({ etape }: { etape: EtapeWithLocations }) {
+function EtapeCard({ etape, isVisible }: { etape: EtapeWithLocations; isVisible: boolean }) {
   const { pedagogicalInfo, recruitmentInfo, teachingModalities, locations } = etape;
   const hasLocations = locations && locations.length > 0;
 
@@ -408,15 +409,15 @@ function EtapeCard({ etape }: { etape: EtapeWithLocations }) {
           )}
         </div>
 
-        {hasLocations && <MiniMap locations={locations} />}
+        {hasLocations && <MiniMap locations={locations} isVisible={isVisible} />}
       </div>
     </div>
   );
 }
 
-function ParcoursCard({ data }: { data: ParcoursAggregation }) {
+function ParcoursCard({ data, isVisible }: { data: ParcoursAggregation; isVisible: boolean }) {
   const { parcours: p, etapes: parcoursEtapes } = data;
-  const collapseId = `parcours-${p.infp}-${p.openingYear}`;
+  const collapseId = `collapse-parcours-${p.infp}-${p.openingYear}`;
 
   return (
     <div className="fr-card fr-card--shadow fr-mb-2w">
@@ -542,7 +543,7 @@ function ParcoursCard({ data }: { data: ParcoursAggregation }) {
             {parcoursEtapes.length > 0 && (
               <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
                 {parcoursEtapes.map((etape) => (
-                  <EtapeCard key={etape.infe} etape={etape} />
+                  <EtapeCard key={etape.infe} etape={etape} isVisible={isVisible} />
                 ))}
               </div>
             )}
@@ -612,20 +613,24 @@ export default function ParcoursOrganisation({
   parcours,
   etapes,
   locations,
-}: ParcoursOrganisationProps) {
-  const [selectedYear, setSelectedYear] = useState(() => {
+  isVisible = true,
+}: ParcoursOrganisationProps & { isVisible?: boolean }) {
+  const [selectedYear, setSelectedYear] = useState<number | null>(() => {
     const years = [...new Set(parcours.map((p) => p.openingYear as number))].sort((a, b) => b - a);
     return years[0] || new Date().getFullYear();
   });
 
   const aggregatedParcours = useMemo(() => {
+    if (!selectedYear) return [];
     return parcours
       .filter((p) => p.openingYear === selectedYear)
       .map((p) => aggregateParcoursData(p, etapes, locations || []));
   }, [parcours, etapes, locations, selectedYear]);
 
   const parcoursYears = useMemo(() => {
-    return [...new Set(parcours.map((p) => p.openingYear as number))].sort((a, b) => b - a);
+    return [...new Set(parcours.map((p) => p.openingYear as number))]
+      .sort((a, b) => b - a)
+      .map(String);
   }, [parcours]);
 
   const globalStats = useGlobalStats(aggregatedParcours);
@@ -634,41 +639,25 @@ export default function ParcoursOrganisation({
 
   return (
     <section id="parcours">
-      <PillsTitle icon="fr-icon-road-map-line" as="h2">
-        Parcours de formation ({parcours.length})
-      </PillsTitle>
-
       {parcoursYears.length > 1 && (
-        <div className="fr-mb-3w">
-          <fieldset className="fr-segmented">
-            <div className="fr-segmented__elements">
-              {parcoursYears.map((year) => (
-                <div key={year} className="fr-segmented__element">
-                  <input
-                    checked={year === selectedYear}
-                    value={year}
-                    type="radio"
-                    id={`segmented-${year}`}
-                    name="segmented"
-                    onChange={() => setSelectedYear(year)}
-                  />
-                  <label className="fr-label" htmlFor={`segmented-${year}`}>
-                    {year}
-                  </label>
-                </div>
-              ))}
-            </div>
-          </fieldset>
-        </div>
+        <YearSelector
+          availableYears={parcoursYears}
+          selectedYear={selectedYear ? String(selectedYear) : null}
+          onYearChange={(year) => setSelectedYear(year ? Number(year) : null)}
+          legend="Choix de l'année d'ouverture"
+          hint="Afficher les parcours pour une année spécifique"
+          hideEvolution
+        />
       )}
 
-      <GlobalStats stats={globalStats} year={selectedYear} />
+      <GlobalStats stats={globalStats} year={selectedYear || new Date().getFullYear()} />
 
       <div>
         {aggregatedParcours.map((data) => (
           <ParcoursCard
             key={`parcours-${data.parcours.infp}-${data.parcours.openingYear}`}
             data={data}
+            isVisible={isVisible}
           />
         ))}
       </div>

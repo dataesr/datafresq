@@ -1,11 +1,11 @@
 import { useMemo } from 'react';
 import FormationMap from '@/components/maps/FormationMap';
-import PillsTitle from '@/components/PillsTitle';
 import type { Etablissement as EtablissementType, Program } from '~/schemas/programs';
 
 type EtablissementsProps = {
   etabs: Program['etablissements'];
   locations: Program['locations'];
+  isVisible?: boolean;
 };
 
 interface GroupedEtablissement {
@@ -265,20 +265,16 @@ function MapLegend({
   );
 }
 
-export default function Etablissement({ etabs, locations }: EtablissementsProps) {
+export default function Etablissement({ etabs, locations, isVisible = true }: EtablissementsProps) {
   const groupedEtabs = useMemo(() => groupEtablissementsByPaysage(etabs), [etabs]);
 
-  // Count stats for the section title
-  const totalEtabs = etabs.length;
+  // Count stats for the map legend
   const totalSites = locations.filter((loc) => loc.types.includes('site')).length;
   const totalEtabLocations = locations.filter((loc) => loc.types.includes('etablissement')).length;
 
   return (
     <section id="etablissement">
-      <PillsTitle as="h2" icon="fr-icon-building-line">
-        Établissement{totalEtabs > 1 ? 's' : ''}
-      </PillsTitle>
-
+      <h2 className="fr-h4">Établissements</h2>
       <div
         style={{
           display: 'grid',
@@ -309,7 +305,17 @@ export default function Etablissement({ etabs, locations }: EtablissementsProps)
               overflow: 'hidden',
             }}
           >
-            <FormationMap locations={locations} />
+            {isVisible ? (
+              <FormationMap locations={locations} />
+            ) : (
+              <div
+                style={{
+                  width: '100%',
+                  height: '100%',
+                  background: 'var(--background-contrast-grey)',
+                }}
+              />
+            )}
           </div>
 
           {/* Map legend with counts - no gap, directly under map */}

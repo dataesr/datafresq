@@ -20,6 +20,9 @@
     background-position: 0 100%;
     background-repeat: no-repeat;
     background-size: 100% 2px;
+    .fr-nav__item::before {
+      content: none !important;
+    }
     .fr-nav__item {
       align-items: flex-start;
       position: static;

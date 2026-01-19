@@ -1,13 +1,12 @@
 import { SimpleStatCard } from '@/components/cards/StatCards';
 
 interface EffectifsStatsCardsProps {
-  year: string;
   total: number;
   women: number;
   men: number;
 }
 
-export function EffectifsStatsCards({ year, total, women, men }: EffectifsStatsCardsProps) {
+export function EffectifsStatsCards({ total, women, men }: EffectifsStatsCardsProps) {
   const feminizationRate = total > 0 ? `${Math.round((women / total) * 100)}%` : '-';
 
   return (
@@ -21,7 +20,7 @@ export function EffectifsStatsCards({ year, total, women, men }: EffectifsStatsC
     >
       <SimpleStatCard
         value={total}
-        label={`Étudiants inscrits (${year})`}
+        label={`Étudiants inscrits`}
         icon="fr-icon-team-fill"
         color="green-archipel"
       />

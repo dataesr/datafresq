@@ -1,5 +1,4 @@
 import { useMemo, useState } from 'react';
-import PillsTitle from '@/components/PillsTitle';
 import { SearchInput } from '@/components/SearchInput';
 import type { Program } from '~/schemas/programs';
 
@@ -234,11 +233,7 @@ export default function Debouches({ romeInfos }: DebouchesProps) {
   // Now do conditional rendering
   if (romeInfos && romeInfos.length > 0) {
     return (
-      <section id="debouches" className="formation-section">
-        <PillsTitle as="h2" icon="fr-icon-briefcase-line">
-          Débouchés professionnels
-        </PillsTitle>
-
+      <section id="debouches">
         <div className="fr-mb-3w">
           <p>
             Cette formation ouvre l'accès à <strong>{romeInfos.length} métiers</strong> répertoriés
@@ -298,11 +293,7 @@ export default function Debouches({ romeInfos }: DebouchesProps) {
   }
 
   return (
-    <section id="debouches" className="formation-section">
-      <PillsTitle as="h2" icon="fr-icon-briefcase-line">
-        Débouchés professionnels
-      </PillsTitle>
-
+    <section id="debouches">
       <div className="fr-callout">
         <p>Aucune donnée disponible.</p>
       </div>

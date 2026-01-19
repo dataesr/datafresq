@@ -10,6 +10,7 @@ interface YearSelectorProps {
   evolutionLabel?: string;
   disableEvolution?: boolean;
   disableEvolutionTooltip?: string;
+  hideEvolution?: boolean;
 }
 
 export function YearSelector({
@@ -22,6 +23,7 @@ export function YearSelector({
   evolutionLabel = 'Evolution',
   disableEvolution = false,
   disableEvolutionTooltip = "Pas assez de données pour afficher l'évolution",
+  hideEvolution = false,
 }: YearSelectorProps) {
   const id = useId();
 
@@ -48,24 +50,26 @@ export function YearSelector({
               </label>
             </div>
           ))}
-        <div key="evolution" className="fr-segmented__element">
-          <input
-            checked={!selectedYear}
-            value=""
-            type="radio"
-            id={`${id}-year-evolution`}
-            name={`${id}-year`}
-            onChange={() => onYearChange(null)}
-            disabled={disableEvolution}
-          />
-          <label
-            className="fr-label"
-            htmlFor={`${id}-year-evolution`}
-            title={disableEvolution ? disableEvolutionTooltip : undefined}
-          >
-            {evolutionLabel}
-          </label>
-        </div>
+        {!hideEvolution && (
+          <div key="evolution" className="fr-segmented__element">
+            <input
+              checked={!selectedYear}
+              value=""
+              type="radio"
+              id={`${id}-year-evolution`}
+              name={`${id}-year`}
+              onChange={() => onYearChange(null)}
+              disabled={disableEvolution}
+            />
+            <label
+              className="fr-label"
+              htmlFor={`${id}-year-evolution`}
+              title={disableEvolution ? disableEvolutionTooltip : undefined}
+            >
+              {evolutionLabel}
+            </label>
+          </div>
+        )}
       </div>
     </fieldset>
   );

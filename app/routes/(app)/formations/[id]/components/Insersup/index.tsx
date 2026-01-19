@@ -11,7 +11,6 @@ import {
   YearSelector,
 } from '@/components/insersup';
 import { NoDataMessage } from '@/components/NoDataMessage';
-import PillsTitle from '@/components/PillsTitle';
 import type { InsersupStats, InsersupYearStats } from '~/schemas/programs';
 import { InsersupStatsCards } from './components/InsersupStatsCards';
 import { SalaryByGenderChart } from './components/SalaryByGenderChart';
@@ -56,21 +55,14 @@ export default function Insersup({ insersupData }: InsersupProps) {
 
   if (!insersupData || insersupData.byYear.length === 0) {
     return (
-      <section id="insersup" className="formation-section">
-        <PillsTitle as="h2" icon="fr-icon-briefcase-line">
-          Insertion professionnelle
-        </PillsTitle>
+      <section id="insersup">
         <EmptyState />
       </section>
     );
   }
 
   return (
-    <section id="insersup" className="formation-section">
-      <PillsTitle as="h2" icon="fr-icon-briefcase-line">
-        Insertion professionnelle
-      </PillsTitle>
-
+    <section id="insersup">
       <div>
         <YearSelector
           availableYears={availableYears}

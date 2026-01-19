@@ -71,6 +71,7 @@ export default function AppRouter() {
         <Route path="faq" element={<Faq />} />
         <Route path="formations" element={<FormationsListPage />} />
         <Route path="formations/:inf" element={<FormationPage />} />
+        <Route path="formations/:inf/:tab" element={<FormationPage />} />
 
         <Route path="espaces" element={<EspacesPage />} />
         <Route path="espaces/nouveau" element={<NouveauEspacePage />} />

@@ -1,7 +1,6 @@
 import { Activity, useMemo, useState } from 'react';
 import { EffectifsEvolutionChart, EmptyState } from '@/components/effectifs';
 import { AutoGrid } from '@/components/Grids/AutoGrid';
-import PillsTitle from '@/components/PillsTitle';
 import { YearSelector } from '@/components/YearSelector';
 import type { SiseRecord } from '~/schemas/programs';
 import { CityChart } from './components/CityChart';
@@ -38,9 +37,6 @@ export default function Effectifs({ siseData }: EffectifsProps) {
   if (!stats.hasData) {
     return (
       <section id="effectifs">
-        <PillsTitle as="h2" icon="fr-icon-group-line">
-          Effectifs étudiants
-        </PillsTitle>
         <EmptyState />
       </section>
     );
@@ -48,10 +44,6 @@ export default function Effectifs({ siseData }: EffectifsProps) {
 
   return (
     <section id="effectifs">
-      <PillsTitle as="h2" icon="fr-icon-group-line">
-        Effectifs étudiants
-      </PillsTitle>
-
       <div>
         <YearSelector
           availableYears={availableYears}
@@ -71,7 +63,6 @@ export default function Effectifs({ siseData }: EffectifsProps) {
           return (
             <Activity key={year} mode={selectedYear === year ? 'visible' : 'hidden'}>
               <EffectifsStatsCards
-                year={yearData.year}
                 total={yearData.total}
                 women={yearData.women}
                 men={yearData.men}

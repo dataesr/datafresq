@@ -1,7 +1,6 @@
 import { AccreditationCard } from '@/components/cards/AccreditationCard';
 import { KeyValueCard } from '@/components/cards/KeyValueCard';
 import { AutoGrid } from '@/components/Grids/AutoGrid';
-import PillsTitle from '@/components/PillsTitle';
 import type { Program } from '~/schemas/programs';
 
 export default function FicheAdministrative({ formation }: { formation: Program }) {
@@ -15,9 +14,6 @@ export default function FicheAdministrative({ formation }: { formation: Program 
 
   return (
     <section id="fiche-administrative">
-      <PillsTitle icon="fr-icon-info-line" as="h2">
-        Informations générales
-      </PillsTitle>
       <div className="fr-mb-6w">
         <AutoGrid min={300} gap="sm">
           <KeyValueCard label="Secteur" value={secteur} />
