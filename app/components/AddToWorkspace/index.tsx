@@ -191,7 +191,7 @@ export default function AddToWorkspace({
             }}
           >
             <Link
-              to="/espaces/nouveau"
+              to={`/espaces/nouveau?formationIds=${formationIds.join(',')}`}
               className="fr-btn fr-btn--sm fr-btn--tertiary-no-outline fr-icon-add-line fr-btn--icon-left"
             >
               Créer un espace

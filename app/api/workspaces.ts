@@ -47,6 +47,7 @@ async function createWorkspace(input: {
   color?: string;
   isPublic?: boolean;
   users?: { userId: string; role: 'viewer' | 'editor' }[];
+  programs?: string[];
 }) {
   const { data, error } = await api.workspaces.post(input);
   if (error) throw new APIError(error);

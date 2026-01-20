@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Link, useNavigate } from 'react-router';
+import { Link, useNavigate, useSearchParams } from 'react-router';
 import { useAuth } from '@/api/auth';
 import { useCreateWorkspace } from '@/api/workspaces';
 import { CollaboratorList, usePendingUsers } from '@/components/CollaboratorList';
@@ -12,6 +12,10 @@ export default function NouveauEspacePage() {
   const { toast } = useToast();
   const { user } = useAuth();
   const createMutation = useCreateWorkspace();
+  const [searchParams] = useSearchParams();
+
+  const formationIdsParam = searchParams.get('formationIds');
+  const formationIds = formationIdsParam ? formationIdsParam.split(',').filter(Boolean) : [];
 
   const [name, setName] = useState('');
   const [description, setDescription] = useState('');
@@ -20,7 +24,6 @@ export default function NouveauEspacePage() {
 
   const { pendingUsers, addUser, removeUser, changeRole } = usePendingUsers();
 
-  // Exclude current user from search results
   const excludeUserIds = user ? [user.id] : [];
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -41,12 +44,17 @@ export default function NouveauEspacePage() {
         color,
         isPublic,
         users: pendingUsers.map((u) => ({ userId: u.userId, role: u.role })),
+        programs: formationIds.length > 0 ? formationIds : undefined,
       },
       {
         onSuccess: (data) => {
+          const successMessage =
+            formationIds.length > 0
+              ? `L'espace "${data.name}" a été créé avec ${formationIds.length} formation${formationIds.length > 1 ? 's' : ''}`
+              : `L'espace "${data.name}" a été créé`;
           toast({
             type: 'success',
-            description: `L'espace "${data.name}" a été créé`,
+            description: successMessage,
           });
           navigate(`/espaces/${data.id}`);
         },
@@ -94,8 +102,17 @@ export default function NouveauEspacePage() {
 
       <h1 className="fr-h2 fr-mb-4w">Créer un espace de travail</h1>
 
+      {formationIds.length > 0 && (
+        <div className="fr-alert fr-alert--info fr-mb-3w">
+          <p className="fr-alert__title">
+            {formationIds.length} formation{formationIds.length > 1 ? 's' : ''} sera
+            {formationIds.length > 1 ? 'ont' : ''} ajoutée{formationIds.length > 1 ? 's' : ''} à cet
+            espace
+          </p>
+        </div>
+      )}
+
       <form onSubmit={handleSubmit}>
-        {/* Général */}
         <div className="fr-grid-row fr-pb-6w">
           <div className="fr-col-12 fr-col-md-4 fr-px-1w">
             <p className="fr-text--lead fr-text--bold fr-mb-1w">Général</p>
@@ -136,7 +153,6 @@ export default function NouveauEspacePage() {
 
         <hr />
 
-        {/* Visibilité */}
         <div className="fr-grid-row fr-py-6w">
           <div className="fr-col-12 fr-col-md-4 fr-px-1w">
             <p className="fr-text--lead fr-text--bold fr-mb-1w">Visibilité</p>
@@ -182,7 +198,6 @@ export default function NouveauEspacePage() {
 
         <hr />
 
-        {/* Collaborateurs */}
         <div className="fr-grid-row fr-py-6w">
           <div className="fr-col-12 fr-col-md-4 fr-px-1w">
             <p className="fr-text--lead fr-text--bold fr-mb-1w">Collaborateurs</p>
@@ -204,7 +219,6 @@ export default function NouveauEspacePage() {
 
         <hr />
 
-        {/* Actions */}
         <div className="fr-grid-row fr-py-6w">
           <div className="fr-col-12 fr-col-md-4 fr-px-1w" />
           <div className="fr-col-12 fr-col-md-6 fr-col-offset-md-2 fr-px-2w">
