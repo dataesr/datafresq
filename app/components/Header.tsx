@@ -53,7 +53,12 @@ export default function Header() {
                       ESR
                     </span>
                     <span className="fr-text--light"> - </span>
-                    <span className="fr-text--bold">Data Fresq</span>
+                    <span style={{ letterSpacing: '0.1rem' }} className="fr-text--bold">
+                      data
+                    </span>
+                    <span style={{ letterSpacing: '0.1rem' }} className="fr-text--light">
+                      FRESQ
+                    </span>
                   </p>
                 </Link>
                 <p className="fr-header__service-tagline fr-hidden fr-unhidden-md">
