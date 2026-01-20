@@ -91,7 +91,7 @@
   width: 3rem;
   height: 3px;
   padding: 0;
-  background: var(--border-default-blue-france);
+  background: var(--text-label-blue-france);
   border: none;
   margin: 0 auto 1.5rem;
 }
