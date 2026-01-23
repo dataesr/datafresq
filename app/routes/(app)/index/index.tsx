@@ -36,10 +36,10 @@ function StatsSection() {
             {stats.map((stat) => (
               <div
                 key={stat.key}
-                className="fx-card fx-card--sm fx-card--rounded fx-card--lift"
+                className="fx-card fx-card--sm fx-card--lift"
                 style={{ display: 'flex', alignItems: 'flex-start', gap: '1rem' }}
               >
-                <div className={`home-icon-box ${stat.icon}`} aria-hidden="true" />
+                <div className={`icon-box ${stat.icon}`} aria-hidden="true" />
                 <div>
                   <p
                     className="fr-text--bold fr-mb-0"
@@ -111,9 +111,9 @@ function FeaturesSection() {
           {features.map((feature) => (
             <div
               key={feature.title}
-              className="fx-card fx-card--sm fx-card--rounded fx-card--lift fx-card--bg-default"
+              className="fx-card fx-card--sm fx-card--lift fx-card--bg-default"
             >
-              <div className={`home-icon-box ${feature.icon} fr-mb-2v`} aria-hidden="true" />
+              <div className={`icon-box ${feature.icon} fr-mb-2v`} aria-hidden="true" />
               <h3 className="fr-text--md fr-text--bold fr-mb-1v">{feature.title}</h3>
               <p className="fr-text--sm fr-text-mention--grey fr-mb-0">{feature.description}</p>
             </div>

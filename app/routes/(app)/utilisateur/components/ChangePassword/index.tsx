@@ -2,7 +2,6 @@ import { useForm } from '@tanstack/react-form';
 import { z } from 'zod';
 
 import { useChangePassword } from '@/api/users';
-import { Button } from '@/components/Button';
 import { Password } from '@/components/Password';
 import { useToast } from '@/hooks/useToast';
 import { passwordSchema as passwordFieldSchema } from '@/utils/password';
@@ -120,15 +119,14 @@ export default function ChangePassword() {
           selector={(state) => [state.canSubmit, state.isSubmitting, state.isPristine]}
         >
           {([canSubmit, isSubmitting, isPristine]) => (
-            <Button
-              size="sm"
+            <button
+              className="fr-btn fr-btn--secondary fr-btn--sm"
               type="submit"
-              variant="secondary"
               disabled={!canSubmit || isSubmitting || isPending || isPristine}
               onClick={() => passwordForm.handleSubmit()}
             >
               {isSubmitting || isPending ? 'Mise à jour...' : 'Mettre à jour'}
-            </Button>
+            </button>
           )}
         </passwordForm.Subscribe>
       </div>

@@ -1,7 +1,7 @@
 import { Link } from 'react-router';
 import { useAuth, useSignOut } from '@/api/auth';
 import { Avatar } from './Avatar';
-import { Dropdown } from './Dropdown';
+import { Dropdown } from './ui/Dropdown';
 
 export default function Header() {
   const { user, isAuthenticated } = useAuth();
@@ -76,48 +76,46 @@ export default function Header() {
                     title="Menu utilisateur"
                     align="end"
                   >
-                    <div
-                      className="fr-p-3v fr-pr-6w"
-                      style={{ display: 'flex', alignItems: 'center', gap: '.5rem' }}
-                    >
-                      <Avatar name={user.firstName} />
-                      <div style={{ textAlign: 'left' }}>
-                        <p className="fr-text--bold fr-mb-0">
-                          {user.firstName} {user.lastName}
-                        </p>
-                        {user.email && (
-                          <p className="fr-text--xs fr-text-mention--grey fr-mb-0">{user.email}</p>
-                        )}
+                    <Dropdown.Header>
+                      <div
+                        className="fr-py-1v fr-pr-5w"
+                        style={{ display: 'flex', alignItems: 'center', gap: '.5rem' }}
+                      >
+                        <Avatar name={user.firstName} />
+                        <div style={{ textAlign: 'left' }}>
+                          <p className="fr-text--bold fr-mb-0">
+                            {user.firstName} {user.lastName}
+                          </p>
+                          {user.email && (
+                            <p className="fr-text--xs fr-text-mention--grey fr-mb-0">
+                              {user.email}
+                            </p>
+                          )}
+                        </div>
                       </div>
-                    </div>
-                    <hr />
-                    <Link
-                      className="fx-dropdown__item fr-icon-stack-line"
-                      to="/espaces"
-                      role="menuitem"
-                    >
+                    </Dropdown.Header>
+                    <Dropdown.Link className="fr-py-3v" icon="stack-line" to="/espaces">
                       Mes espaces
-                    </Link>
-                    <Link
-                      className="fx-dropdown__item fr-icon-settings-5-line"
+                    </Dropdown.Link>
+                    <Dropdown.Link
+                      className="fr-py-3v"
+                      icon="settings-5-line"
                       to="/utilisateur/profil"
-                      role="menuitem"
                     >
                       Gérer mon compte
-                    </Link>
+                    </Dropdown.Link>
                     {user.role === 'admin' && (
-                      <Link
-                        className="fx-dropdown__item fr-icon-terminal-line"
+                      <Dropdown.Link
+                        className="fr-py-3v"
+                        icon="terminal-line"
                         to="/admin/utilisateurs"
-                        role="menuitem"
                       >
                         Administration du site
-                      </Link>
+                      </Dropdown.Link>
                     )}
-                    <div className="fx-dropdown__actions">
+                    <Dropdown.Footer align="center">
                       <button
                         type="button"
-                        role="menuitem"
                         className="fr-mx-2w fr-my-1w fr-btn fr-btn--sm fr-btn--secondary fr-btn--icon-left fr-icon-logout-box-r-line"
                         onClick={handleLogout}
                         style={{
@@ -127,7 +125,7 @@ export default function Header() {
                       >
                         Se déconnecter
                       </button>
-                    </div>
+                    </Dropdown.Footer>
                   </Dropdown>
                 </div>
               </div>

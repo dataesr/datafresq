@@ -1,5 +1,4 @@
 import { useRevokeAllSessions, useRevokeSession, useSessions } from '@/api/users';
-import { Button } from '@/components/Button';
 import { useToast } from '@/hooks/useToast';
 
 export default function ManageSessions() {
@@ -96,18 +95,15 @@ export default function ManageSessions() {
                           </p>
                         </div>
                         {index !== 0 && (
-                          <Button
-                            color="error"
-                            icon="delete-bin-line"
+                          <button
+                            type="button"
+                            className="fr-btn fr-btn--tertiary-no-outline fr-btn--sm fr-icon-delete-bin-line fr-btn--icon-left fr-btn--error"
                             onClick={() => handleRevokeSession(session.id)}
-                            size="sm"
                             title="Révoquer cette session"
-                            variant="text"
-                            iconPosition="left"
                             disabled={isRevokingSession}
                           >
                             Révoquer
-                          </Button>
+                          </button>
                         )}
                       </li>
                     ))}
@@ -119,14 +115,14 @@ export default function ManageSessions() {
         </div>
       </div>
       <div className="settings-card__footer">
-        <Button
+        <button
+          type="button"
+          className="fr-btn fr-btn--secondary fr-btn--sm"
           disabled={sessionCount < 2 || isRevokingAll}
-          variant="secondary"
-          size="sm"
           onClick={handleRevokeAllSessions}
         >
           {isRevokingAll ? 'Révocation...' : 'Tout révoquer'}
-        </Button>
+        </button>
       </div>
     </div>
   );

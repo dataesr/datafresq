@@ -1,8 +1,8 @@
 import { useState } from 'react';
 import type { UserSearchResult } from '@/api/users';
 import { Avatar } from '@/components/Avatar';
-import { Dropdown } from '@/components/Dropdown';
 import UserSearchSelect from '@/components/UserSearchSelect';
+import { Select } from '@/components/ui/Select';
 
 export interface PendingUser {
   userId: string;
@@ -62,19 +62,19 @@ function PendingUserRow({
           {user.email}
         </p>
       </div>
-      <Dropdown label={selectedRoleLabel} size="sm" outline>
+      <Select label={selectedRoleLabel} size="sm" outline>
         {ROLE_OPTIONS.map((option) => (
-          <button
+          <Select.Radio
             key={option.id}
-            type="button"
-            role="menuitem"
-            className={`fx-dropdown__item ${user.role === option.id ? 'fx-dropdown__item--active' : ''}`}
-            onClick={() => onRoleChange(option.id)}
+            value={option.id}
+            name={`role-${user.userId}`}
+            checked={user.role === option.id}
+            onChange={() => onRoleChange(option.id)}
           >
             {option.label}
-          </button>
+          </Select.Radio>
         ))}
-      </Dropdown>
+      </Select>
       <button
         type="button"
         className="fr-btn fr-btn--sm fr-btn--tertiary-no-outline fr-icon-delete-line"

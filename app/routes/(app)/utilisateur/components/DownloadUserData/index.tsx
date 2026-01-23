@@ -1,5 +1,3 @@
-import { Button } from '@/components/Button';
-
 export default function DownloadUserDataCard() {
   const handleDownload = () => {
     alert('Téléchargement des données utilisateur...');
@@ -17,9 +15,13 @@ export default function DownloadUserDataCard() {
         </div>
       </div>
       <div className="settings-card__footer">
-        <Button variant="secondary" size="sm" onClick={handleDownload}>
+        <button
+          type="button"
+          className="fr-btn fr-btn--secondary fr-btn--sm"
+          onClick={handleDownload}
+        >
           Télécharger mes données
-        </Button>
+        </button>
       </div>
     </div>
   );

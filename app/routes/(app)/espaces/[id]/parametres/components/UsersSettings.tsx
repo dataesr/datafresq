@@ -3,8 +3,8 @@ import type { UserSearchResult } from '@/api/users';
 import { useAddUsers, useRemoveUsers, useUpdateUserRole } from '@/api/workspaces';
 import { Avatar } from '@/components/Avatar';
 import { getDisplayName } from '@/components/CollaboratorList';
-import { Dropdown } from '@/components/Dropdown';
 import UserSearchSelect from '@/components/UserSearchSelect';
+import { Select } from '@/components/ui/Select';
 import { useToast } from '@/hooks/useToast';
 import type { ReadWorkspace } from '~/schemas/workspaces';
 
@@ -102,19 +102,19 @@ function UserRow({ user, workspaceId, isOwner }: UserRowProps) {
         </p>
       </div>
       {isOwner ? (
-        <Dropdown label={selectedRoleLabel} size="sm" outline disabled={updateUserRole.isPending}>
+        <Select label={selectedRoleLabel} size="sm" outline disabled={updateUserRole.isPending}>
           {ROLE_OPTIONS.map((option) => (
-            <button
+            <Select.Radio
               key={option.id}
-              type="button"
-              role="menuitem"
-              className={`fx-dropdown__item ${user.role === option.id ? 'fx-dropdown__item--active' : ''}`}
-              onClick={() => handleRoleChange(option.id)}
+              value={option.id}
+              name={`role-${user.userId}`}
+              checked={user.role === option.id}
+              onChange={() => handleRoleChange(option.id)}
             >
               {option.label}
-            </button>
+            </Select.Radio>
           ))}
-        </Dropdown>
+        </Select>
       ) : (
         <span
           className={`fr-badge fr-badge--sm ${user.role === 'editor' ? 'fr-badge--green-emeraude' : 'fr-badge--blue-cumulus'}`}

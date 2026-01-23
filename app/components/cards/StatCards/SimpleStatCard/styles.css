@@ -1,0 +1,22 @@
+.stat-card {
+  display: flex;
+  align-items: flex-start;
+  gap: 1rem;
+  overflow: hidden;
+  flex-wrap: wrap;
+
+  .stat-card__icon {
+    width: 2.5rem;
+    height: 2.5rem;
+    min-width: 2.5rem;
+    border-radius: 0.375rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .stat-card__value {
+    font-size: 1.5rem;
+    line-height: 1.2;
+  }
+}

@@ -13,6 +13,7 @@
 }
 
 .fx-card--shadow {
+  border: none !important;
   --idle: transparent;
   --hover: var(--background-raised-grey-hover);
   --active: var(--background-raised-grey-active);

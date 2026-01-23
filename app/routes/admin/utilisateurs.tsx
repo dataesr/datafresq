@@ -17,8 +17,6 @@ import {
   useRevokeUserSessions,
 } from '@/api/admin';
 import { useInviteUser } from '@/api/invitations';
-import Dropdown from '@/components/Dropdown';
-import DropdownExamples from '@/components/Dropdown/examples';
 import { DebouncedInput } from '@/components/debounced-input';
 import { Modal, useModal } from '@/components/Modal';
 import {
@@ -31,6 +29,8 @@ import {
   USER_COLUMN_IDS,
   type UserColumnId,
 } from '@/components/table';
+import { Dropdown } from '@/components/ui/Dropdown';
+import { Select } from '@/components/ui/Select';
 import { useToast } from '@/hooks/useToast';
 import type { UserAdmin } from '~/schemas/users';
 
@@ -220,34 +220,29 @@ export default function AdminUsers() {
 
         return (
           <Dropdown icon="more-fill" size="sm" outline={false} title="Actions" aria-label="Actions">
-            <button
-              type="button"
-              role="menuitem"
-              className={`fx-dropdown__item fr-icon-${isAdmin ? 'user-line' : 'admin-line'}`}
+            <Dropdown.Item
+              icon={isAdmin ? 'user-line' : 'admin-line'}
               onClick={() => handleRoleChange(user.id, isAdmin ? 'user' : 'admin')}
               disabled={changeRole.isPending}
             >
               {isAdmin ? 'Rétrograder en utilisateur' : 'Promouvoir admin'}
-            </button>
-            <button
-              type="button"
-              role="menuitem"
-              className="fx-dropdown__item fr-icon-logout-box-line"
+            </Dropdown.Item>
+            <Dropdown.Item
+              icon="logout-box-line"
               onClick={() => handleRevokeSessions(user.id)}
               disabled={revokeSessions.isPending}
             >
               Révoquer les sessions
-            </button>
-            <hr />
-            <button
-              type="button"
-              role="menuitem"
-              className="fx-dropdown__item fx-dropdown__item--destructive fr-icon-delete-line"
+            </Dropdown.Item>
+            <Dropdown.Separator />
+            <Dropdown.Item
+              icon="delete-line"
+              destructive
               onClick={() => handleDeleteUser(user.id)}
               disabled={deleteUser.isPending || !user.isActive}
             >
               Désactiver
-            </button>
+            </Dropdown.Item>
           </Dropdown>
         );
       },
@@ -330,49 +325,27 @@ export default function AdminUsers() {
           type="text"
           value={globalFilter}
         />
-        <Dropdown
+        <Select
           label={ROLE_FILTER_LABELS[roleFilter] || 'Tous les rôles'}
           size="sm"
           outline={false}
           title="Filtrer par rôle"
         >
-          {ROLE_FILTER_OPTIONS.map((role) => {
-            const isChecked = roleFilter === role;
-            return (
-              <div
-                key={role}
-                role="menuitemradio"
-                aria-checked={isChecked}
-                className="fx-dropdown__input"
-                tabIndex={0}
-                onClick={() => {
-                  setRoleFilter(role);
-                  setPageIndex(0);
-                }}
-                onKeyDown={(e) => {
-                  if (e.key === 'Enter' || e.key === ' ') {
-                    e.preventDefault();
-                    setRoleFilter(role);
-                    setPageIndex(0);
-                  }
-                }}
-              >
-                <input
-                  type="radio"
-                  name="role-filter"
-                  checked={isChecked}
-                  onChange={() => {
-                    setRoleFilter(role);
-                    setPageIndex(0);
-                  }}
-                  tabIndex={-1}
-                  aria-hidden="true"
-                />
-                <span>{ROLE_FILTER_LABELS[role]}</span>
-              </div>
-            );
-          })}
-        </Dropdown>
+          {ROLE_FILTER_OPTIONS.map((role) => (
+            <Select.Radio
+              key={role}
+              value={role}
+              name="role-filter"
+              checked={roleFilter === role}
+              onChange={() => {
+                setRoleFilter(role);
+                setPageIndex(0);
+              }}
+            >
+              {ROLE_FILTER_LABELS[role]}
+            </Select.Radio>
+          ))}
+        </Select>
         <div style={{ marginLeft: 'auto', display: 'flex', gap: '.5rem', alignItems: 'center' }}>
           <PageSizeSelector
             value={String(pageSize)}
@@ -525,7 +498,6 @@ export default function AdminUsers() {
           </div>
         </div>
       </Modal>
-      <DropdownExamples />
     </div>
   );
 }

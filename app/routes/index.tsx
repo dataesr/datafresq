@@ -5,6 +5,7 @@ import FullPageLoader from '@/components/FullPageLoader';
 import AdminLayout from '@/components/layouts/AdminLayout';
 import AppLayout from '@/components/layouts/AppLayout';
 import AuthLayout from '@/components/layouts/AuthLayout';
+import ComposantsExemples from './(app)/composants/exemples';
 import EspacesPage from './(app)/espaces';
 import EspaceLayout from './(app)/espaces/[id]/layout';
 import NouveauEspacePage from './(app)/espaces/nouveau';
@@ -72,6 +73,7 @@ export default function AppRouter() {
         <Route path="formations" element={<FormationsListPage />} />
         <Route path="formations/:inf" element={<FormationPage />} />
         <Route path="formations/:inf/:tab" element={<FormationPage />} />
+        <Route path="composants/exemples" element={<ComposantsExemples />} />
 
         <Route path="espaces" element={<EspacesPage />} />
         <Route path="espaces/nouveau" element={<NouveauEspacePage />} />

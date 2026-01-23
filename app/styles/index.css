@@ -2,6 +2,7 @@
 @import "./table.css";
 @import "./layout.css";
 @import "./dsfr-extensions/index.css";
+@import "./icon-box.css";
 
 html {
   scroll-behavior: smooth;

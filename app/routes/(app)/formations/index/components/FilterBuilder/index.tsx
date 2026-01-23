@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useId, useMemo, useState } from 'react';
 import { type Institution, useInstitutionsSearch } from '@/api/institutions';
 import { type FilterState, useProgramsFacets } from '@/api/programs';
-import { Dropdown } from '@/components/Dropdown';
+import { Select } from '@/components/ui/Select';
 import './styles.css';
 
 // =============================================================================
@@ -9,6 +9,7 @@ import './styles.css';
 // =============================================================================
 
 type FilterType = 'multiselect' | 'async-search' | 'boolean';
+type FilterGroup = 'typeDiplome' | 'etablissement' | 'domaine' | 'donneesDispo';
 
 interface FilterConfig {
   key: keyof FilterState;
@@ -16,6 +17,7 @@ interface FilterConfig {
   type: FilterType;
   placeholder?: string;
   facetKey?: string;
+  group?: FilterGroup;
 }
 
 interface FilterRowData {
@@ -38,33 +40,60 @@ interface FilterBuilderProps {
 // =============================================================================
 
 const FILTER_CONFIGS: FilterConfig[] = [
-  { key: 'cycle', label: 'Cycle', type: 'multiselect', facetKey: 'cycles' },
-  { key: 'diplomaType', label: 'Type de diplôme', type: 'multiselect', facetKey: 'diplomaTypes' },
+  { key: 'cycle', label: 'Cycle', type: 'multiselect', facetKey: 'cycles', group: 'typeDiplome' },
+  {
+    key: 'diplomaType',
+    label: 'Type de diplôme',
+    type: 'multiselect',
+    facetKey: 'diplomaTypes',
+    group: 'typeDiplome',
+  },
   {
     key: 'diplomaCategory',
     label: 'Catégorie',
     type: 'multiselect',
     facetKey: 'diplomaCategories',
+    group: 'typeDiplome',
   },
-  { key: 'region', label: 'Région', type: 'multiselect', facetKey: 'regions' },
-  { key: 'academy', label: 'Académie', type: 'multiselect', facetKey: 'academies' },
+  {
+    key: 'region',
+    label: 'Région',
+    type: 'multiselect',
+    facetKey: 'regions',
+    group: 'etablissement',
+  },
+  {
+    key: 'academy',
+    label: 'Académie',
+    type: 'multiselect',
+    facetKey: 'academies',
+    group: 'etablissement',
+  },
   {
     key: 'paysageId',
     label: 'Établissement',
     type: 'async-search',
     placeholder: 'Rechercher...',
+    group: 'etablissement',
   },
-  { key: 'sector', label: 'Secteur', type: 'multiselect', facetKey: 'sectors' },
+  {
+    key: 'sector',
+    label: 'Secteur',
+    type: 'multiselect',
+    facetKey: 'sectors',
+    group: 'etablissement',
+  },
   {
     key: 'disciplinarySector',
     label: 'Secteur disciplinaire',
     type: 'multiselect',
     facetKey: 'disciplinarySectors',
+    group: 'domaine',
   },
-  { key: 'domain', label: 'Domaine', type: 'multiselect', facetKey: 'domains' },
-  { key: 'hasSiseInfos', label: 'Données SISE', type: 'boolean' },
-  { key: 'hasRncpInfos', label: 'Données RNCP', type: 'boolean' },
-  { key: 'hasRomeInfos', label: 'Données ROME', type: 'boolean' },
+  { key: 'domain', label: 'Domaine', type: 'multiselect', facetKey: 'domains', group: 'domaine' },
+  { key: 'hasSiseInfos', label: 'Données SISE', type: 'boolean', group: 'donneesDispo' },
+  { key: 'hasRncpInfos', label: 'Données RNCP', type: 'boolean', group: 'donneesDispo' },
+  { key: 'hasRomeInfos', label: 'Données ROME', type: 'boolean', group: 'donneesDispo' },
 ];
 
 // =============================================================================
@@ -84,7 +113,10 @@ function SelectionBadges({ items, onRemove, maxVisible = 5 }: SelectionBadgesPro
   const remaining = items.length - maxVisible;
 
   return (
-    <div className="fr-tags-group fr-hidden fr-unhidden-sm fr-mt-1w">
+    <div
+      style={{ display: 'inline-flex' }}
+      className="fr-tags-group fr-hidden fr-unhidden-sm fr-mt-1w"
+    >
       {visible.map((item) => (
         <p key={item.key} className="fr-tag fr-tag--sm fr-tag--blue-france">
           {item.label.length > 25 ? `${item.label.substring(0, 25)}...` : item.label}
@@ -141,7 +173,6 @@ function MultiselectValuePicker({
     return options.filter((opt) => opt.key.toLowerCase().includes(searchQuery.toLowerCase()));
   }, [options, searchQuery]);
 
-  // Sort: selected first, then by count
   const sortedOptions = useMemo(() => {
     return [...filteredOptions].sort((a, b) => {
       const aSelected = selectedValues.includes(a.key);
@@ -153,11 +184,11 @@ function MultiselectValuePicker({
   }, [filteredOptions, selectedValues]);
 
   const handleToggle = useCallback(
-    (key: string) => {
-      if (selectedValues.includes(key)) {
-        onChange(selectedValues.filter((v) => v !== key));
-      } else {
+    (key: string, checked: boolean) => {
+      if (checked) {
         onChange([...selectedValues, key]);
+      } else {
+        onChange(selectedValues.filter((v) => v !== key));
       }
     },
     [selectedValues, onChange],
@@ -176,7 +207,6 @@ function MultiselectValuePicker({
     return `${selectedValues.length} sélectionnés`;
   };
 
-  // Build badge items
   const badgeItems = selectedValues.map((v) => ({
     key: v,
     label: options.find((o) => o.key === v)?.key ?? v,
@@ -184,58 +214,30 @@ function MultiselectValuePicker({
 
   return (
     <div>
-      <Dropdown label={getDisplayLabel()} size="sm" outline>
+      <Select label={getDisplayLabel()} size="sm" outline multiple>
         {options.length > 8 && (
-          <div className="fx-dropdown__search">
-            <input
-              type="search"
-              data-autofocus
-              placeholder="Rechercher..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-            />
-          </div>
+          <Select.Search
+            placeholder="Rechercher..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+          />
         )}
-        <div style={{ maxHeight: '250px', overflowY: 'auto' }}>
-          {sortedOptions.length === 0 ? (
-            <div className="fx-dropdown__empty">Aucune option</div>
-          ) : (
-            sortedOptions.map((option) => {
-              const isChecked = selectedValues.includes(option.key);
-              return (
-                <div
-                  key={option.key}
-                  role="menuitemcheckbox"
-                  aria-checked={isChecked}
-                  className="fx-dropdown__input"
-                  tabIndex={0}
-                  onClick={() => handleToggle(option.key)}
-                  onKeyDown={(e) => {
-                    if (e.key === 'Enter' || e.key === ' ') {
-                      e.preventDefault();
-                      handleToggle(option.key);
-                    }
-                  }}
-                >
-                  <input
-                    type="checkbox"
-                    checked={isChecked}
-                    onChange={() => handleToggle(option.key)}
-                    tabIndex={-1}
-                    aria-hidden="true"
-                  />
-                  <span style={{ flex: 1, minWidth: 0 }} className="clamp-1" title={option.key}>
-                    {option.key}
-                  </span>
-                  <span className="fr-badge fr-badge--sm fr-badge--no-icon">
-                    {option.count.toLocaleString('fr-FR')}
-                  </span>
-                </div>
-              );
-            })
-          )}
-        </div>
-      </Dropdown>
+        {sortedOptions.length === 0 ? (
+          <Select.Empty>Aucune option</Select.Empty>
+        ) : (
+          sortedOptions.map((option) => (
+            <Select.Checkbox
+              key={option.key}
+              value={option.key}
+              checked={selectedValues.includes(option.key)}
+              onChange={(checked) => handleToggle(option.key, checked)}
+              count={option.count}
+            >
+              {option.key}
+            </Select.Checkbox>
+          ))
+        )}
+      </Select>
       <SelectionBadges items={badgeItems} onRemove={handleRemoveBadge} />
     </div>
   );
@@ -262,14 +264,14 @@ function AsyncSearchValuePicker({
   });
 
   const handleToggle = useCallback(
-    (inst: Institution) => {
-      if (selectedValues.includes(inst.id)) {
+    (inst: Institution, checked: boolean) => {
+      if (checked) {
+        onChange([...selectedValues, inst.id], [...selectedItems, inst]);
+      } else {
         onChange(
           selectedValues.filter((v) => v !== inst.id),
           selectedItems.filter((i) => i.id !== inst.id),
         );
-      } else {
-        onChange([...selectedValues, inst.id], [...selectedItems, inst]);
       }
     },
     [selectedValues, selectedItems, onChange],
@@ -285,7 +287,6 @@ function AsyncSearchValuePicker({
     [selectedValues, selectedItems, onChange],
   );
 
-  // Merge selected items with search results
   const displayOptions = useMemo(() => {
     const result = [...selectedItems];
     for (const inst of institutions) {
@@ -293,7 +294,6 @@ function AsyncSearchValuePicker({
         result.push(inst);
       }
     }
-    // Sort: selected first
     return result.sort((a, b) => {
       const aSelected = selectedValues.includes(a.id);
       const bSelected = selectedValues.includes(b.id);
@@ -312,7 +312,6 @@ function AsyncSearchValuePicker({
   const showInitialMessage = searchQuery.length === 0 && selectedItems.length === 0;
   const showMinLengthMessage = searchQuery.length > 0 && searchQuery.length < 2;
 
-  // Build badge items with labels (not IDs)
   const badgeItems = selectedItems.map((item) => ({
     key: item.id,
     label: item.label,
@@ -320,75 +319,48 @@ function AsyncSearchValuePicker({
 
   return (
     <div>
-      <Dropdown label={getDisplayLabel()} size="sm" outline>
-        <div className="fx-dropdown__search">
-          <input
-            type="search"
-            data-autofocus
-            placeholder="Saisissez au moins 2 caractères..."
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-          />
-        </div>
+      <Select label={getDisplayLabel()} size="sm" outline multiple>
+        <Select.Search
+          placeholder="Saisissez au moins 2 caractères..."
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
+        />
 
-        {isLoading && (
-          <div className="fx-dropdown__loading">
-            <span className="fr-icon-loader-4-line" aria-hidden="true" />
-            <span>Chargement...</span>
-          </div>
-        )}
+        {isLoading && <Select.Loading>Chargement...</Select.Loading>}
 
         {!isLoading && showInitialMessage && (
-          <div className="fx-dropdown__empty">Saisissez au moins 2 caractères</div>
+          <Select.Empty>Saisissez au moins 2 caractères</Select.Empty>
         )}
 
         {!isLoading && showMinLengthMessage && (
-          <div className="fx-dropdown__empty">Saisissez au moins 2 caractères</div>
+          <Select.Empty>Saisissez au moins 2 caractères</Select.Empty>
         )}
 
-        {!isLoading && displayOptions.length > 0 && (
-          <div style={{ maxHeight: '250px', overflowY: 'auto' }}>
-            {displayOptions.map((inst) => {
-              const isChecked = selectedValues.includes(inst.id);
-              const subLabel = [inst.nature, inst.city].filter(Boolean).join(' - ');
-              return (
-                <div
-                  key={inst.id}
-                  role="menuitemcheckbox"
-                  aria-checked={isChecked}
-                  className="fx-dropdown__input"
-                  tabIndex={0}
-                  onClick={() => handleToggle(inst)}
-                  onKeyDown={(e) => {
-                    if (e.key === 'Enter' || e.key === ' ') {
-                      e.preventDefault();
-                      handleToggle(inst);
-                    }
-                  }}
-                >
-                  <input
-                    type="checkbox"
-                    checked={isChecked}
-                    onChange={() => handleToggle(inst)}
-                    tabIndex={-1}
-                    aria-hidden="true"
-                  />
-                  <div style={{ display: 'flex', flexDirection: 'column', flex: 1, minWidth: 0 }}>
-                    <span className="clamp-1" title={inst.label}>
-                      {inst.label}
+        {!isLoading &&
+          displayOptions.length > 0 &&
+          displayOptions.map((inst) => {
+            const subLabel = [inst.nature, inst.city].filter(Boolean).join(' - ');
+            return (
+              <Select.Checkbox
+                key={inst.id}
+                value={inst.id}
+                checked={selectedValues.includes(inst.id)}
+                onChange={(checked) => handleToggle(inst, checked)}
+              >
+                <div style={{ display: 'flex', flexDirection: 'column', flex: 1, minWidth: 0 }}>
+                  <span className="clamp-1" title={inst.label}>
+                    {inst.label}
+                  </span>
+                  {subLabel && (
+                    <span className="fr-text--xs fr-text-mention--grey fr-mb-0 clamp-1">
+                      {subLabel}
                     </span>
-                    {subLabel && (
-                      <span className="fr-text--xs fr-text-mention--grey fr-mb-0 clamp-1">
-                        {subLabel}
-                      </span>
-                    )}
-                  </div>
+                  )}
                 </div>
-              );
-            })}
-          </div>
-        )}
-      </Dropdown>
+              </Select.Checkbox>
+            );
+          })}
+      </Select>
       <SelectionBadges items={badgeItems} onRemove={handleRemoveBadge} />
     </div>
   );
@@ -409,39 +381,22 @@ function BooleanValuePicker({ value, onChange, counts }: BooleanValuePickerProps
   const displayLabel = value === 'true' ? 'Oui' : value === 'false' ? 'Non' : 'Sélectionner...';
 
   return (
-    <Dropdown label={displayLabel} size="sm" outline>
-      {options.map((option) => {
-        const isChecked = value === option.key;
-        return (
-          <div
-            key={option.key}
-            role="menuitemradio"
-            aria-checked={isChecked}
-            className="fx-dropdown__input"
-            tabIndex={0}
-            onClick={() => onChange(isChecked ? null : option.key)}
-            onKeyDown={(e) => {
-              if (e.key === 'Enter' || e.key === ' ') {
-                e.preventDefault();
-                onChange(isChecked ? null : option.key);
-              }
-            }}
-          >
-            <input
-              type="radio"
-              checked={isChecked}
-              onChange={() => onChange(isChecked ? null : option.key)}
-              tabIndex={-1}
-              aria-hidden="true"
-            />
-            <span>{option.label}</span>
-            <span className="fr-badge fr-badge--sm fr-badge--no-icon">
-              {option.count.toLocaleString('fr-FR')}
-            </span>
-          </div>
-        );
-      })}
-    </Dropdown>
+    <Select label={displayLabel} size="sm" outline>
+      {options.map((option) => (
+        <Select.Radio
+          key={option.key}
+          value={option.key}
+          name="boolean-filter"
+          checked={value === option.key}
+          onChange={() => onChange(value === option.key ? null : option.key)}
+        >
+          <span style={{ flex: 1 }}>{option.label}</span>
+          <span className="fr-badge fr-badge--sm fr-badge--no-icon">
+            {option.count.toLocaleString('fr-FR')}
+          </span>
+        </Select.Radio>
+      ))}
+    </Select>
   );
 }
 
@@ -629,19 +584,66 @@ function AddFilterDropdown({ availableFilters, onAddFilter }: AddFilterDropdownP
     return null;
   }
 
+  const domainFilters = availableFilters.filter((c) => c.group === 'domaine');
+  const donneesDispoFilters = availableFilters.filter((c) => c.group === 'donneesDispo');
+  const etablissementFilters = availableFilters.filter((c) => c.group === 'etablissement');
+  const typeDiplomeFilters = availableFilters.filter((c) => c.group === 'typeDiplome');
+
   return (
-    <Dropdown label="Ajouter un filtre" size="sm" outline={false} icon="add-line">
-      {availableFilters.map((config) => (
-        <button
-          key={config.key}
-          type="button"
-          className="fx-dropdown__item"
-          onClick={() => onAddFilter(config.key)}
-        >
-          {config.label}
-        </button>
-      ))}
-    </Dropdown>
+    <Select label="Ajouter un filtre" outline={false} icon="add-line">
+      {typeDiplomeFilters.length > 0 && (
+        <Select.Group label="Types de diplôme">
+          {typeDiplomeFilters.map((config) => (
+            <Select.Option
+              key={config.key}
+              value={config.key}
+              onClick={() => onAddFilter(config.key)}
+            >
+              {config.label}
+            </Select.Option>
+          ))}
+        </Select.Group>
+      )}
+      {etablissementFilters.length > 0 && (
+        <Select.Group label="Établissements">
+          {etablissementFilters.map((config) => (
+            <Select.Option
+              key={config.key}
+              value={config.key}
+              onClick={() => onAddFilter(config.key)}
+            >
+              {config.label}
+            </Select.Option>
+          ))}
+        </Select.Group>
+      )}
+      {domainFilters.length > 0 && (
+        <Select.Group label="Domaines">
+          {domainFilters.map((config) => (
+            <Select.Option
+              key={config.key}
+              value={config.key}
+              onClick={() => onAddFilter(config.key)}
+            >
+              {config.label}
+            </Select.Option>
+          ))}
+        </Select.Group>
+      )}
+      {donneesDispoFilters.length > 0 && (
+        <Select.Group label="Données disponibles">
+          {donneesDispoFilters.map((config) => (
+            <Select.Option
+              key={config.key}
+              value={config.key}
+              onClick={() => onAddFilter(config.key)}
+            >
+              {config.label}
+            </Select.Option>
+          ))}
+        </Select.Group>
+      )}
+    </Select>
   );
 }
 

@@ -11,9 +11,9 @@ import {
 import { useMemo, useState } from 'react';
 import { Link, useParams } from 'react-router';
 import { useWorkspacePrograms } from '@/api/workspaces';
-import Dropdown from '@/components/Dropdown';
 import { PRIVACY_THRESHOLD } from '@/components/insersup';
 import { PageSizeSelector, Pagination } from '@/components/table';
+import { Select } from '@/components/ui/Select';
 import type { InsersupProgramData, InsersupYearStats } from '~/schemas/aggregations';
 
 interface ProgramsTableProps {
@@ -160,44 +160,25 @@ function MonthVisibilityToggle({ visibleMonths, onToggleMonth }: MonthVisibility
   );
 
   return (
-    <Dropdown
+    <Select
       label={buttonLabel}
       icon="calendar-line"
       size="sm"
       outline={false}
       title="Gérer les périodes visibles"
+      multiple
     >
-      {MONTHS.map((month) => {
-        const isVisible = visibleMonths.has(month);
-
-        return (
-          <div
-            key={month}
-            role="menuitemcheckbox"
-            aria-checked={isVisible}
-            className="fx-dropdown__input"
-            tabIndex={0}
-            onClick={() => onToggleMonth(month)}
-            onKeyDown={(e) => {
-              if (e.key === 'Enter' || e.key === ' ') {
-                e.preventDefault();
-                onToggleMonth(month);
-              }
-            }}
-          >
-            <input
-              type="checkbox"
-              checked={isVisible}
-              onChange={() => onToggleMonth(month)}
-              tabIndex={-1}
-              aria-hidden="true"
-              style={{ pointerEvents: 'none' }}
-            />
-            <span>{MONTH_LABELS[month]}</span>
-          </div>
-        );
-      })}
-    </Dropdown>
+      {MONTHS.map((month) => (
+        <Select.Checkbox
+          key={month}
+          value={month}
+          checked={visibleMonths.has(month)}
+          onChange={() => onToggleMonth(month)}
+        >
+          {MONTH_LABELS[month]}
+        </Select.Checkbox>
+      ))}
+    </Select>
   );
 }
 

@@ -1,6 +1,5 @@
 import type { Table } from '@tanstack/react-table';
-import { useId } from 'react';
-import Dropdown from '@/components/Dropdown';
+import { Select } from '@/components/ui/Select';
 
 interface ColumnVisibilityToggleProps<TData> {
   table: Table<TData>;
@@ -11,8 +10,6 @@ export function ColumnVisibilityToggle<TData>({
   table,
   columnLabels,
 }: ColumnVisibilityToggleProps<TData>) {
-  const id = useId();
-
   const toggleableColumns = table
     .getAllLeafColumns()
     .filter((column) => Object.keys(columnLabels).includes(column.id));
@@ -30,49 +27,25 @@ export function ColumnVisibilityToggle<TData>({
     </>
   );
 
-  const handleToggle = (column: (typeof toggleableColumns)[number]) => {
-    column.toggleVisibility(!column.getIsVisible());
-  };
-
   return (
-    <Dropdown
+    <Select
       label={buttonLabel}
       icon="table-line"
       size="sm"
       outline={false}
       title="Gérer les colonnes visibles"
+      multiple
     >
-      {toggleableColumns.map((column, index) => {
-        const isVisible = column.getIsVisible();
-        const inputId = `${id}-col-${index}`;
-
-        return (
-          <div
-            key={column.id}
-            role="menuitemcheckbox"
-            aria-checked={isVisible}
-            className="fx-dropdown__input"
-            tabIndex={0}
-            onClick={() => handleToggle(column)}
-            onKeyDown={(e) => {
-              if (e.key === 'Enter' || e.key === ' ') {
-                e.preventDefault();
-                handleToggle(column);
-              }
-            }}
-          >
-            <input
-              type="checkbox"
-              id={inputId}
-              checked={isVisible}
-              onChange={() => handleToggle(column)}
-              tabIndex={-1}
-              aria-hidden="true"
-            />
-            <span>{columnLabels[column.id]}</span>
-          </div>
-        );
-      })}
-    </Dropdown>
+      {toggleableColumns.map((column) => (
+        <Select.Checkbox
+          key={column.id}
+          value={column.id}
+          checked={column.getIsVisible()}
+          onChange={(checked) => column.toggleVisibility(checked)}
+        >
+          {columnLabels[column.id]}
+        </Select.Checkbox>
+      ))}
+    </Select>
   );
 }

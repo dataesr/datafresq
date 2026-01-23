@@ -1,5 +1,5 @@
 import { useCallback, useState } from 'react';
-import { Dropdown } from '@/components/Dropdown';
+import { Dropdown } from '@/components/ui/Dropdown';
 
 interface ExportButtonProps {
   totalCount?: number;
@@ -81,7 +81,7 @@ export default function ExportButton({ totalCount = 0, disabled = false }: Expor
 
   const getItemIcon = (format: ExportFormat, defaultIcon: string) => {
     if (isExporting && exportingFormat === format) {
-      return 'fr-icon-refresh-line fr-icon--spin';
+      return 'refresh-line';
     }
     return defaultIcon;
   };
@@ -95,22 +95,20 @@ export default function ExportButton({ totalCount = 0, disabled = false }: Expor
       size="sm"
       outline={false}
     >
-      <button
-        type="button"
-        className={`fx-dropdown__item ${getItemIcon('xlsx', 'fr-icon-file-text-line')}`}
+      <Dropdown.Item
+        icon={getItemIcon('xlsx', 'file-text-line')}
         onClick={() => handleExport('xlsx')}
         disabled={isExporting}
       >
         Exporter en Excel (.xlsx)
-      </button>
-      <button
-        type="button"
-        className={`fx-dropdown__item ${getItemIcon('json', 'fr-icon-code-s-slash-line')}`}
+      </Dropdown.Item>
+      <Dropdown.Item
+        icon={getItemIcon('json', 'code-s-slash-line')}
         onClick={() => handleExport('json')}
         disabled={isExporting}
       >
         Exporter en JSON (.json)
-      </button>
+      </Dropdown.Item>
     </Dropdown>
   );
 }

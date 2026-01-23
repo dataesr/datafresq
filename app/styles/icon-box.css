@@ -1,0 +1,11 @@
+.icon-box {
+  width: 2.5rem;
+  height: 2.5rem;
+  min-width: 2.5rem;
+  border-radius: 0.375rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--background-contrast-blue-france);
+  color: var(--text-action-high-blue-france);
+}
