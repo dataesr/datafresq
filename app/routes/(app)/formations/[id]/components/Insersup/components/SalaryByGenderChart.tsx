@@ -12,14 +12,14 @@ import { useMemo, useRef } from 'react';
 import { AnalyticsGraph } from '@/components/AnalyticsGraph';
 import { getChartColor } from '@/components/highcharts';
 import { BlurredNoData, MONTH_KEYS, MONTHS } from '@/components/insersup';
-import type { ProgramInsersupYearStats } from '../types';
+import type { InsersupYearStats } from '~/schemas/programs';
 
 interface SalaryByGenderChartProps {
-  yearData: ProgramInsersupYearStats;
+  yearData: InsersupYearStats;
   year: string;
 }
 
-function useSalaryByGenderData(yearData: ProgramInsersupYearStats) {
+function useSalaryByGenderData(yearData: InsersupYearStats) {
   return useMemo(() => {
     const femme = yearData.byGender?.femme;
     const homme = yearData.byGender?.homme;
@@ -61,12 +61,7 @@ export function SalaryByGenderChart({ yearData, year }: SalaryByGenderChartProps
         icon="fr-icon-money-euro-circle-line"
         message="Données insuffisantes pour comparer les salaires par genre."
       >
-        <Chart
-          ref={chartRef}
-          containerProps={{
-            style: { width: '100%', minWidth: '200px', height: '350px' },
-          }}
-        >
+        <Chart ref={chartRef}>
           <Credits enabled={false} />
           <Legend align="center" />
           <Tooltip shared valuePrefix="" valueSuffix=" €" />

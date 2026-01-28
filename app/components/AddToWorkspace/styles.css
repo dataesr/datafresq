@@ -58,9 +58,17 @@
   background-color: var(--border-default-blue-france);
 }
 
-.awt-input {
+.awt-input-group {
   box-shadow: 0 1px 0 0 var(--border-default-grey);
   background-color: var(--background-contrast-grey);
+}
+
+.awt-input {
+  width: 100%;
+  height: 2.5rem;
+  max-height: 2.5rem;
+  border-radius: 0 !important;
+  box-shadow: none !important;
 }
 
 .awt-input-clear-btn {
@@ -109,4 +117,10 @@
 
 .atw-create-btn span::before {
   --icon-size: 1.25rem;
+}
+
+.awt-listbox {
+  max-height: calc(100vh - 15rem);
+  overflow-y: scroll;
+  overflow-x: hidden;
 }

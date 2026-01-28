@@ -90,7 +90,7 @@ export default function AddToWorkspace({
 
       <Modal {...modalProps} className="atw-modal">
         <div className="awt-wrapper">
-          <div className="fr-input-group fr-mb-0 fr-p-1v awt-input">
+          <div className="fr-input-group fr-mb-0 fr-p-1v awt-input-group">
             <div
               className={cn('fr-input-wrap', {
                 'fr-icon-search-line': !searchValue,
@@ -98,14 +98,7 @@ export default function AddToWorkspace({
               })}
             >
               <input
-                className="fr-input"
-                style={{
-                  width: '100%',
-                  height: '2.5rem',
-                  maxHeight: '2.5rem',
-                  borderRadius: 0,
-                  boxShadow: 'none',
-                }}
+                className="fr-input awt-input"
                 ref={inputRef}
                 value={searchValue}
                 onChange={(e) => setSearchValue(e.target.value)}
@@ -133,25 +126,9 @@ export default function AddToWorkspace({
               )}
             </div>
           </div>
-          <div
-            style={{
-              maxHeight: 'calc(100vh - 10rem)',
-              overflowY: 'scroll',
-              overflowX: 'hidden',
-            }}
-            role="listbox"
-            id={`${modalId}-workspace-list`}
-          >
+          <div className="awt-listbox" role="listbox" id={`${modalId}-workspace-list`}>
             {filteredWorkspaces?.length === 0 && (
-              <div
-                style={{
-                  padding: '1rem 1rem',
-                  display: 'flex',
-                  alignItems: 'start',
-                  flexDirection: 'column',
-                  width: '100%',
-                }}
-              >
+              <div className="fr-p-4w fx-flex fx-items-start fx-flex-col">
                 <i>Aucun espace trouvé</i>
               </div>
             )}
@@ -170,8 +147,8 @@ export default function AddToWorkspace({
                 onClick={() => handleAddToWorkspace(workspace.id)}
                 disabled={addPrograms.isPending}
               >
-                <div className="clamp-1 fr-text--sm fr-mb-0">{workspace.name}</div>
-                <div className="clamp-1 fr-text-mention--grey fr-text--xs fr-mb-0">
+                <div className="fx-clamp-1 fr-text--sm fr-mb-0">{workspace.name}</div>
+                <div className="fx-clamp-1 fr-text-mention--grey fr-text--xs fr-mb-0">
                   par {workspace.ownerInfo?.firstName} {workspace.ownerInfo?.lastName}
                   {' -- '}
                   {workspace.programs?.length || 0}
@@ -180,16 +157,14 @@ export default function AddToWorkspace({
               </button>
             ))}
           </div>
-          <div
-            style={{
-              width: '100%',
-              padding: '0.75rem 1rem',
-              boxShadow: '0 -1px 0 0 var(--border-default-grey)',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'flex-end',
-            }}
-          >
+          <div className="fr-py-3v fr-px-2w fx-flex fx-items-center fx-justify-between fx-shadow-border-top">
+            <button
+              type="button"
+              className="fr-btn fr-btn--sm fr-btn--tertiary-no-outline"
+              onClick={close}
+            >
+              Annuler
+            </button>
             <Link
               to={`/espaces/nouveau?formationIds=${formationIds.join(',')}`}
               className="fr-btn fr-btn--sm fr-btn--tertiary-no-outline fr-icon-add-line fr-btn--icon-left"
@@ -197,14 +172,6 @@ export default function AddToWorkspace({
               Créer un espace
             </Link>
           </div>
-          <button
-            type="button"
-            className="fr-btn fr-btn--sm fr-btn--tertiary-no-outline fr-btn--icon-right fr-icon-close-line"
-            onClick={close}
-            style={{ position: 'absolute', top: '-2.5rem', right: 0 }}
-          >
-            Fermer
-          </button>
         </div>
       </Modal>
     </>

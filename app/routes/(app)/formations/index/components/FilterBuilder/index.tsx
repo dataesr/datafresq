@@ -128,14 +128,12 @@ function SelectionBadges({ items, onRemove, maxVisible = 5 }: SelectionBadgesPro
               e.stopPropagation();
               onRemove(item.key);
             }}
+            className="fx-flex fx-items-center fx-justify-center"
             style={{
               background: 'none',
               border: 'none',
               cursor: 'pointer',
               padding: '0.125rem',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
               borderRadius: '50%',
               color: 'inherit',
             }}
@@ -214,7 +212,7 @@ function MultiselectValuePicker({
 
   return (
     <div>
-      <Select label={getDisplayLabel()} size="sm" outline multiple>
+      <Select label={getDisplayLabel()} outline multiple>
         {options.length > 8 && (
           <Select.Search
             placeholder="Rechercher..."
@@ -319,7 +317,7 @@ function AsyncSearchValuePicker({
 
   return (
     <div>
-      <Select label={getDisplayLabel()} size="sm" outline multiple>
+      <Select label={getDisplayLabel()} outline multiple>
         <Select.Search
           placeholder="Saisissez au moins 2 caractères..."
           value={searchQuery}
@@ -347,12 +345,12 @@ function AsyncSearchValuePicker({
                 checked={selectedValues.includes(inst.id)}
                 onChange={(checked) => handleToggle(inst, checked)}
               >
-                <div style={{ display: 'flex', flexDirection: 'column', flex: 1, minWidth: 0 }}>
-                  <span className="clamp-1" title={inst.label}>
+                <div className="fx-flex fx-flex-col" style={{ flex: 1, minWidth: 0 }}>
+                  <span className="fx-clamp-1" title={inst.label}>
                     {inst.label}
                   </span>
                   {subLabel && (
-                    <span className="fr-text--xs fr-text-mention--grey fr-mb-0 clamp-1">
+                    <span className="fr-text--xs fr-text-mention--grey fr-mb-0 fx-clamp-1">
                       {subLabel}
                     </span>
                   )}
@@ -381,7 +379,7 @@ function BooleanValuePicker({ value, onChange, counts }: BooleanValuePickerProps
   const displayLabel = value === 'true' ? 'Oui' : value === 'false' ? 'Non' : 'Sélectionner...';
 
   return (
-    <Select label={displayLabel} size="sm" outline>
+    <Select label={displayLabel} outline>
       {options.map((option) => (
         <Select.Radio
           key={option.key}
@@ -427,31 +425,14 @@ function FilterRow({
   const operator = config.type === 'boolean' ? 'est' : 'contient';
 
   return (
-    <div
-      className="filter-builder__row"
-      style={{
-        display: 'flex',
-        alignItems: 'first baseline',
-        gap: '0.75rem',
-        padding: '0.5rem 0.75rem',
-        marginBottom: '0.5rem',
-      }}
-    >
+    <div className="filter-builder__row fx-flex fx-items-baseline fx-gap-4w fr-px-3v fr-py-1w fr-mb-1w">
       <span
-        className="fr-text--sm fr-text--bold fr-mb-0"
-        style={{ minWidth: '120px', flexShrink: 0 }}
+        className="fr-text fr-text--bold fx-flex-shrink-0 fr-mb-0"
+        style={{ minWidth: '120px' }}
       >
         {config.label}
       </span>
-      <span
-        className="fr-text--xs fr-text-mention--grey fr-mb-0"
-        style={{
-          fontStyle: 'italic',
-          flexShrink: 0,
-        }}
-      >
-        {operator}
-      </span>
+      <i className="fr-text--sm fr-text-mention--grey fx-flex-shrink-0 fr-mb-0">{operator}</i>
       <div style={{ flex: 1, minWidth: 0 }}>
         {config.type === 'multiselect' && (
           <MultiselectValuePicker
@@ -519,20 +500,11 @@ function SearchRow({ value, onChange }: SearchRowProps) {
   };
 
   return (
-    <div
-      className="filter-builder__row"
-      style={{
-        display: 'flex',
-        flexDirection: 'column',
-        gap: '0.5rem',
-        padding: '0.75rem',
-        marginBottom: '0.5rem',
-      }}
-    >
+    <div className="filter-builder__row fx-flex fx-flex-col fx-gap-2w fr-px-3v fr-py-1w fr-mb-1w">
       <label htmlFor={inputId} className="fr-text--sm fr-text--bold fr-mb-0">
         Termes recherchés
       </label>
-      <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+      <div className="fx-flex fx-items-center fx-gap-2w">
         <input
           id={inputId}
           type="text"
@@ -540,27 +512,19 @@ function SearchRow({ value, onChange }: SearchRowProps) {
           value={localValue}
           onChange={(e) => setLocalValue(e.target.value)}
           onKeyDown={handleKeyDown}
-          style={{
-            flex: 1,
-            border: 'none',
-            background: 'transparent',
-            outline: 'none',
-            fontSize: '0.875rem',
-            fontFamily: 'inherit',
-            color: 'var(--text-default-grey)',
-          }}
+          className="filter-builder__search"
         />
         {value ? (
           <button
             type="button"
-            className="fr-btn fr-btn--sm fr-icon-close-line fr-btn--tertiary-no-outline"
+            className="fr-btn fr-icon-close-line fr-btn--tertiary-no-outline"
             onClick={handleClear}
             title="Effacer la recherche"
           />
         ) : (
           <button
             type="button"
-            className="fr-btn fr-btn--sm fr-icon-search-line fr-btn--tertiary-no-outline"
+            className="fr-btn fr-icon-search-line fr-btn--tertiary-no-outline"
             onClick={() => onChange(localValue)}
             title="Recherche"
           />
@@ -817,16 +781,7 @@ export function FilterBuilder({
   const activeCount = rows.filter((r) => r.values.length > 0).length + (searchQuery ? 1 : 0);
 
   return (
-    <div
-      className="filter-builder"
-      style={{
-        background: 'var(--background-alt-grey)',
-        border: '1px solid var(--border-default-grey)',
-        padding: '0.75rem',
-        marginBottom: '1.5rem',
-      }}
-    >
-      {/* Header */}
+    <div className="filter-builder fr-p-3v fr-mb-3w">
       <div className="fx-spacer fr-mb-3v">
         <span className="fr-text--bold fr-mb-0">
           <span className="fr-icon-search-line fr-mr-1v fr-icon--sm" aria-hidden="true" />
@@ -875,14 +830,14 @@ export function FilterBuilder({
         <AddFilterDropdown availableFilters={availableFilters} onAddFilter={handleAddFilter} />
 
         {resultCount !== undefined && (
-          <div style={{ marginLeft: 'auto' }}>
+          <div>
             {isLoading ? (
               <span className="fr-text--sm fr-text-mention--grey fr-mb-0">
                 <span
-                  className="fr-icon-refresh-line fr-icon--sm"
+                  className="fr-icon-refresh-line fr-icon--sm fr-mx-1v"
                   aria-hidden="true"
                   style={{ animation: 'spin 1s linear infinite' }}
-                />{' '}
+                />
                 Chargement...
               </span>
             ) : (

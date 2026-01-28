@@ -3,6 +3,7 @@
 @import "./tag.css";
 @import "./card.css";
 @import "./nav.css";
+@import "./flex.css";
 
 .fx-text-title--blue-france {
   color: var(--text-title-blue-france);

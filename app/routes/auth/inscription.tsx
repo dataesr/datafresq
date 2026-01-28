@@ -35,13 +35,9 @@ export default function CreerUnCompte() {
   if (!token) {
     return (
       <div
+        className="fx-flex fx-flex-col fx-items-center fx-justify-center fr-p-4w"
         style={{
-          display: 'flex',
-          flexDirection: 'column',
-          alignItems: 'center',
-          justifyContent: 'center',
           textAlign: 'center',
-          padding: '2rem',
         }}
       >
         <span
@@ -64,13 +60,9 @@ export default function CreerUnCompte() {
   if (registerSuccess) {
     return (
       <div
+        className="fx-flex fx-flex-col fx-items-center fx-justify-center fr-p-4w"
         style={{
-          display: 'flex',
-          flexDirection: 'column',
-          alignItems: 'center',
-          justifyContent: 'center',
           textAlign: 'center',
-          padding: '2rem',
         }}
       >
         <span
@@ -107,11 +99,8 @@ export default function CreerUnCompte() {
         disabled={registerMutation.isPending}
       >
         <div
+          className="fx-flex fx-flex-col fx-items-center fx-justify-center"
           style={{
-            display: 'flex',
-            flexDirection: 'column',
-            alignItems: 'center',
-            justifyContent: 'center',
             width: '100%',
           }}
         >

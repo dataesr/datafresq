@@ -8,9 +8,9 @@ import {
   EmploymentStabilityEvolutionChart,
   EmptyState,
   PRIVACY_THRESHOLD,
-  YearSelector,
 } from '@/components/insersup';
 import { NoDataMessage } from '@/components/NoDataMessage';
+import { YearSelector } from '@/components/YearSelector';
 import type { InsersupStats, InsersupYearStats } from '~/schemas/programs';
 import { InsersupStatsCards } from './components/InsersupStatsCards';
 import { SalaryByGenderChart } from './components/SalaryByGenderChart';

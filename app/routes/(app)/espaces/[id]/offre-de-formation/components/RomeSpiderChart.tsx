@@ -50,9 +50,7 @@ export function RomeSpiderChart({ data, limit = TOP_ROME_LIMIT }: RomeSpiderChar
       chartRef={chartRef}
       source={FRESQ_SOURCE}
     >
-      <div style={{ width: '100%', minWidth: '200px', height: '400px' }}>
-        <SpiderChart data={spiderData} seriesName="Formations" />
-      </div>
+      <SpiderChart data={spiderData} seriesName="Formations" />
     </AnalyticsGraph>
   );
 }

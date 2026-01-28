@@ -88,12 +88,7 @@ export function EmploymentStabilityEvolutionChart({
         noData={!hasData}
         message="Aucune donnée disponible pour afficher l'évolution de l'emploi stable."
       >
-        <Chart
-          ref={chartRef}
-          containerProps={{
-            style: { width: '100%', minWidth: '200px', height: '500px' },
-          }}
-        >
+        <Chart ref={chartRef}>
           <Credits enabled={false} />
           <Legend align="center" />
           <Tooltip shared valueSuffix="%" />

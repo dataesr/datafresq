@@ -72,10 +72,7 @@ export default function ManageSessions() {
                   </p>
                   <ul className="xfr-simple-card-list">
                     {sessions.map((session, index) => (
-                      <li
-                        key={session.id}
-                        style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}
-                      >
+                      <li key={session.id} className="fx-flex fx-items-center fx-gap-4w">
                         <div style={{ flexGrow: 1 }}>
                           {index === 0 && (
                             <p className="fr-badge fr-badge--sm fr-badge--success fr-mb-0">

@@ -46,21 +46,16 @@ export function SparklineStatCard({
 
   return (
     <div
-      className="fr-card fr-card--shadow"
-      style={{
-        padding: 0,
-        overflow: 'hidden',
-        display: 'flex',
-        flexDirection: 'column',
-      }}
+      className="fr-card fr-card--shadow fx-flex fx-flex-col fr-p-0"
+      style={{ overflow: 'hidden' }}
     >
-      <div style={{ padding: '1.5rem 1.75rem 0.75rem' }}>
-        <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between' }}>
+      <div className="fr-px-7v fr-pt-3w fr-pb-3v">
+        <div className="fx-flex fx-items-start fx-justify-between">
           <div>
             <p className="fr-text-mention--grey fr-text--sm fr-mb-1w">{label}</p>
             <p
-              className="fr-text--bold fr-text-title--grey"
-              style={{ marginBottom: '0.25rem', fontSize: '1.75rem' }}
+              className="fr-text--bold fr-text-title--grey fx-mb-1v"
+              style={{ fontSize: '1.75rem' }}
             >
               {typeof value === 'number' ? value.toLocaleString('fr-FR') : value}
               {suffix && <span className="fr-text--sm fr-text--regular fr-ml-1v">{suffix}</span>}
@@ -69,10 +64,7 @@ export function SparklineStatCard({
           {icon && <span className={icon} style={{ color: chartColor }} aria-hidden="true" />}
         </div>
         {hasMultipleYears && trendDirection !== 'stable' && (
-          <div
-            className="fr-mt-1v"
-            style={{ display: 'flex', alignItems: 'center', gap: '0.25rem' }}
-          >
+          <div className="fr-mt-1v fx-flex fx-items-center fx-gap-1w">
             <span
               className={`fr-badge fr-badge--sm fr-badge--no-icon ${trendDirection === 'up' ? 'fr-badge--success' : 'fr-badge--warning'}`}
             >

@@ -124,6 +124,7 @@
   margin: 0;
   padding: 0;
   filter: drop-shadow(var(--overlap-shadow, 0 6px 18px rgba(0, 0, 18, 0.16)));
+  background-color: var(--background-overlap-grey, #fff);
   min-width: 100%;
 }
 

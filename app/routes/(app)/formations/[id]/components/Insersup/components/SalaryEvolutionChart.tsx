@@ -124,12 +124,7 @@ export function SalaryEvolutionChart({ sortedByYear }: SalaryEvolutionChartProps
           </fieldset>
         </div>
 
-        <Chart
-          ref={chartRef}
-          containerProps={{
-            style: { width: '100%', minWidth: '200px', height: '500px' },
-          }}
-        >
+        <Chart ref={chartRef}>
           <Credits enabled={false} />
           <Legend align="center" />
           <Tooltip shared valuePrefix="" valueSuffix=" €" />

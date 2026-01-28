@@ -50,15 +50,13 @@ function SortableHeader({ column, children }: SortableHeaderProps) {
     <button
       type="button"
       onClick={() => column.toggleSorting()}
+      className="fx-flex fx-items-center fx-gap-1w"
       style={{
         background: 'none',
         border: 'none',
         padding: 0,
         font: 'inherit',
         cursor: 'pointer',
-        display: 'flex',
-        alignItems: 'center',
-        gap: '0.25rem',
       }}
     >
       {children}
@@ -286,7 +284,7 @@ export function ProgramsTable({ yearData }: ProgramsTableProps) {
           Détail par formation ({programsWithSiseCount}/{programTableData.length} avec données SISE
           pour {yearData.year})
         </h4>
-        <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
+        <div className="fx-flex fx-gap-2w fx-items-center">
           <PageSizeSelector
             value={String(pageSize)}
             onChange={(size) => {

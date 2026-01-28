@@ -74,7 +74,7 @@ export function GeneralSettings({ workspace }: GeneralSettingsProps) {
             value={color}
             onChange={setColor}
           />
-          <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
+          <div className="fx-flex fx-justify-end">
             <button
               type="submit"
               className="fr-btn fr-btn--sm fr-icon-save-line fr-btn--icon-left"

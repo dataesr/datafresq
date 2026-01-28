@@ -155,7 +155,7 @@ export default function ProgramsTable({ selectedPrograms, onSelectionChange }: P
             />
           </Activity>
         </div>
-        <div style={{ display: 'flex', gap: '.5rem', alignItems: 'center' }}>
+        <div className="fx-flex fx-gap-2w fx-items-center">
           <PageSizeSelector onChange={handlePageSizeChange} value={pageSize.toString()} />
           <ColumnVisibilityToggle table={table} columnLabels={columnLabels} />
           <ExportButton totalCount={totalCount} />
@@ -211,10 +211,7 @@ export default function ProgramsTable({ selectedPrograms, onSelectionChange }: P
                   >
                     {isFetching && cell.column.id !== 'select' ? (
                       cell.column.id === 'officialTitle' ? (
-                        <div
-                          className="fr-py-1v"
-                          style={{ display: 'flex', flexDirection: 'column', gap: '.75rem' }}
-                        >
+                        <div className="fr-py-1v fx-flex fx-flex-col fx-gap-3w">
                           <span className="skeleton-text skeleton-text--xl" />
                           <span
                             className="skeleton-text skeleton-text--lg"

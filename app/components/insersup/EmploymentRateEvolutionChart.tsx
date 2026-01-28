@@ -53,12 +53,7 @@ export function EmploymentRateEvolutionChart({ sortedByYear }: EmploymentRateEvo
       source="InserSup (MESR)"
     >
       <BlurredNoData noData={!hasData} message={noDataMessage}>
-        <Chart
-          ref={chartRef}
-          containerProps={{
-            style: { width: '100%', minWidth: '200px', height: '500px' },
-          }}
-        >
+        <Chart ref={chartRef}>
           <Credits enabled={false} />
           <Legend align="center" />
           <Tooltip shared valueSuffix="%" />

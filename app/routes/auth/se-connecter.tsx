@@ -45,11 +45,8 @@ export default function SignIn() {
         disabled={signInMutation.isPending}
       >
         <div
+          className="fx-flex fx-flex-col fx-items-center fx-justify-center"
           style={{
-            display: 'flex',
-            flexDirection: 'column',
-            alignItems: 'center',
-            justifyContent: 'center',
             width: '100%',
           }}
         >

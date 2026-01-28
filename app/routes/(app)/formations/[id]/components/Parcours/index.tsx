@@ -186,16 +186,10 @@ function EtapeCard({ etape, isVisible }: { etape: EtapeWithLocations; isVisible:
     (recruitmentInfo?.selectionMethods && recruitmentInfo.selectionMethods.length > 0);
 
   return (
-    <div
-      className="fr-py-3w fr-px-2v"
-      style={{ borderTop: '1px solid var(--border-default-grey)' }}
-    >
-      <div style={{ display: 'flex', gap: '1rem' }}>
+    <div className="fr-py-3w fr-px-2v fx-shadow-border-top">
+      <div className="fx-flex fx-gap-4w">
         <div style={{ flex: 1 }}>
-          <div
-            className="fr-mb-1v"
-            style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', flexWrap: 'wrap' }}
-          >
+          <div className="fr-mb-1v fx-flex fx-items-center fx-gap-2w fx-flex-wrap">
             {etape.level && (
               <span className="fr-badge fr-badge--sm fr-badge--blue-france fr-badge--no-icon">
                 {etape.level}
@@ -213,7 +207,7 @@ function EtapeCard({ etape, isVisible }: { etape: EtapeWithLocations; isVisible:
 
           <p className="fr-text--md fr-text--bold fr-mb-1w">{etape.label}</p>
 
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '0.25rem' }}>
+          <div className="fx-flex fx-flex-col fx-gap-1w">
             {etape.capacity !== undefined && etape.capacity !== null && (
               <div className="fr-text--sm fr-mb-0">
                 <span
@@ -278,10 +272,7 @@ function EtapeCard({ etape, isVisible }: { etape: EtapeWithLocations; isVisible:
                 <span className="fr-icon-book-2-line fr-icon--sm fr-mr-1v" aria-hidden="true" />
                 Informations pédagogiques
               </summary>
-              <div
-                className="fr-pl-3w fr-pt-1w"
-                style={{ display: 'flex', flexDirection: 'column', gap: '0.25rem' }}
-              >
+              <div className="fr-pl-3w fr-pt-1w fx-flex fx-flex-col fx-gap-1w">
                 {pedagogicalInfo?.keywords && pedagogicalInfo.keywords.length > 0 && (
                   <div className="fr-text--sm fr-mb-0">
                     <span className="fr-text-mention--grey">Mots-clés : </span>
@@ -338,10 +329,7 @@ function EtapeCard({ etape, isVisible }: { etape: EtapeWithLocations; isVisible:
                 <span className="fr-icon-clipboard-line fr-icon--sm fr-mr-1v" aria-hidden="true" />
                 Informations de recrutement
               </summary>
-              <div
-                className="fr-pl-3w fr-pt-1w"
-                style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}
-              >
+              <div className="fr-pl-3w fr-pt-1w fx-flex fx-flex-col fx-gap-2w">
                 {recruitmentInfo?.expectations && recruitmentInfo.expectations.length > 0 && (
                   <div className="fr-text--sm fr-mb-0">
                     <span className="fr-text--bold">Attentes :</span>
@@ -436,9 +424,7 @@ function ParcoursCard({ data, isVisible }: { data: ParcoursAggregation; isVisibl
                   <span className="fr-text--sm fr-ml-1w fr-text-mention--grey">({p.sigle})</span>
                 )}
               </div>
-              <div
-                style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', flexWrap: 'wrap' }}
-              >
+              <div className="fx-flex fx-items-center fx-gap-2w fx-flex-wrap">
                 {data.hasAlternance && (
                   <span className="fr-badge fr-badge--sm fr-badge--purple-glycine fr-badge--no-icon">
                     Alternance
@@ -466,15 +452,7 @@ function ParcoursCard({ data, isVisible }: { data: ParcoursAggregation; isVisibl
 
         <div className="fr-collapse" id={collapseId}>
           <div className="fr-pt-2w fr-px-2w">
-            <div
-              className="fr-mb-2w"
-              style={{
-                display: 'flex',
-                gap: '1rem',
-                flexWrap: 'wrap',
-                alignItems: 'center',
-              }}
-            >
+            <div className="fr-mb-2w fx-flex fx-gap-4w fx-flex-wrap fx-items-center">
               {p.rncp && (
                 <div className="fr-text--sm fr-mb-0">
                   <span
@@ -482,12 +460,7 @@ function ParcoursCard({ data, isVisible }: { data: ParcoursAggregation; isVisibl
                     aria-hidden="true"
                   />
                   <span className="fr-text-mention--grey">RNCP </span>
-                  <span
-                    className="fr-text--bold"
-                    style={{ fontFamily: '"Courier New", monospace' }}
-                  >
-                    {p.rncp}
-                  </span>
+                  <span className="fr-text--bold fx-text--monospace">{p.rncp}</span>
                 </div>
               )}
 
@@ -498,12 +471,7 @@ function ParcoursCard({ data, isVisible }: { data: ParcoursAggregation; isVisibl
                     aria-hidden="true"
                   />
                   <span className="fr-text-mention--grey">SISE </span>
-                  <span
-                    className="fr-text--bold"
-                    style={{ fontFamily: '"Courier New", monospace' }}
-                  >
-                    {String(p.codeSise)}
-                  </span>
+                  <span className="fr-text--bold fx-text--monospace">{String(p.codeSise)}</span>
                 </div>
               )}
 
@@ -541,7 +509,7 @@ function ParcoursCard({ data, isVisible }: { data: ParcoursAggregation; isVisibl
             </div>
 
             {parcoursEtapes.length > 0 && (
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
+              <div className="fx-flex fx-flex-col fx-gap-3w">
                 {parcoursEtapes.map((etape) => (
                   <EtapeCard key={etape.infe} etape={etape} isVisible={isVisible} />
                 ))}
@@ -556,10 +524,7 @@ function ParcoursCard({ data, isVisible }: { data: ParcoursAggregation; isVisibl
 
 function GlobalStats({ stats, year }: { stats: ReturnType<typeof useGlobalStats>; year: number }) {
   return (
-    <div
-      className="fr-py-2w fr-px-1w fr-mb-3w"
-      style={{ display: 'flex', gap: '1.5rem', flexWrap: 'wrap', alignItems: 'center' }}
-    >
+    <div className="fr-py-2w fr-px-1w fr-mb-3w fx-flex fx-gap-6w fx-flex-wrap fx-items-center">
       <div className="fr-text--lg fr-text--bold fr-mb-0">
         <span className="">{stats.total}</span> parcours en {year}
         {stats.openCount > 0 && (

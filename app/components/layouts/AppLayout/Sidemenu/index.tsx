@@ -67,14 +67,7 @@ export default function Sidemenu() {
           </div>
           <hr className="fr-py-1v fr-my-1w fr-hidden fr-unhidden-md" />
           <div className="fr-px-1w fr-hidden fr-unhidden-md">
-            <div
-              style={{
-                display: 'flex',
-                justifyContent: 'space-between',
-                alignItems: 'center',
-                paddingBottom: '.5rem',
-              }}
-            >
+            <div className="fx-flex fx-justify-between fx-items-center fr-pb-2w">
               <span className="fr-text--lg fr-mb-0 fr-text--heavy">MES ESPACES</span>
               <Link
                 to="/espaces/nouveau"

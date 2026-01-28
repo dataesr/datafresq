@@ -63,10 +63,7 @@ export function DisciplineDistributionChart({
       chartRef={chartRef}
       source={FRESQ_SOURCE}
     >
-      <Chart
-        ref={chartRef}
-        containerProps={{ style: { width: '100%', minWidth: '200px', height: '400px' } }}
-      >
+      <Chart ref={chartRef}>
         <Credits enabled={false} />
         <Legend enabled={false} />
         <Tooltip valueSuffix=" formations" />

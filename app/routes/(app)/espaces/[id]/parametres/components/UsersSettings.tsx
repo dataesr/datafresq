@@ -1,141 +1,11 @@
 import { useAuth } from '@/api/auth';
 import type { UserSearchResult } from '@/api/users';
 import { useAddUsers, useRemoveUsers, useUpdateUserRole } from '@/api/workspaces';
-import { Avatar } from '@/components/Avatar';
-import { getDisplayName } from '@/components/CollaboratorList';
-import UserSearchSelect from '@/components/UserSearchSelect';
-import { Select } from '@/components/ui/Select';
 import { useToast } from '@/hooks/useToast';
 import type { ReadWorkspace } from '~/schemas/workspaces';
-
-const ROLE_OPTIONS = [
-  { id: 'viewer' as const, label: 'Lecteur' },
-  { id: 'editor' as const, label: 'Éditeur' },
-];
-
-interface UserRowProps {
-  user: ReadWorkspace['users'][number];
-  workspaceId: string;
-  isOwner: boolean;
-}
-
-function UserRow({ user, workspaceId, isOwner }: UserRowProps) {
-  const { toast } = useToast();
-  const removeUsers = useRemoveUsers();
-  const updateUserRole = useUpdateUserRole();
-
-  const displayName = user.userInfo
-    ? getDisplayName({
-        firstName: user.userInfo.firstName,
-        lastName: user.userInfo.lastName,
-        email: user.userInfo.email,
-      })
-    : user.userId;
-
-  const handleRemove = () => {
-    removeUsers.mutate(
-      { workspaceId, userIds: [user.userId] },
-      {
-        onSuccess: () => {
-          toast({
-            type: 'success',
-            description: `${displayName} a été retiré`,
-          });
-        },
-        onError: (error) => {
-          toast({
-            type: 'error',
-            description: error.message,
-          });
-        },
-      },
-    );
-  };
-
-  const handleRoleChange = (newRole: 'viewer' | 'editor') => {
-    if (newRole === user.role) return;
-
-    updateUserRole.mutate(
-      { workspaceId, userId: user.userId, role: newRole },
-      {
-        onSuccess: () => {
-          toast({
-            type: 'success',
-            description: `${displayName} est maintenant ${newRole === 'editor' ? 'éditeur' : 'lecteur'}`,
-          });
-        },
-        onError: (error) => {
-          toast({
-            type: 'error',
-            description: error.message,
-          });
-        },
-      },
-    );
-  };
-
-  const selectedRoleLabel = ROLE_OPTIONS.find((opt) => opt.id === user.role)?.label || 'Lecteur';
-
-  return (
-    <li
-      className="fr-py-2w"
-      style={{
-        display: 'flex',
-        alignItems: 'center',
-        borderBottom: '1px solid var(--border-default-grey)',
-        gap: '.5rem',
-      }}
-    >
-      <Avatar name={displayName} size={40} />
-      <div style={{ flex: 1, minWidth: 0 }}>
-        <p
-          className="fr-mb-0 fr-text--bold"
-          style={{ overflow: 'hidden', textOverflow: 'ellipsis' }}
-        >
-          {displayName}
-        </p>
-        <p
-          className="fr-mb-0 fr-text--sm fr-text-mention--grey"
-          style={{ overflow: 'hidden', textOverflow: 'ellipsis' }}
-        >
-          {user.userInfo?.email}
-        </p>
-      </div>
-      {isOwner ? (
-        <Select label={selectedRoleLabel} size="sm" outline disabled={updateUserRole.isPending}>
-          {ROLE_OPTIONS.map((option) => (
-            <Select.Radio
-              key={option.id}
-              value={option.id}
-              name={`role-${user.userId}`}
-              checked={user.role === option.id}
-              onChange={() => handleRoleChange(option.id)}
-            >
-              {option.label}
-            </Select.Radio>
-          ))}
-        </Select>
-      ) : (
-        <span
-          className={`fr-badge fr-badge--sm ${user.role === 'editor' ? 'fr-badge--green-emeraude' : 'fr-badge--blue-cumulus'}`}
-        >
-          {user.role === 'editor' ? 'Éditeur' : 'Lecteur'}
-        </span>
-      )}
-      {isOwner && (
-        <button
-          type="button"
-          className="fr-btn fr-btn--sm fr-btn--tertiary-no-outline fr-icon-delete-line"
-          title="Retirer cet utilisateur"
-          onClick={handleRemove}
-          disabled={removeUsers.isPending}
-        >
-          Retirer
-        </button>
-      )}
-    </li>
-  );
-}
+import { getDisplayName, type UserRole } from '../../../components/constants';
+import { UserListItem } from '../../../components/UserListItem';
+import UserSearchSelect from '../../../components/UserSearchSelect';
 
 interface UsersSettingsProps {
   workspace: ReadWorkspace;
@@ -145,8 +15,9 @@ export function UsersSettings({ workspace }: UsersSettingsProps) {
   const { toast } = useToast();
   const { user: currentUser } = useAuth();
   const addUsers = useAddUsers();
+  const removeUsers = useRemoveUsers();
+  const updateUserRole = useUpdateUserRole();
 
-  // Exclude existing users, the owner, and the current user
   const existingUserIds = workspace.users.map((u) => u.userId);
   const excludeUserIds = [
     ...existingUserIds,
@@ -177,6 +48,46 @@ export function UsersSettings({ workspace }: UsersSettingsProps) {
     );
   };
 
+  const handleRemove = (userId: string, displayName: string) => {
+    removeUsers.mutate(
+      { workspaceId: workspace.id, userIds: [userId] },
+      {
+        onSuccess: () => {
+          toast({
+            type: 'success',
+            description: `${displayName} a été retiré`,
+          });
+        },
+        onError: (error) => {
+          toast({
+            type: 'error',
+            description: error.message,
+          });
+        },
+      },
+    );
+  };
+
+  const handleRoleChange = (userId: string, newRole: UserRole, displayName: string) => {
+    updateUserRole.mutate(
+      { workspaceId: workspace.id, userId, role: newRole },
+      {
+        onSuccess: () => {
+          toast({
+            type: 'success',
+            description: `${displayName} est maintenant ${newRole === 'editor' ? 'éditeur' : 'lecteur'}`,
+          });
+        },
+        onError: (error) => {
+          toast({
+            type: 'error',
+            description: error.message,
+          });
+        },
+      },
+    );
+  };
+
   return (
     <div className="fr-grid-row fr-pb-6w">
       <div className="fr-col-12 fr-col-md-4 fr-px-1w">
@@ -187,22 +98,42 @@ export function UsersSettings({ workspace }: UsersSettingsProps) {
         </p>
       </div>
       <div className="fr-col-12 fr-col-md-6 fr-col-offset-md-2 fr-px-2w">
-        {/* Add new users section */}
         <UserSearchSelect
           label="Ajouter un collaborateur"
-          hint=" - Recherchez par nom ou email"
+          hint="Recherchez par nom ou email"
           placeholder="Rechercher un utilisateur..."
           onSelect={handleUserSelect}
           excludeUserIds={excludeUserIds}
         />
 
-        {/* Existing users */}
         {workspace.users.length > 0 && (
           <div className="fr-mt-3w">
-            <ul style={{ listStyle: 'none', padding: 0, margin: 0 }}>
-              {workspace.users.map((user) => (
-                <UserRow key={user.userId} user={user} workspaceId={workspace.id} isOwner />
-              ))}
+            <ul className="fx-reset-list fx-separated-list">
+              {workspace.users.map((user) => {
+                const displayName = user.userInfo
+                  ? getDisplayName({
+                      firstName: user.userInfo.firstName,
+                      lastName: user.userInfo.lastName,
+                      email: user.userInfo.email,
+                    })
+                  : user.userId;
+
+                return (
+                  <UserListItem
+                    key={user.userId}
+                    user={{
+                      userId: user.userId,
+                      email: user.userInfo?.email || '',
+                      firstName: user.userInfo?.firstName,
+                      lastName: user.userInfo?.lastName,
+                    }}
+                    role={user.role}
+                    onRoleChange={(role) => handleRoleChange(user.userId, role, displayName)}
+                    onRemove={() => handleRemove(user.userId, displayName)}
+                    disabled={removeUsers.isPending || updateUserRole.isPending}
+                  />
+                );
+              })}
             </ul>
           </div>
         )}

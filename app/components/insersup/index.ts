@@ -34,4 +34,3 @@ export {
   ratesToArray,
   ratesToArrayWithTrailingNulls,
 } from './utils';
-export { YearSelector } from './YearSelector';

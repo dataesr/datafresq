@@ -306,10 +306,7 @@ export default function AdminUsers() {
 
   return (
     <div className="fr-py-4w">
-      <div
-        className="fr-mb-3w"
-        style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap', alignItems: 'center' }}
-      >
+      <div className="fr-mb-3w fx-flex fx-gap-2w fx-flex-wrap fx-items-center">
         <button
           type="button"
           className="fr-btn fr-btn--secondary fr-btn--sm fr-icon-mail-add-line fr-btn--icon-left"
@@ -346,7 +343,7 @@ export default function AdminUsers() {
             </Select.Radio>
           ))}
         </Select>
-        <div style={{ marginLeft: 'auto', display: 'flex', gap: '.5rem', alignItems: 'center' }}>
+        <div className="fx-flex fx-gap-2w fx-items-center" style={{ marginLeft: 'auto' }}>
           <PageSizeSelector
             value={String(pageSize)}
             onChange={(size) => setPageSize(Number(size))}

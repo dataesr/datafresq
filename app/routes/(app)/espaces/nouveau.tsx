@@ -2,10 +2,10 @@ import { useState } from 'react';
 import { Link, useNavigate, useSearchParams } from 'react-router';
 import { useAuth } from '@/api/auth';
 import { useCreateWorkspace } from '@/api/workspaces';
-import { CollaboratorList, usePendingUsers } from '@/components/CollaboratorList';
 import ColorPicker from '@/components/ColorPicker';
 import { Input } from '@/components/Input';
 import { useToast } from '@/hooks/useToast';
+import { PendingUserManager, usePendingUsers } from './components/PendingUserManager';
 
 export default function NouveauEspacePage() {
   const navigate = useNavigate();
@@ -207,7 +207,7 @@ export default function NouveauEspacePage() {
             </p>
           </div>
           <div className="fr-col-12 fr-col-md-6 fr-col-offset-md-2 fr-px-2w">
-            <CollaboratorList
+            <PendingUserManager
               pendingUsers={pendingUsers}
               onAddUser={addUser}
               onRemoveUser={removeUser}
@@ -222,7 +222,7 @@ export default function NouveauEspacePage() {
         <div className="fr-grid-row fr-py-6w">
           <div className="fr-col-12 fr-col-md-4 fr-px-1w" />
           <div className="fr-col-12 fr-col-md-6 fr-col-offset-md-2 fr-px-2w">
-            <div style={{ display: 'flex', gap: '1rem', justifyContent: 'flex-end' }}>
+            <div className="fx-flex fx-gap-4w fx-justify-end">
               <Link to="/espaces" className="fr-btn fr-btn--secondary">
                 Annuler
               </Link>

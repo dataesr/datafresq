@@ -56,7 +56,6 @@ export function BubbleMap({
 
   return (
     <MapsChart
-      containerProps={{ style: { width: '100%', height: '100%' } }}
       options={{
         chart: {
           map: mapDataFR,

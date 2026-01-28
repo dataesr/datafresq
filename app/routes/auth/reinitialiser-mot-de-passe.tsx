@@ -30,13 +30,9 @@ export default function ReinitialiserMotDePasse() {
   if (!token) {
     return (
       <div
+        className="fx-flex fx-flex-col fx-items-center fx-justify-center fr-p-4w"
         style={{
-          display: 'flex',
-          flexDirection: 'column',
-          alignItems: 'center',
-          justifyContent: 'center',
           textAlign: 'center',
-          padding: '2rem',
         }}
       >
         <span
@@ -58,13 +54,9 @@ export default function ReinitialiserMotDePasse() {
   if (resetSuccess) {
     return (
       <div
+        className="fx-flex fx-flex-col fx-items-center fx-justify-center fr-p-4w"
         style={{
-          display: 'flex',
-          flexDirection: 'column',
-          alignItems: 'center',
-          justifyContent: 'center',
           textAlign: 'center',
-          padding: '2rem',
         }}
       >
         <span
@@ -101,11 +93,8 @@ export default function ReinitialiserMotDePasse() {
         disabled={resetPasswordMutation.isPending}
       >
         <div
+          className="fx-flex fx-flex-col fx-items-center fx-justify-center"
           style={{
-            display: 'flex',
-            flexDirection: 'column',
-            alignItems: 'center',
-            justifyContent: 'center',
             width: '100%',
           }}
         >

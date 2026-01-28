@@ -46,7 +46,7 @@ export function getUserColumns(): Record<Exclude<UserColumnId, 'actions'>, Colum
       enableHiding: false,
       header: 'Email',
       cell: ({ row }) => (
-        <span className="clamp-1" title={row.original.email}>
+        <span className="fx-clamp-1" title={row.original.email}>
           {row.original.email}
         </span>
       ),
@@ -58,7 +58,7 @@ export function getUserColumns(): Record<Exclude<UserColumnId, 'actions'>, Colum
       minSize: 150,
       header: 'Nom',
       cell: ({ row }) => (
-        <span className="clamp-1">
+        <span className="fx-clamp-1">
           {getUserDisplayName(row.original.firstName, row.original.lastName)}
         </span>
       ),

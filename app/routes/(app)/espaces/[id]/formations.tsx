@@ -174,7 +174,7 @@ export default function Formations() {
             </button>
           </Activity>
         </div>
-        <div style={{ display: 'flex', gap: '.5rem', alignItems: 'center' }}>
+        <div className="fx-flex fx-gap-2w fx-items-center">
           <PageSizeSelector
             value={String(pageSize)}
             onChange={(size) => setPageSize(Number(size))}

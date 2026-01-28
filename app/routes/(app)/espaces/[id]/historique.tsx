@@ -69,11 +69,8 @@ export default function Historique() {
         {history.data.map((event) => (
           <li
             key={event.id}
+            className="fx-flex fx-items-start fx-gap-2w fr-py-2w fr-px-0"
             style={{
-              display: 'flex',
-              alignItems: 'flex-start',
-              gap: '1rem',
-              padding: '1rem 0',
               borderBottom: '1px solid var(--border-default-grey)',
             }}
           >

@@ -64,7 +64,7 @@ export default function FormationsListPage() {
 
         <div>
           {isProgramsLoading && programs.length === 0 && (
-            <div className="fr-py-4w" style={{ textAlign: 'center' }}>
+            <div className="fr-py-4w fx-flex fx-justify-center">
               <p className="fr-text--lg">Chargement des formations...</p>
             </div>
           )}
@@ -83,7 +83,7 @@ export default function FormationsListPage() {
           )}
 
           {!isProgramsLoading && programs.length === 0 && !programsError && (
-            <div className="fr-py-4w" style={{ textAlign: 'center' }}>
+            <div className="fr-py-4w fx-flex fx-flex-col fx-items-center">
               <p className="fr-text--lg fr-text-mention--grey">Aucune formation trouvée</p>
               <p className="fr-text--sm fr-text-mention--grey">
                 Essayez de modifier vos critères de recherche

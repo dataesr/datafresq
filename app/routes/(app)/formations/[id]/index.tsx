@@ -123,17 +123,8 @@ export default function FormationPage() {
           </nav>
 
           <div>
-            <div
-              className="fr-mb-1w"
-              style={{
-                display: 'flex',
-                justifyContent: 'flex-start',
-                alignItems: 'center',
-                flexWrap: 'wrap',
-                gap: '1rem',
-              }}
-            >
-              <ul className="fr-badges-group" style={{ flexGrow: 1 }}>
+            <div className="fr-mb-1w fx-flex fx-justify-start fx-items-center fx-flex-wrap fx-gap-4w">
+              <ul className="fr-badges-group fx-flex-grow">
                 <li className="fr-badge fr-badge--sm">{formation.diploma.type}</li>
                 <li
                   className={cn('fr-badge fr-badge--sm', {
@@ -147,7 +138,7 @@ export default function FormationPage() {
                     : "Statut d'accréditation inconnu"}
                 </li>
               </ul>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+              <div className="fx-flex fx-items-center fx-gap-4w">
                 <a
                   target="_blank"
                   rel="noopener noreferrer"
@@ -159,9 +150,7 @@ export default function FormationPage() {
                 <AddToWorkspace formationIds={[formation.inf]} />
               </div>
             </div>
-            <h1 className="fr-h3 fr-mb-1w" style={{ flexGrow: 1 }}>
-              {formation.label}
-            </h1>
+            <h1 className="fr-h3 fr-mb-1w fx-flex-grow">{formation.label}</h1>
             <p className="fr-text-mention--grey fr-text--sm fr-mb-0">
               {formation.etablissements?.map((etab, index: number) => (
                 <span key={etab.uai}>

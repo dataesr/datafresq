@@ -113,7 +113,7 @@ export function DropdownIconOnly() {
 
 export function DropdownSizes() {
   return (
-    <div style={{ display: 'flex', gap: '1rem', alignItems: 'flex-start' }}>
+    <div className="fx-flex fx-gap-4w fx-items-start">
       <Dropdown label="Small" size="sm">
         <Dropdown.Item>Option 1</Dropdown.Item>
         <Dropdown.Item>Option 2</Dropdown.Item>
@@ -527,7 +527,7 @@ export function SelectWithIconVariants() {
   const [category, setCategory] = useState<string | null>(null);
 
   return (
-    <div style={{ display: 'flex', gap: '1rem', alignItems: 'flex-start' }}>
+    <div className="fx-flex fx-gap-4w fx-items-start">
       <Select label={country || 'Pays'} icon="earth-line" size="sm">
         <Select.Option value="fr" selected={country === 'fr'} onClick={() => setCountry('France')}>
           France

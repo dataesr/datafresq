@@ -64,10 +64,7 @@ export function EffectifsEvolutionChart(props: EffectifsEvolutionChartProps) {
       chartRef={chartRef}
       source={SISE_SOURCE}
     >
-      <Chart
-        ref={chartRef}
-        containerProps={{ style: { width: '100%', minWidth: '250px', height: '350px' } }}
-      >
+      <Chart ref={chartRef}>
         <Credits enabled={false} />
         <Legend align="center" />
         <Tooltip shared />

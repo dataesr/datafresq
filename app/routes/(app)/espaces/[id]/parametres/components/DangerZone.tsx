@@ -52,8 +52,8 @@ export function DangerZone({ workspace }: DangerZoneProps) {
       </div>
       <div className="fr-col-12 fr-col-md-6 fr-col-offset-md-2 fr-px-2w">
         <div
+          className="fr-p-6w"
           style={{
-            padding: '1.5rem',
             border: '1px solid var(--border-default-error)',
             borderRadius: '0.5rem',
           }}

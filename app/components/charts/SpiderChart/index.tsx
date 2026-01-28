@@ -37,7 +37,6 @@ export function SpiderChart({
 
   return (
     <Chart
-      containerProps={{ style: { width: '100%', height: '100%' } }}
       options={{
         chart: {
           polar: true,

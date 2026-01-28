@@ -46,12 +46,10 @@ export function RegionChoroplethMap({ data }: RegionChoroplethMapProps) {
       description="Répartition géographique des formations par région."
       source={FRESQ_SOURCE}
     >
-      <div style={{ width: '100%', minWidth: '200px', height: '400px' }}>
-        <ChoroplethMap
-          data={choroplethData}
-          tooltipPointFormat="<b>{point.name}</b>: {point.value} formations"
-        />
-      </div>
+      <ChoroplethMap
+        data={choroplethData}
+        tooltipPointFormat="<b>{point.name}</b>: {point.value} formations"
+      />
     </AnalyticsGraph>
   );
 }

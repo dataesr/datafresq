@@ -168,19 +168,8 @@ export default function EspaceLayout() {
           </nav>
 
           <div>
-            <div
-              className="fr-mb-1w"
-              style={{
-                display: 'flex',
-                justifyContent: 'flex-start',
-                alignItems: 'center',
-                flexWrap: 'wrap',
-                gap: '1rem',
-              }}
-            >
-              <h1 className="fr-h3 fr-mb-0" style={{ flexGrow: 1 }}>
-                {workspace.name}
-              </h1>
+            <div className="fr-mb-1w fx-flex fx-items-center fx-flex-wrap fx-gap-2w">
+              <h1 className="fr-h3 fr-mb-0 fx-flex-grow">{workspace.name}</h1>
               <Avatars users={allUsers} size={32} />
               {isMember && !isOwner && (
                 <button
@@ -194,7 +183,7 @@ export default function EspaceLayout() {
               )}
             </div>
             {workspace.description && (
-              <p className="fr-text--sm clamp-3 fr-mb-0" style={{ maxWidth: '64rem' }}>
+              <p className="fr-text--sm fx-clamp-3 fr-mb-0" style={{ maxWidth: '64rem' }}>
                 {workspace.description}
               </p>
             )}

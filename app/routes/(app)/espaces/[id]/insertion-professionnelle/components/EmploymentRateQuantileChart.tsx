@@ -142,12 +142,7 @@ export function EmploymentRateQuantileChart({ yearData, year }: EmploymentRateQu
         noData={!hasData}
         message="Pas assez de formations avec des données suffisantes pour calculer les quartiles (minimum 4 formations avec au moins 20 sortants chacune)."
       >
-        <Chart
-          ref={chartRef}
-          containerProps={{
-            style: { width: '100%', minWidth: '200px', height: '350px' },
-          }}
-        >
+        <Chart ref={chartRef}>
           <Credits enabled={false} />
           <Legend align="center" />
           <Tooltip />

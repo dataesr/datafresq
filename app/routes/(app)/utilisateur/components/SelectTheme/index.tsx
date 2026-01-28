@@ -23,11 +23,7 @@ export default function SelectTheme() {
                     id="fr-radios-theme-light"
                     name="fr-radios-theme"
                   />
-                  <label
-                    style={{ display: 'flex' }}
-                    className="fr-label"
-                    htmlFor="fr-radios-theme-light"
-                  >
+                  <label className="fr-label fx-flex" htmlFor="fr-radios-theme-light">
                     <span style={{ flexGrow: 1 }}>Clair</span>
                     <svg
                       aria-hidden="true"
@@ -58,11 +54,7 @@ export default function SelectTheme() {
                     id="fr-radios-theme-dark"
                     name="fr-radios-theme"
                   />
-                  <label
-                    style={{ display: 'flex' }}
-                    className="fr-label"
-                    htmlFor="fr-radios-theme-dark"
-                  >
+                  <label className="fr-label fx-flex" htmlFor="fr-radios-theme-dark">
                     <span style={{ flexGrow: 1 }}>Sombre</span>
                     <svg
                       aria-hidden="true"
@@ -93,11 +85,7 @@ export default function SelectTheme() {
                     id="fr-radios-theme-system"
                     name="fr-radios-theme"
                   />
-                  <label
-                    style={{ display: 'flex' }}
-                    className="fr-label"
-                    htmlFor="fr-radios-theme-system"
-                  >
+                  <label className="fr-label fx-flex" htmlFor="fr-radios-theme-system">
                     <span style={{ flexGrow: 1 }}>Système</span>
                     <svg
                       aria-hidden="true"

@@ -1,7 +1,8 @@
 import { useId, useMemo, useRef, useState } from 'react';
 import { type UserSearchResult, useUserSearch } from '@/api/users';
+import { Avatar } from '@/components/Avatar';
+import { getDisplayName } from '../constants';
 import './styles.css';
-import { Avatar } from '../Avatar';
 
 interface UserSearchSelectProps {
   onSelect: (user: UserSearchResult) => void;
@@ -10,13 +11,6 @@ interface UserSearchSelectProps {
   label?: string;
   hint?: string;
   required?: boolean;
-}
-
-function getUserDisplayName(user: UserSearchResult): string {
-  if (user.firstName || user.lastName) {
-    return [user.firstName, user.lastName].filter(Boolean).join(' ');
-  }
-  return user.email;
 }
 
 export default function UserSearchSelect({
@@ -36,7 +30,6 @@ export default function UserSearchSelect({
 
   const { data: users = [], isLoading, isFetching } = useUserSearch(query);
 
-  // Filter out excluded users
   const filteredUsers = useMemo(() => {
     return users.filter((user) => !excludeUserIds.includes(user.id));
   }, [users, excludeUserIds]);
@@ -49,11 +42,9 @@ export default function UserSearchSelect({
   };
 
   const handleSelect = (user: UserSearchResult) => {
-    // Close dropdown and clear input first
     setIsOpen(false);
     setQuery('');
     setHighlightedIndex(0);
-    // Then notify parent
     onSelect(user);
   };
 
@@ -83,10 +74,8 @@ export default function UserSearchSelect({
   };
 
   const handleBlur = (e: React.FocusEvent) => {
-    // Only close if focus is leaving the component entirely
     const relatedTarget = e.relatedTarget as Node | null;
     if (!e.currentTarget.contains(relatedTarget)) {
-      // Small delay to allow click events to fire first
       setTimeout(() => {
         setIsOpen(false);
       }, 100);
@@ -94,8 +83,8 @@ export default function UserSearchSelect({
   };
 
   return (
-    <search className="fr-fieldset" onBlur={handleBlur}>
-      <div className="fr-input-group fr-mb-0" style={{ width: '100%' }}>
+    <search className="user-search-select" onBlur={handleBlur}>
+      <div className="fr-input-group fr-mb-0">
         {label && (
           <label className="fr-label" htmlFor={inputId}>
             {label}
@@ -137,30 +126,32 @@ export default function UserSearchSelect({
               {isLoading ? 'Recherche en cours...' : 'Aucun utilisateur trouvé'}
             </div>
           ) : (
-            filteredUsers.map((user, index) => (
-              <button
-                type="button"
-                key={user.id}
-                id={`${inputId}-option-${index}`}
-                className={`user-search-select__option ${
-                  index === highlightedIndex ? 'user-search-select__option--highlighted' : ''
-                }`}
-                onMouseDown={(e) => {
-                  // Prevent blur from firing before click
-                  e.preventDefault();
-                  handleSelect(user);
-                }}
-                onMouseEnter={() => setHighlightedIndex(index)}
-              >
-                <Avatar size={32} name={getUserDisplayName(user)} />
-                <div className="user-search-select__user-info">
-                  <span className="user-search-select__name">{getUserDisplayName(user)}</span>
-                  {(user.firstName || user.lastName) && (
-                    <span className="user-search-select__email">{user.email}</span>
-                  )}
-                </div>
-              </button>
-            ))
+            filteredUsers.map((user, index) => {
+              const displayName = getDisplayName(user);
+              return (
+                <button
+                  type="button"
+                  key={user.id}
+                  id={`${inputId}-option-${index}`}
+                  className={`user-search-select__option ${
+                    index === highlightedIndex ? 'user-search-select__option--highlighted' : ''
+                  }`}
+                  onMouseDown={(e) => {
+                    e.preventDefault();
+                    handleSelect(user);
+                  }}
+                  onMouseEnter={() => setHighlightedIndex(index)}
+                >
+                  <Avatar size={32} name={displayName} />
+                  <div className="user-search-select__user-info">
+                    <span className="user-search-select__name">{displayName}</span>
+                    {(user.firstName || user.lastName) && (
+                      <span className="user-search-select__email">{user.email}</span>
+                    )}
+                  </div>
+                </button>
+              );
+            })
           )}
         </div>
       )}
@@ -168,5 +159,4 @@ export default function UserSearchSelect({
   );
 }
 
-export { getUserDisplayName };
 export type { UserSearchResult };

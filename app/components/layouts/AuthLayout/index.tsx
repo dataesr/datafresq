@@ -11,14 +11,7 @@ export default function AuthLayout() {
       <div className={cn('auth-layout-logo-container')}>
         <img src={dataesrLogo} alt="Logo" />
       </div>
-      <div
-        style={{
-          display: 'flex',
-          flexDirection: 'column',
-          alignItems: 'center',
-          justifyContent: 'center',
-        }}
-      >
+      <div className="fx-flex fx-flex-col fx-items-center fx-justify-center">
         <div className={cn('auth-layout-card-wrapper', 'fr-card', 'fr-card--shadow', 'fr-py-2w')}>
           <Outlet />
         </div>

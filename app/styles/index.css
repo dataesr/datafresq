@@ -3,14 +3,11 @@
 @import "./layout.css";
 @import "./dsfr-extensions/index.css";
 @import "./icon-box.css";
+@import "./utility.css";
 
 html {
   scroll-behavior: smooth;
   scroll-padding-top: 2rem;
-}
-
-.fr-text-black-white--grey {
-  fill: var(--text-black-white-grey);
 }
 
 .signup-step {
@@ -133,33 +130,6 @@ button.fr-link {
   height: 100%;
   left: 0;
   background-color: var(--border-action-high-blue-france);
-}
-
-.clamp-1 {
-  display: -webkit-box;
-  -webkit-line-clamp: 1;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
-}
-
-.clamp-2 {
-  display: -webkit-box;
-  -webkit-line-clamp: 2;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
-}
-
-.clamp-3 {
-  display: -webkit-box;
-  -webkit-line-clamp: 3;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
-}
-.clamp-4 {
-  display: -webkit-box;
-  -webkit-line-clamp: 4;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
 }
 
 .highlighted > STRONG {

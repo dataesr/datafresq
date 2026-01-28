@@ -138,6 +138,7 @@ export function AnalyticsGraph({
           role="img"
           aria-labelledby={titleId}
           aria-describedby={description ? descriptionId : undefined}
+          className="fx-width-100"
         >
           {children}
         </div>
@@ -153,10 +154,7 @@ export function AnalyticsGraph({
         {/* Source section - pushed to bottom with marginTop: auto */}
         {source && (
           <div className="analytics-graph__source">
-            <p
-              className="fr-text--xs fr-mb-0"
-              style={{ display: 'flex', alignItems: 'flex-start', gap: '0.5rem' }}
-            >
+            <p className="fr-text--xs fr-mb-0 fx-flex fx-items-start fx-gap-1w">
               <span className="fr-icon-database-line fr-icon--sm" aria-hidden="true" />
               <span>Source : {source}</span>
             </p>

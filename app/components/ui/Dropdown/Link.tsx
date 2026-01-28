@@ -41,7 +41,7 @@ export function Link(props: LinkComponentProps) {
   );
 
   if (isExternalLink(props)) {
-    const { external, ...anchorProps } = rest as DropdownExternalLinkProps;
+    const { external: _, ...anchorProps } = rest as DropdownExternalLinkProps;
     return (
       <a role="menuitem" className={classes} {...anchorProps}>
         {children}

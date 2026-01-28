@@ -67,12 +67,7 @@ export function EmploymentRateChart({ yearData, year }: EmploymentRateChartProps
       source="InserSup (MESR)"
     >
       <BlurredNoData noData={!canShow} icon="fr-icon-lock-line" message={noDataMessage}>
-        <Chart
-          ref={chartRef}
-          containerProps={{
-            style: { width: '100%', minWidth: '200px', height: '350px' },
-          }}
-        >
+        <Chart ref={chartRef}>
           <Credits enabled={false} />
           <Legend align="center" />
           <Tooltip shared valueSuffix="%" />

@@ -14,7 +14,7 @@ function ScoreIndicator({ score = 0 }: { score?: number }) {
   const bars = [0.1, 0.3, 0.5, 0.7, 0.9];
 
   return (
-    <div className="fr-pr-3w" style={{ display: 'flex', justifyContent: 'center', gap: '2px' }}>
+    <div className="fr-pr-3w fx-flex fx-justify-center" style={{ gap: '2px' }}>
       {bars.map((threshold, index) => (
         <div
           key={`${id}-${bars[index]}`}
@@ -113,7 +113,7 @@ export function getProgramColumns(): Record<ProgramColumnId, ColumnDef<ProgramSe
       enableSorting: false,
       enableHiding: false,
       header: ({ table }) => (
-        <div style={{ display: 'flex', alignItems: 'center', maxWidth: 'fit-content' }}>
+        <div className="fx-flex fx-items-center fx-width-fit-content">
           <IndeterminateCheckbox
             checked={table.getIsAllRowsSelected()}
             indeterminate={table.getIsSomeRowsSelected()}
@@ -146,17 +146,16 @@ export function getProgramColumns(): Record<ProgramColumnId, ColumnDef<ProgramSe
         <div>
           <Link
             to={`/formations/${original.inf}`}
-            className="table-link fr-text--sm clamp-1 fr-mb-1v"
+            className="table-link fr-text--sm fx-clamp-1 fr-mb-1v"
             title={original.label}
           >
             {original.label}
           </Link>
           <p
-            style={{ width: 'fit-content' }}
             title={original.etablissements
               ?.map((e) => ('paysageElt' in e && e.paysageElt?.name) || e.name)
               .join(', ')}
-            className="fr-text--xs fr-text-mention--grey clamp-1 fr-mb-0"
+            className="fr-text--xs fr-text-mention--grey fx-clamp-1 fr-mb-0 fx-width-fit-content"
           >
             {original.etablissements
               ?.map((e) => ('paysageElt' in e && e.paysageElt?.name) || e.name)
@@ -202,7 +201,7 @@ export function getProgramColumns(): Record<ProgramColumnId, ColumnDef<ProgramSe
       maxSize: 150,
       header: 'Cycle',
       cell: ({ row }) => (
-        <span title={row.original.cycle} className="clamp-1">
+        <span title={row.original.cycle} className="fx-clamp-1">
           {row.original.cycle || '-'}
         </span>
       ),
@@ -219,7 +218,7 @@ export function getProgramColumns(): Record<ProgramColumnId, ColumnDef<ProgramSe
       maxSize: 250,
       header: 'Type de diplôme',
       cell: ({ row }) => (
-        <span title={row.original.diploma?.type} className="clamp-1">
+        <span title={row.original.diploma?.type} className="fx-clamp-1">
           {row.original.diploma?.type || '-'}
         </span>
       ),
@@ -237,7 +236,7 @@ export function getProgramColumns(): Record<ProgramColumnId, ColumnDef<ProgramSe
       enableSorting: false,
       header: 'SISE',
       cell: ({ row }) => (
-        <div style={{ display: 'flex', justifyContent: 'start' }}>
+        <div className="fx-flex fx-justify-start">
           <span
             className={cn('fr-badge fr-badge--sm', {
               'fr-badge--success': row.original.hasSiseInfos,
@@ -262,7 +261,7 @@ export function getProgramColumns(): Record<ProgramColumnId, ColumnDef<ProgramSe
       enableSorting: false,
       header: 'RNCP',
       cell: ({ row }) => (
-        <div style={{ display: 'flex', justifyContent: 'start' }}>
+        <div className="fx-flex fx-justify-start">
           <span
             className={cn('fr-badge fr-badge--sm', {
               'fr-badge--success': row.original.hasRncpInfos,
@@ -287,7 +286,7 @@ export function getProgramColumns(): Record<ProgramColumnId, ColumnDef<ProgramSe
       enableSorting: false,
       header: 'ROME',
       cell: ({ row }) => (
-        <div style={{ display: 'flex', justifyContent: 'start' }}>
+        <div className="fx-flex fx-justify-start">
           <span
             className={cn('fr-badge fr-badge--sm', {
               'fr-badge--success': row.original.hasRomeInfos,

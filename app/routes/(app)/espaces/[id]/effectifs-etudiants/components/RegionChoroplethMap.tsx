@@ -48,12 +48,10 @@ export function RegionChoroplethMap({ data }: RegionChoroplethMapProps) {
       description="Répartition géographique des étudiants par région."
       source={SISE_SOURCE_SHORT}
     >
-      <div style={{ width: '100%', minWidth: '200px', height: '400px' }}>
-        <ChoroplethMap
-          data={choroplethData}
-          tooltipPointFormat="<b>{point.name}</b>: {point.value} étudiants"
-        />
-      </div>
+      <ChoroplethMap
+        data={choroplethData}
+        tooltipPointFormat="<b>{point.name}</b>: {point.value} étudiants"
+      />
     </AnalyticsGraph>
   );
 }

@@ -1,4 +1,5 @@
 import { SimpleStatCard } from '@/components/cards/StatCards';
+import { AutoGrid } from '@/components/Grids/AutoGrid';
 
 interface EffectifsStatsCardsProps {
   total: number;
@@ -10,14 +11,7 @@ export function EffectifsStatsCards({ total, women, men }: EffectifsStatsCardsPr
   const feminizationRate = total > 0 ? `${Math.round((women / total) * 100)}%` : '-';
 
   return (
-    <div
-      style={{
-        display: 'grid',
-        gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 180px), 1fr))',
-        gap: '1rem',
-        marginBottom: '1.25rem',
-      }}
-    >
+    <AutoGrid min={180}>
       <SimpleStatCard
         value={total}
         label={`Étudiants inscrits`}
@@ -37,6 +31,6 @@ export function EffectifsStatsCards({ total, women, men }: EffectifsStatsCardsPr
         icon="fr-icon-user-star-fill"
         color="yellow-tournesol"
       />
-    </div>
+    </AutoGrid>
   );
 }

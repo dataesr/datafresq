@@ -1,194 +1,17 @@
-import cn from 'classnames';
-import { Activity, useState } from 'react';
+import { parseAsStringLiteral, useQueryState } from 'nuqs';
+import { Activity, Suspense } from 'react';
 import { Link } from 'react-router';
 import { usePublicWorkspaces, useSharedWorkspaces, useWorkspaces } from '@/api/workspaces';
 import { AutoGrid } from '@/components/Grids/AutoGrid';
-import type { ReadWorkspace } from '~/schemas/workspaces';
+import { CreateWorkspaceCard, WorkspaceCard } from './components/WorkspaceCard';
+import { WorkspaceSkeleton } from './components/WorkspaceSkeleton';
 
-function WorkspaceBadge({ isPublic }: { isPublic: boolean }) {
-  return (
-    <span
-      className={cn(
-        'fr-badge fr-badge--sm fr-badge--no-icon',
-        isPublic ? 'fr-badge--green-emeraude' : 'fr-badge--blue-cumulus',
-      )}
-    >
-      {isPublic ? 'Public' : 'Privé'}
-    </span>
-  );
-}
-
-function WorkspaceCardSkeleton() {
-  return (
-    <div className="fx-card fx-card--sm fx-card--rounded">
-      <div
-        style={{
-          height: '4px',
-          width: '100%',
-          background: 'var(--background-alt-grey)',
-          borderRadius: '2px',
-          marginBottom: '1rem',
-        }}
-      />
-      <div
-        style={{
-          height: '1.25rem',
-          width: '60%',
-          background: 'var(--background-alt-grey)',
-          marginBottom: '0.75rem',
-          borderRadius: '2px',
-        }}
-      />
-      <div
-        style={{
-          height: '0.875rem',
-          width: '100%',
-          background: 'var(--background-alt-grey)',
-          marginBottom: '0.5rem',
-          borderRadius: '2px',
-        }}
-      />
-      <div
-        style={{
-          height: '0.875rem',
-          width: '40%',
-          background: 'var(--background-alt-grey)',
-          borderRadius: '2px',
-        }}
-      />
-    </div>
-  );
-}
-
-function WorkspaceSkeleton() {
-  return (
-    <AutoGrid type="fill" min={320}>
-      {[1, 2, 3, 4, 5, 6].map((i) => (
-        <WorkspaceCardSkeleton key={i} />
-      ))}
-    </AutoGrid>
-  );
-}
-
-function WorkspaceCard({ workspace }: { workspace: ReadWorkspace }) {
-  const { color, description, id, isPublic, name, programs, users, ownerInfo } = workspace;
-
-  return (
-    <div
-      className="fx-card fr-enlarge-link fx-card--sm fx-card--rounded fx-card--lift"
-      style={{ textDecoration: 'none', display: 'block' }}
-    >
-      {/* Color bar */}
-      <div
-        style={{
-          height: '4px',
-          backgroundColor: `var(--artwork-minor-${color})`,
-          borderRadius: '2px',
-          marginBottom: '0.75rem',
-        }}
-      />
-
-      {/* Header: title + badge */}
-      <div
-        style={{
-          display: 'flex',
-          justifyContent: 'space-between',
-          alignItems: 'flex-start',
-          gap: '0.5rem',
-          marginBottom: '0.5rem',
-        }}
-      >
-        <Link
-          to={`/espaces/${id}`}
-          className="fr-text--md fr-text--bold fr-mb-0 clamp-1"
-          style={{ flex: 1 }}
-        >
-          {name}
-        </Link>
-        <WorkspaceBadge isPublic={isPublic} />
-      </div>
-
-      {/* Description */}
-      <p className="fr-text--sm fr-text-mention--grey clamp-2 fr-mb-2w">
-        {description || 'Aucune description'}
-      </p>
-
-      {/* Footer: metadata */}
-      <p className="fr-text--xs fr-text-mention--grey fr-mb-0">
-        <span className="fr-icon-user-line fr-icon--sm fr-mr-1v" aria-hidden="true" />
-        {ownerInfo?.firstName} {ownerInfo?.lastName}
-        <span className="fr-mx-1w">•</span>
-        <span className="fr-icon-team-line fr-icon--sm fr-mr-1v" aria-hidden="true" />
-        {(users?.length ?? 0) + 1}
-        <span className="fr-mx-1w">•</span>
-        <span className="fr-icon-file-text-line fr-icon--sm fr-mr-1v" aria-hidden="true" />
-        {programs?.length ?? 0} formation{(programs?.length ?? 0) > 1 ? 's' : ''}
-      </p>
-    </div>
-  );
-}
-
-function CreateWorkspaceCard() {
-  return (
-    <Link
-      to="/espaces/nouveau"
-      className="fx-card fx-card--sm fx-card--rounded"
-      style={{
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        minHeight: '140px',
-        textDecoration: 'none',
-        border: '2px dashed var(--border-default-grey)',
-        background: 'transparent',
-      }}
-    >
-      <div style={{ textAlign: 'center' }}>
-        <span
-          className="fr-icon-add-line fr-icon--lg"
-          aria-hidden="true"
-          style={{
-            color: 'var(--text-action-high-blue-france)',
-            marginBottom: '0.5rem',
-            display: 'block',
-          }}
-        />
-        <p
-          className="fr-text--sm fr-text--bold fr-mb-0"
-          style={{ color: 'var(--text-action-high-blue-france)' }}
-        >
-          Créer un espace
-        </p>
-      </div>
-    </Link>
-  );
-}
-
-function WorkspaceCardList({
-  workspaces,
-  isLoading,
-  showCreateCard = false,
-  emptyMessage = 'Aucun espace de travail trouvé. Créez votre premier espace de travail pour commencer.',
-}: {
-  workspaces: ReadWorkspace[] | undefined;
-  isLoading: boolean;
-  showCreateCard?: boolean;
-  emptyMessage?: string;
-}) {
-  if (isLoading) return <WorkspaceSkeleton />;
-
-  if (!workspaces?.length && !showCreateCard) {
-    return (
-      <div className="fr-callout">
-        <h3 className="fr-callout__title">Aucun espace de travail</h3>
-        <p className="fr-callout__text">{emptyMessage}</p>
-      </div>
-    );
-  }
+function MyWorkspacesList() {
+  const { data: workspaces } = useWorkspaces();
 
   return (
     <AutoGrid type="fill" min={320} gap="md">
-      {showCreateCard && <CreateWorkspaceCard />}
+      <CreateWorkspaceCard />
       {workspaces?.map((workspace) => (
         <WorkspaceCard key={workspace.id} workspace={workspace} />
       ))}
@@ -196,32 +19,53 @@ function WorkspaceCardList({
   );
 }
 
-function MyWorkspacesTab() {
-  const { data: workspaces, isLoading } = useWorkspaces();
+function SharedWorkspacesList() {
+  const { data: workspaces } = useSharedWorkspaces();
 
-  return <WorkspaceCardList workspaces={workspaces} isLoading={isLoading} showCreateCard />;
-}
-
-function SharedWorkspacesTab() {
-  const { data: workspaces, isLoading } = useSharedWorkspaces();
+  if (!workspaces?.length) {
+    return (
+      <div className="fr-callout">
+        <h3 className="fr-callout__title">Aucun espace de travail</h3>
+        <p className="fr-callout__text">Aucun espace partagé avec vous pour le moment.</p>
+      </div>
+    );
+  }
 
   return (
-    <WorkspaceCardList
-      workspaces={workspaces}
-      isLoading={isLoading}
-      emptyMessage="Aucun espace partagé avec vous pour le moment."
-    />
+    <AutoGrid type="fill" min={320} gap="md">
+      {workspaces.map((workspace) => (
+        <WorkspaceCard key={workspace.id} workspace={workspace} />
+      ))}
+    </AutoGrid>
   );
 }
 
-function PublicWorkspacesTab() {
-  const { data: workspaces, isLoading } = usePublicWorkspaces();
+function PublicWorkspacesList() {
+  const { data: workspaces } = usePublicWorkspaces();
 
-  return <WorkspaceCardList workspaces={workspaces} isLoading={isLoading} />;
+  if (!workspaces?.length) {
+    return (
+      <div className="fr-callout">
+        <h3 className="fr-callout__title">Aucun espace de travail</h3>
+        <p className="fr-callout__text">Aucun espace de travail public trouvé.</p>
+      </div>
+    );
+  }
+
+  return (
+    <AutoGrid type="fill" min={320} gap="md">
+      {workspaces.map((workspace) => (
+        <WorkspaceCard key={workspace.id} workspace={workspace} />
+      ))}
+    </AutoGrid>
+  );
 }
 
 export default function EspacesPage() {
-  const [activeTab, setActiveTab] = useState<'my' | 'public' | 'shared'>('my');
+  const [activeTab, setActiveTab] = useQueryState(
+    'tab',
+    parseAsStringLiteral(['my', 'shared', 'public'] as const).withDefault('my'),
+  );
 
   return (
     <div className="page">
@@ -249,6 +93,7 @@ export default function EspacesPage() {
           </ol>
         </div>
       </nav>
+
       <div className="fr-grid-row fr-grid-row--middle fr-mb-4w">
         <div className="fr-col">
           <h1 className="fr-h2 fr-mb-1w">Espaces de travail</h1>
@@ -258,7 +103,7 @@ export default function EspacesPage() {
         </div>
       </div>
 
-      <nav className="fr-nav xfr-nav--horizontal" aria-label="Navigation des espaces">
+      <nav className="fr-nav" aria-label="Navigation des espaces">
         <ul className="fr-nav__list">
           <li className="fr-nav__item">
             <button
@@ -299,17 +144,22 @@ export default function EspacesPage() {
       <hr className="fr-mt-0 fr-mb-4w" />
 
       <Activity mode={activeTab === 'my' ? 'visible' : 'hidden'}>
-        <MyWorkspacesTab />
+        <Suspense fallback={<WorkspaceSkeleton />}>
+          <MyWorkspacesList />
+        </Suspense>
       </Activity>
+
       <Activity mode={activeTab === 'shared' ? 'visible' : 'hidden'}>
-        <SharedWorkspacesTab />
+        <Suspense fallback={<WorkspaceSkeleton />}>
+          <SharedWorkspacesList />
+        </Suspense>
       </Activity>
+
       <Activity mode={activeTab === 'public' ? 'visible' : 'hidden'}>
-        <PublicWorkspacesTab />
+        <Suspense fallback={<WorkspaceSkeleton />}>
+          <PublicWorkspacesList />
+        </Suspense>
       </Activity>
     </div>
   );
 }
-
-// Re-export components for use elsewhere
-export { WorkspaceCard, WorkspaceCardList, WorkspaceBadge };

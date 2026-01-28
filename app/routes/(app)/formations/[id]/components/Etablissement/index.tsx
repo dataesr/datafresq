@@ -1,4 +1,5 @@
 import { useMemo } from 'react';
+import { AutoGrid } from '@/components/Grids/AutoGrid';
 import FormationMap from '@/components/maps/FormationMap';
 import type { Etablissement as EtablissementType, Program } from '~/schemas/programs';
 
@@ -27,7 +28,6 @@ function groupEtablissementsByPaysage(etabs: Program['etablissements']): Grouped
     const paysageElt = etab.paysageElt;
 
     if (!paysageEltToUse) {
-      // No paysageEltToUse, treat as standalone
       const key = etab.uai;
       if (!grouped.has(key)) {
         grouped.set(key, {
@@ -56,14 +56,11 @@ function groupEtablissementsByPaysage(etabs: Program['etablissements']): Grouped
     const group = grouped.get(key)!;
     group.allEtabs.push(etab);
 
-    // Check if this is a direct filiation (paysageElt.id === paysageEltToUse.id)
     const isDirectFiliation = paysageElt?.id === paysageEltToUse.id;
 
     if (isDirectFiliation) {
-      // This is the main element
       group.mainEtab = etab;
     } else {
-      // This is a sub-element
       group.subEtabs.push({
         etab,
         method: paysageElt?.uaiToPaysageMethod,
@@ -99,7 +96,6 @@ function SubEtabCard({ etab, method }: { etab: EtablissementType; method: string
 function EtablissementGroupCard({ group }: { group: GroupedEtablissement }) {
   const { mainEtab, subEtabs, paysageName, paysageId, allEtabs } = group;
 
-  // Use mainEtab info if available, otherwise use the first sub-etab's parent info
   const displayEtab = mainEtab || subEtabs[0]?.etab;
   const hasMultiple = allEtabs.length > 1;
   const hasSubElements = subEtabs.length > 0;
@@ -108,12 +104,8 @@ function EtablissementGroupCard({ group }: { group: GroupedEtablissement }) {
 
   return (
     <div className="fr-card fr-card--shadow fr-p-3w">
-      {/* Header with type badge and name */}
       <div className="fr-mb-2w">
-        <div
-          className="fr-mb-1v"
-          style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', flexWrap: 'wrap' }}
-        >
+        <div className="fr-mb-1v fx-flex fx-items-center fx-gap-2w fx-flex-wrap">
           {displayEtab.typeDelivrance && (
             <span className="fr-badge fr-badge--success fr-badge--sm">
               {displayEtab.typeDelivrance}
@@ -139,17 +131,14 @@ function EtablissementGroupCard({ group }: { group: GroupedEtablissement }) {
         <h3 className="fr-text--lg fr-text--bold fr-mb-0">{paysageName}</h3>
       </div>
 
-      {/* Main etablissement info */}
-      <div style={{ display: 'flex', flexDirection: 'column', gap: '0.25rem' }}>
+      <div className="fx-flex fx-flex-col fx-gap-1w">
         <div className="fr-text--sm fr-mb-0">
           <span
             className="fr-icon-barcode-line fr-icon--sm fr-mr-1v fr-text-mention--grey"
             aria-hidden="true"
           />
           <span className="fr-text-mention--grey">Paysage </span>
-          <span className="fr-text--bold" style={{ fontFamily: '"Courier New", monospace' }}>
-            {paysageId}
-          </span>
+          <span className="fr-text--bold fx-text--monospace">{paysageId}</span>
         </div>
 
         {mainEtab?.uai && (
@@ -159,9 +148,7 @@ function EtablissementGroupCard({ group }: { group: GroupedEtablissement }) {
               aria-hidden="true"
             />
             <span className="fr-text-mention--grey">UAI </span>
-            <span className="fr-text--bold" style={{ fontFamily: '"Courier New", monospace' }}>
-              {mainEtab.uai}
-            </span>
+            <span className="fr-text--bold fx-text--monospace">{mainEtab.uai}</span>
           </div>
         )}
 
@@ -192,14 +179,13 @@ function EtablissementGroupCard({ group }: { group: GroupedEtablissement }) {
         )}
       </div>
 
-      {/* Sub-elements section - always visible */}
       {hasSubElements && (
         <div className="fr-mt-2w">
           <p className="fr-text--sm fr-text--bold fr-mb-1w fr-text-mention--grey">
             {subEtabs.length} composante{subEtabs.length > 1 ? 's' : ''} rattachée
             {subEtabs.length > 1 ? 's' : ''}
           </p>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+          <div className="fx-flex fx-flex-col fx-gap-2w">
             {subEtabs.map(({ etab, method }) => (
               <SubEtabCard key={etab.uai} etab={etab} method={method} />
             ))}
@@ -207,7 +193,6 @@ function EtablissementGroupCard({ group }: { group: GroupedEtablissement }) {
         </div>
       )}
 
-      {/* If no main but has sub-elements, show them directly */}
       {!hasSubElements && !mainEtab && allEtabs.length === 1 && allEtabs[0] && (
         <div className="fr-mt-2w fr-text--sm">
           {allEtabs[0].uai && (
@@ -217,9 +202,7 @@ function EtablissementGroupCard({ group }: { group: GroupedEtablissement }) {
                 aria-hidden="true"
               />
               <span className="fr-text-mention--grey">UAI </span>
-              <span className="fr-text--bold" style={{ fontFamily: '"Courier New", monospace' }}>
-                {allEtabs[0].uai}
-              </span>
+              <span className="fr-text--bold fx-text--monospace">{allEtabs[0].uai}</span>
             </>
           )}
         </div>
@@ -238,7 +221,7 @@ function MapLegend({
   return (
     <div className="fx-spacer fr-py-2w fr-px-2v fr-background-alt--grey fr-text--xs fr-mb-0 fr-mt-3w">
       {totalEtabLocations > 0 && (
-        <div style={{ display: 'flex', alignItems: 'center', gap: '0.375rem' }}>
+        <div className="fx-flex fx-items-center fx-gap-1w">
           <span
             className="fr-icon-map-pin-2-fill fr-icon--sm"
             style={{ color: 'var(--background-action-high-blue-france)' }}
@@ -250,7 +233,7 @@ function MapLegend({
         </div>
       )}
       {totalSites > 0 && (
-        <div style={{ display: 'flex', alignItems: 'center', gap: '0.375rem' }}>
+        <div className="fx-flex fx-items-center fx-gap-1w">
           <span
             className="fr-icon-map-pin-user-fill fr-icon--sm"
             style={{ color: 'var(--background-action-high-green-emeraude)' }}
@@ -268,33 +251,22 @@ function MapLegend({
 export default function Etablissement({ etabs, locations, isVisible = true }: EtablissementsProps) {
   const groupedEtabs = useMemo(() => groupEtablissementsByPaysage(etabs), [etabs]);
 
-  // Count stats for the map legend
   const totalSites = locations.filter((loc) => loc.types.includes('site')).length;
   const totalEtabLocations = locations.filter((loc) => loc.types.includes('etablissement')).length;
 
   return (
     <section id="etablissement">
       <h2 className="fr-h4">Établissements</h2>
-      <div
-        style={{
-          display: 'grid',
-          gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 450px), 1fr))',
-          gap: '1.5rem',
-          alignItems: 'start',
-        }}
-      >
-        {/* Etablissements column */}
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
+      <AutoGrid min={450}>
+        <div className="fx-flex fx-flex-col fx-gap-6w">
           {groupedEtabs.map((group) => (
             <EtablissementGroupCard key={group.paysageId} group={group} />
           ))}
         </div>
 
-        {/* Map column */}
         <div
+          className="fx-flex fx-flex-col"
           style={{
-            display: 'flex',
-            flexDirection: 'column',
             position: 'sticky',
             top: '1rem',
           }}
@@ -318,12 +290,11 @@ export default function Etablissement({ etabs, locations, isVisible = true }: Et
             )}
           </div>
 
-          {/* Map legend with counts - no gap, directly under map */}
           {(totalEtabLocations > 0 || totalSites > 0) && (
             <MapLegend totalEtabLocations={totalEtabLocations} totalSites={totalSites} />
           )}
         </div>
-      </div>
+      </AutoGrid>
     </section>
   );
 }

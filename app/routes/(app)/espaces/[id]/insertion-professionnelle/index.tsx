@@ -11,9 +11,9 @@ import {
   EmploymentStabilityEvolutionChart,
   EmptyState,
   PRIVACY_THRESHOLD,
-  YearSelector,
 } from '@/components/insersup';
 import { NoDataMessage } from '@/components/NoDataMessage';
+import { YearSelector } from '@/components/YearSelector';
 import type { InsersupYearStats } from '~/schemas/aggregations';
 import { EmptyWorkspace } from '../components/EmptyWorkspace';
 import { EmploymentRateQuantileChart } from './components/EmploymentRateQuantileChart';

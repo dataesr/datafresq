@@ -9,3 +9,7 @@
   background: var(--background-contrast-blue-france);
   color: var(--text-action-high-blue-france);
 }
+
+.icon-box--inline {
+  display: inline-flex;
+}

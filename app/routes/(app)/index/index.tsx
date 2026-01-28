@@ -36,8 +36,7 @@ function StatsSection() {
             {stats.map((stat) => (
               <div
                 key={stat.key}
-                className="fx-card fx-card--sm fx-card--lift"
-                style={{ display: 'flex', alignItems: 'flex-start', gap: '1rem' }}
+                className="fx-card fx-card--sm fx-card--lift fx-flex fx-items-start fx-gap-4w"
               >
                 <div className={`icon-box ${stat.icon}`} aria-hidden="true" />
                 <div>

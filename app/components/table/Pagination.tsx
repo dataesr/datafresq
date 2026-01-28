@@ -21,15 +21,7 @@ export const Pagination = memo(function Pagination({
   const endItem = Math.min(currentPage * pageSize, totalCount);
 
   return (
-    <div
-      style={{
-        display: 'flex',
-        flexDirection: 'row',
-        justifyContent: 'space-between',
-        alignItems: 'baseline',
-        gap: '1rem',
-      }}
-    >
+    <div className="fx-flex fx-flex-row fx-justify-between fx-items-baseline fx-gap-4w">
       <p className="fr-text--sm fr-text-mention--grey fr-mb-0">
         <strong>
           {startItem} - {endItem}
@@ -37,7 +29,7 @@ export const Pagination = memo(function Pagination({
         sur <strong>{totalCount.toLocaleString('fr-FR')}</strong> résultats
       </p>
       <nav aria-label="Pagination">
-        <ul style={{ display: 'flex', gap: '.5rem', listStyle: 'none', padding: 0, margin: 0 }}>
+        <ul className="fx-flex fx-gap-2w fx-reset-list">
           <li>
             <button
               type="button"

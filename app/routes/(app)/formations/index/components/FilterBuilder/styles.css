@@ -48,6 +48,10 @@
     transform: rotate(360deg);
   }
 }
+.filter-builder {
+  background: var(--background-alt-grey);
+  border: 1px solid var(--border-default-grey);
+}
 
 /* Tag dismiss button hover */
 .filter-builder .fr-tag button:hover {
@@ -59,4 +63,14 @@
   .filter-builder__row {
     flex-wrap: wrap;
   }
+}
+
+.filter-builder__search {
+  flex: 1;
+  border: none;
+  background: transparent;
+  outline: none !important;
+  font-size: 1rem;
+  font-family: inherit;
+  color: var(--text-default-grey);
 }
