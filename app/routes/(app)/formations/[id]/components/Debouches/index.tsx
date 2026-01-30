@@ -1,6 +1,6 @@
 import { useMemo, useState } from 'react';
-import { SearchInput } from '@/components/SearchInput';
 import type { Program } from '~/schemas/programs';
+import { Input } from '@/components/Input';
 
 type RomeInfo = NonNullable<Program['romeInfos']>[number];
 
@@ -241,11 +241,10 @@ export default function Debouches({ romeInfos }: DebouchesProps) {
           </p>
         </div>
 
-        <SearchInput
-          size="sm"
+        <Input
           placeholder="Rechercher un métier -- Ex: ingénieur, développeur, chimiste..."
           value={searchQuery}
-          onChange={setSearchQuery}
+          onChange={e => setSearchQuery(e.target.value)}
           className="fr-mb-2w"
         />
 

@@ -1,7 +1,8 @@
-import { useMemo } from 'react';
+import { useMemo, useRef } from 'react';
 import { AnalyticsGraph } from '@/components/AnalyticsGraph';
 import { ChoroplethMap } from '@/components/charts/MapChart';
 import { regionToHcKey, SISE_SOURCE_SHORT } from '@/components/effectifs';
+import type { HighchartsReactRefObject } from '@highcharts/react';
 
 interface RegionData {
   region: string;
@@ -36,6 +37,7 @@ function useMapData(data: RegionData[]) {
  * Workspace-specific chart
  */
 export function RegionChoroplethMap({ data }: RegionChoroplethMapProps) {
+  const chartRef = useRef<HighchartsReactRefObject | null>(null);
   const { hasData, choroplethData } = useMapData(data);
 
   if (!hasData) {
@@ -47,6 +49,7 @@ export function RegionChoroplethMap({ data }: RegionChoroplethMapProps) {
       title="Carte des régions (étudiants)"
       description="Répartition géographique des étudiants par région."
       source={SISE_SOURCE_SHORT}
+      chartRef={chartRef}
     >
       <ChoroplethMap
         data={choroplethData}

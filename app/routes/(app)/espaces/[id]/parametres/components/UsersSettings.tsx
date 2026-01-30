@@ -1,7 +1,8 @@
 import { useAuth } from '@/api/auth';
 import type { UserSearchResult } from '@/api/users';
 import { useAddUsers, useRemoveUsers, useUpdateUserRole } from '@/api/workspaces';
-import { useToast } from '@/hooks/useToast';
+import { toast } from '@/components/ui/Toast';
+import { getErrorMessage } from '@/utils/getErrorMessage';
 import type { ReadWorkspace } from '~/schemas/workspaces';
 import { getDisplayName, type UserRole } from '../../../components/constants';
 import { UserListItem } from '../../../components/UserListItem';
@@ -12,7 +13,6 @@ interface UsersSettingsProps {
 }
 
 export function UsersSettings({ workspace }: UsersSettingsProps) {
-  const { toast } = useToast();
   const { user: currentUser } = useAuth();
   const addUsers = useAddUsers();
   const removeUsers = useRemoveUsers();
@@ -26,64 +26,48 @@ export function UsersSettings({ workspace }: UsersSettingsProps) {
   ];
 
   const handleUserSelect = (user: UserSearchResult) => {
-    addUsers.mutate(
-      {
+    const displayName = getDisplayName({ firstName: user.firstName, lastName: user.lastName, email: user.email });
+    toast.promise(
+      addUsers.mutateAsync({
         workspaceId: workspace.id,
         users: [{ userId: user.id, role: 'viewer' }],
-      },
+      }),
       {
-        onSuccess: () => {
-          toast({
-            type: 'success',
-            description: `${getDisplayName({ firstName: user.firstName, lastName: user.lastName, email: user.email })} a été ajouté comme lecteur`,
-          });
-        },
-        onError: (error) => {
-          toast({
-            type: 'error',
-            description: error.message,
-          });
-        },
+        loading: { title: 'Ajout en cours...' },
+        success: { title: `${displayName} a été ajouté comme lecteur` },
+        error: (err) => ({
+          title: "Erreur lors de l'ajout",
+          description: getErrorMessage(err),
+        }),
       },
     );
   };
 
   const handleRemove = (userId: string, displayName: string) => {
-    removeUsers.mutate(
-      { workspaceId: workspace.id, userIds: [userId] },
+    toast.promise(
+      removeUsers.mutateAsync({ workspaceId: workspace.id, userIds: [userId] }),
       {
-        onSuccess: () => {
-          toast({
-            type: 'success',
-            description: `${displayName} a été retiré`,
-          });
-        },
-        onError: (error) => {
-          toast({
-            type: 'error',
-            description: error.message,
-          });
-        },
+        loading: { title: 'Retrait en cours...' },
+        success: { title: `${displayName} a été retiré` },
+        error: (err) => ({
+          title: 'Erreur lors du retrait',
+          description: getErrorMessage(err),
+        }),
       },
     );
   };
 
   const handleRoleChange = (userId: string, newRole: UserRole, displayName: string) => {
-    updateUserRole.mutate(
-      { workspaceId: workspace.id, userId, role: newRole },
+    const roleLabel = newRole === 'editor' ? 'éditeur' : 'lecteur';
+    toast.promise(
+      updateUserRole.mutateAsync({ workspaceId: workspace.id, userId, role: newRole }),
       {
-        onSuccess: () => {
-          toast({
-            type: 'success',
-            description: `${displayName} est maintenant ${newRole === 'editor' ? 'éditeur' : 'lecteur'}`,
-          });
-        },
-        onError: (error) => {
-          toast({
-            type: 'error',
-            description: error.message,
-          });
-        },
+        loading: { title: 'Modification en cours...' },
+        success: { title: `${displayName} est maintenant ${roleLabel}` },
+        error: (err) => ({
+          title: 'Erreur lors de la modification',
+          description: getErrorMessage(err),
+        }),
       },
     );
   };

@@ -146,7 +146,7 @@ export function getProgramColumns(): Record<ProgramColumnId, ColumnDef<ProgramSe
         <div>
           <Link
             to={`/formations/${original.inf}`}
-            className="table-link fr-text--sm fx-clamp-1 fr-mb-1v"
+            className="table-link fr-text--sm fx-clamp-1"
             title={original.label}
           >
             {original.label}

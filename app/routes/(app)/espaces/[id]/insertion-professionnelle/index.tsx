@@ -1,8 +1,8 @@
+import { Activity, memo, useMemo, useState } from 'react';
 import { useParams } from 'react-router';
 import { useWorkspaceAggregations, useWorkspacePermissions } from '@/api/workspaces';
-import '@/components/highcharts';
-import { Activity, useMemo, useState } from 'react';
 import { AutoGrid } from '@/components/Grids/AutoGrid';
+import '@/components/highcharts';
 import {
   EmploymentRateByGenderChart,
   EmploymentRateChart,
@@ -19,6 +19,50 @@ import { EmptyWorkspace } from '../components/EmptyWorkspace';
 import { EmploymentRateQuantileChart } from './components/EmploymentRateQuantileChart';
 import { InsersupStatsCards } from './components/InsersupStatsCards';
 import { ProgramsTable } from './components/ProgramsTable';
+
+type YearContentProps = {
+  yearData: InsersupYearStats;
+  year: string;
+  programCount: number;
+};
+
+const YearContent = memo(function YearContent({ yearData, year, programCount }: YearContentProps) {
+  return (
+    <>
+      <InsersupStatsCards yearData={yearData} programs={programCount} />
+      {yearData.nbSortants < PRIVACY_THRESHOLD ? (
+        <NoDataMessage
+          icon="fr-icon-lock-line"
+          message={`Les taux d'emploi ne peuvent pas être affichés pour cette promotion car le nombre de sortants (${yearData.nbSortants}) est inférieur à 20.`}
+        />
+      ) : (
+        <>
+          <AutoGrid min={450}>
+            <EmploymentRateChart yearData={yearData} year={year} />
+            <EmploymentRateQuantileChart yearData={yearData} year={year} />
+            <EmploymentStabilityChart yearData={yearData} year={year} />
+            <EmploymentRateByGenderChart yearData={yearData} year={year} />
+          </AutoGrid>
+
+          <ProgramsTable yearData={yearData} />
+        </>
+      )}
+    </>
+  );
+});
+
+type EvolutionContentProps = {
+  sortedByYear: InsersupYearStats[];
+};
+
+const EvolutionContent = memo(function EvolutionContent({ sortedByYear }: EvolutionContentProps) {
+  return (
+    <AutoGrid min={600}>
+      <EmploymentRateEvolutionChart sortedByYear={sortedByYear} />
+      <EmploymentStabilityEvolutionChart sortedByYear={sortedByYear} />
+    </AutoGrid>
+  );
+});
 
 function useCanShowEvolution(sortedByYear: InsersupYearStats[]) {
   return useMemo(() => {
@@ -92,39 +136,15 @@ export default function InsertionProfessionnelle() {
       {availableYears.map((year: string) => {
         const yearData = yearDataMap.get(year);
         if (!yearData) return null;
-
         return (
           <Activity key={year} mode={selectedYear === year ? 'visible' : 'hidden'}>
-            <InsersupStatsCards yearData={yearData} programs={aggregations.programCount} />
-            {yearData.nbSortants < PRIVACY_THRESHOLD ? (
-              <NoDataMessage
-                icon="fr-icon-lock-line"
-                message={`Les taux d'emploi ne peuvent pas être affichés pour cette promotion car le nombre de sortants (${yearData.nbSortants}) est inférieur à 20.`}
-              />
-            ) : (
-              <>
-                <AutoGrid min={450}>
-                  <EmploymentRateChart yearData={yearData} year={year} />
-                  <EmploymentRateQuantileChart yearData={yearData} year={year} />
-                </AutoGrid>
-
-                <AutoGrid min={450}>
-                  <EmploymentStabilityChart yearData={yearData} year={year} />
-                  <EmploymentRateByGenderChart yearData={yearData} year={year} />
-                </AutoGrid>
-
-                <ProgramsTable yearData={yearData} />
-              </>
-            )}
+            <YearContent yearData={yearData} year={year} programCount={aggregations.programCount} />
           </Activity>
         );
       })}
 
-      <Activity mode={selectedYear ? 'hidden' : 'visible'}>
-        <AutoGrid min={600}>
-          <EmploymentRateEvolutionChart sortedByYear={sortedByYear} />
-          <EmploymentStabilityEvolutionChart sortedByYear={sortedByYear} />
-        </AutoGrid>
+      <Activity mode={selectedYear === null ? 'visible' : 'hidden'}>
+        <EvolutionContent sortedByYear={sortedByYear} />
       </Activity>
     </div>
   );

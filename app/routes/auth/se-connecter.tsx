@@ -1,22 +1,12 @@
 import { useForm } from '@tanstack/react-form';
-import { Activity } from 'react';
 import { useSignIn } from '@/api/auth';
 import { Input } from '@/components/Input';
 import { Password } from '@/components/Password';
-import { useToast } from '@/hooks/useToast';
+import { toast } from '@/components/ui/Toast';
+import { getErrorMessage } from '@/utils/getErrorMessage';
 
 export default function SignIn() {
-  const { toast } = useToast();
-  const signInMutation = useSignIn({
-    onSuccess: () => {
-      toast({
-        type: 'success',
-        title: 'Succès!',
-        description: 'Connexion réussie',
-        autoDismissAfter: 0,
-      });
-    },
-  });
+  const signInMutation = useSignIn();
 
   const form = useForm({
     defaultValues: {
@@ -24,7 +14,15 @@ export default function SignIn() {
       password: '',
     },
     onSubmit: async ({ value }) => {
-      await signInMutation.mutateAsync(value);
+      toast.promise(signInMutation.mutateAsync(value), {
+        loading: { title: 'Connexion en cours...' },
+        success: { title: 'Connexion réussie', description: 'Bienvenue !' },
+        error: (err) => ({
+          duration: 0,
+          title: 'Échec de la connexion',
+          description: getErrorMessage(err),
+        }),
+      });
     },
   });
 
@@ -46,9 +44,7 @@ export default function SignIn() {
       >
         <div
           className="fx-flex fx-flex-col fx-items-center fx-justify-center"
-          style={{
-            width: '100%',
-          }}
+          style={{ width: '100%' }}
         >
           <legend id="login-legend">
             <h2 className="fr-h4 fr-my-4w">Connexion</h2>
@@ -113,12 +109,6 @@ export default function SignIn() {
           </form.Field>
         </div>
 
-        <Activity mode={signInMutation.isError ? 'visible' : 'hidden'}>
-          <div className="fr-alert fr-alert--error fr-alert--sm fr-mb-2w" role="alert">
-            <p>{signInMutation.error?.message}</p>
-          </div>
-        </Activity>
-
         <div className="fr-fieldset__element">
           <form.Subscribe selector={(state) => [state.canSubmit, state.isSubmitting]}>
             {([canSubmit, isSubmitting]) => (
@@ -129,14 +119,7 @@ export default function SignIn() {
                     className="fr-btn fr-btn--lg fr-mt-2w"
                     disabled={!canSubmit || isSubmitting || signInMutation.isPending}
                   >
-                    {signInMutation.isPending ? (
-                      <>
-                        <span className="fr-icon-refresh-line fr-icon--sm" aria-hidden="true" />
-                        Connexion en cours...
-                      </>
-                    ) : (
-                      'Se connecter'
-                    )}
+                    Se connecter
                   </button>
                 </li>
               </ul>

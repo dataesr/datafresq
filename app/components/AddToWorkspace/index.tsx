@@ -3,8 +3,9 @@ import { useRef, useState } from 'react';
 import { Link } from 'react-router';
 import { useAddPrograms, useWorkspaces } from '@/api/workspaces';
 import { Modal, useModal } from '@/components/Modal';
+import { toast } from '@/components/ui/Toast';
+import { getErrorMessage } from '@/utils/getErrorMessage';
 import './styles.css';
-import { useToast } from '@/hooks/useToast';
 
 interface AddToWorkspaceProps {
   formationIds: string[];
@@ -17,7 +18,6 @@ export default function AddToWorkspace({
   disabled = false,
   onSuccess,
 }: AddToWorkspaceProps) {
-  const { toast } = useToast();
   const { modalProps, modalId, open, close } = useModal();
   const { data: workspaces } = useWorkspaces();
   const addPrograms = useAddPrograms();
@@ -48,32 +48,30 @@ export default function AddToWorkspace({
   };
 
   const handleAddToWorkspace = (workspaceId: string) => {
-    addPrograms.mutate(
-      {
+    const message =
+      formationIds.length === 1
+        ? 'Formation ajoutée avec succès'
+        : `${formationIds.length} formations ajoutées avec succès`;
+
+    toast.promise(
+      addPrograms.mutateAsync({
         workspaceId,
         programIds: formationIds,
-      },
+      }),
       {
-        onSuccess: () => {
-          close();
-          const message =
-            formationIds.length === 1
-              ? 'Formation ajoutée avec succès'
-              : `${formationIds.length} formations ajoutées avec succès`;
-          toast({
-            type: 'success',
-            description: message,
-          });
-          onSuccess?.();
+        loading: { title: 'Ajout en cours...' },
+        success: {
+          title: message,
         },
-        onError: (error) => {
-          toast({
-            type: 'error',
-            description: error.message || "Erreur lors de l'ajout des formations",
-          });
-        },
+        error: (err) => ({
+          title: "Erreur lors de l'ajout",
+          description: getErrorMessage(err),
+        }),
       },
     );
+
+    close();
+    onSuccess?.();
   };
 
   return (

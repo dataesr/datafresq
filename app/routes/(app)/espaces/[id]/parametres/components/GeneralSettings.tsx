@@ -2,7 +2,8 @@ import { useState } from 'react';
 import { useUpdateWorkspace } from '@/api/workspaces';
 import ColorPicker from '@/components/ColorPicker';
 import { Input } from '@/components/Input';
-import { useToast } from '@/hooks/useToast';
+import { toast } from '@/components/ui/Toast';
+import { getErrorMessage } from '@/utils/getErrorMessage';
 import type { ReadWorkspace } from '~/schemas/workspaces';
 
 interface GeneralSettingsProps {
@@ -10,7 +11,6 @@ interface GeneralSettingsProps {
 }
 
 export function GeneralSettings({ workspace }: GeneralSettingsProps) {
-  const { toast } = useToast();
   const updateWorkspace = useUpdateWorkspace();
   const [name, setName] = useState(workspace.name);
   const [description, setDescription] = useState(workspace.description || '');
@@ -18,23 +18,14 @@ export function GeneralSettings({ workspace }: GeneralSettingsProps) {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    updateWorkspace.mutate(
-      { id: workspace.id, name, description, color },
-      {
-        onSuccess: () => {
-          toast({
-            type: 'success',
-            description: 'Informations mises à jour',
-          });
-        },
-        onError: (error) => {
-          toast({
-            type: 'error',
-            description: error.message,
-          });
-        },
-      },
-    );
+    toast.promise(updateWorkspace.mutateAsync({ id: workspace.id, name, description, color }), {
+      loading: { title: 'Mise à jour...' },
+      success: { title: 'Informations mises à jour' },
+      error: (err) => ({
+        title: 'Erreur',
+        description: getErrorMessage(err),
+      }),
+    });
   };
 
   return (

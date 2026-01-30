@@ -1,6 +1,7 @@
 import cn from 'classnames';
-import type { ReactNode } from 'react';
-import { type PopoverAlign, usePopover } from '../hooks/usePopover';
+import type { CSSProperties, ReactNode } from 'react';
+import { type PopoverAlign, type PopoverPlacement, usePopover } from '../hooks/usePopover';
+import { Portal } from '../Portal';
 import { DropdownContext, type DropdownSize } from './context';
 
 export interface DropdownProps {
@@ -15,8 +16,10 @@ export interface DropdownProps {
   'aria-label'?: string;
   disabled?: boolean;
   align?: PopoverAlign;
+  placement?: PopoverPlacement | 'auto';
   closeOnAction?: boolean;
   fullWidth?: boolean;
+  portal?: boolean;
 }
 
 export function Dropdown({
@@ -31,12 +34,17 @@ export function Dropdown({
   'aria-label': ariaLabel,
   disabled = false,
   align = 'auto',
+  placement = 'auto',
   closeOnAction = true,
   fullWidth = false,
+  portal = true,
 }: DropdownProps) {
   const {
     isOpen,
     computedAlign,
+    computedPlacement,
+    maxHeight,
+    position,
     close,
     containerRef,
     triggerRef,
@@ -46,7 +54,7 @@ export function Dropdown({
     handleContainerKeyDown,
     triggerId,
     menuId,
-  } = usePopover({ align });
+  } = usePopover({ align, placement, portal });
 
   const isIconOnly = !label && !!icon;
   const accessibleLabel = ariaLabel ?? (isIconOnly ? title : undefined);
@@ -95,13 +103,54 @@ export function Dropdown({
     'fx-dropdown__popover',
     isOpen && 'fx-dropdown__popover--expanded',
     computedAlign === 'end' && 'fx-dropdown__popover--align-end',
+    computedPlacement === 'top' && 'fx-dropdown__popover--placement-top',
+    portal && 'fx-dropdown__popover--portal',
   );
+
+  const popoverStyle: CSSProperties = {
+    ...(maxHeight != null && {
+      '--popover-max-height': `${maxHeight}px`,
+    }),
+    ...(portal &&
+      position && {
+        position: 'absolute',
+        top: computedPlacement === 'bottom' ? position.top : 'auto',
+        bottom:
+          computedPlacement === 'top'
+            ? `${document.documentElement.scrollHeight - position.top}px`
+            : 'auto',
+        left: computedAlign === 'start' ? position.left : 'auto',
+        right:
+          computedAlign === 'end'
+            ? `${document.documentElement.scrollWidth - position.left}px`
+            : 'auto',
+        minWidth: position.minWidth,
+      }),
+  } as CSSProperties;
 
   const contextValue = {
     close,
     size,
     closeOnAction,
   };
+
+  const popoverContent = (
+    <div
+      ref={menuRef}
+      id={menuId}
+      role="menu"
+      aria-labelledby={triggerId}
+      aria-hidden={!isOpen}
+      className={popoverClasses}
+      style={popoverStyle}
+    >
+      {/* biome-ignore lint/a11y/useKeyWithClickEvents: event delegation for action behavior */}
+      {/* biome-ignore lint/a11y/noStaticElementInteractions: event delegation pattern */}
+      <div className="fx-dropdown__popover-inner" onClick={handleMenuClick}>
+        {children}
+      </div>
+    </div>
+  );
 
   return (
     <DropdownContext.Provider value={contextValue}>
@@ -123,20 +172,7 @@ export function Dropdown({
         >
           {label}
         </button>
-        <div
-          ref={menuRef}
-          id={menuId}
-          role="menu"
-          aria-labelledby={triggerId}
-          aria-hidden={!isOpen}
-          className={popoverClasses}
-        >
-          {/* biome-ignore lint/a11y/useKeyWithClickEvents: event delegation for action behavior */}
-          {/* biome-ignore lint/a11y/noStaticElementInteractions: event delegation pattern */}
-          <div className="fx-dropdown__popover-inner" onClick={handleMenuClick}>
-            {children}
-          </div>
-        </div>
+        {portal ? <Portal>{popoverContent}</Portal> : popoverContent}
       </div>
     </DropdownContext.Provider>
   );

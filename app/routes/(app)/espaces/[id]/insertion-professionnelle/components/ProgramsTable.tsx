@@ -8,12 +8,13 @@ import {
   useReactTable,
   type VisibilityState,
 } from '@tanstack/react-table';
-import { useMemo, useState } from 'react';
+import { useCallback, useMemo, useState } from 'react';
 import { Link, useParams } from 'react-router';
-import { useWorkspacePrograms } from '@/api/workspaces';
+import { useWorkspace, useWorkspacePrograms } from '@/api/workspaces';
 import { PRIVACY_THRESHOLD } from '@/components/insersup';
-import { PageSizeSelector, Pagination } from '@/components/table';
+import { ExportButton, PageSizeSelector, Pagination } from '@/components/table';
 import { Select } from '@/components/ui/Select';
+import { type ExportColumn, exportToXlsx, toSnakeCase } from '@/utils/export-xlsx';
 import type { InsersupProgramData, InsersupYearStats } from '~/schemas/aggregations';
 
 interface ProgramsTableProps {
@@ -39,6 +40,11 @@ interface ProgramTableRow {
   emploiSalFr: Record<MonthKey, MonthData>;
   emploiNonSal: Record<MonthKey, MonthData>;
   emploiStable: Record<MonthKey, MonthData>;
+}
+
+interface ExportRow extends ProgramTableRow {
+  workspaceName: string;
+  exportDate: string;
 }
 
 interface SortableHeaderProps {
@@ -431,7 +437,68 @@ function useProgramTableData(yearData: InsersupYearStats) {
   };
 }
 
+function buildExportColumns(): ExportColumn<ExportRow>[] {
+  const baseColumns: ExportColumn<ExportRow>[] = [
+    { key: 'workspaceName', header: 'Espace de travail' },
+    { key: 'exportDate', header: "Date d'export" },
+    { key: 'inf', header: 'Identifiant' },
+    { key: 'label', header: 'Formation' },
+    { key: 'etablissement', header: 'Établissement' },
+    { key: 'typeDiplome', header: 'Type de diplôme' },
+    { key: 'hasInsersupData', header: 'Données InserSup disponibles' },
+    { key: 'nbSortants', header: 'Sortants' },
+    { key: 'nbPoursuivants', header: 'Poursuivants' },
+  ];
+
+  const monthsToExport = MONTHS;
+
+  for (const month of monthsToExport) {
+    const monthLabel = MONTH_LABELS[month];
+
+    baseColumns.push(
+      {
+        key: `emploiSalFr_${month}_count`,
+        header: `Emploi salarié ${monthLabel} (nb)`,
+        accessor: (row) => row.emploiSalFr[month].count,
+      },
+      {
+        key: `emploiSalFr_${month}_rate`,
+        header: `Emploi salarié ${monthLabel} (%)`,
+        accessor: (row) =>
+          row.emploiSalFr[month].rate !== null ? `${row.emploiSalFr[month].rate}%` : '',
+      },
+      {
+        key: `emploiNonSal_${month}_count`,
+        header: `Emploi non-salarié ${monthLabel} (nb)`,
+        accessor: (row) => row.emploiNonSal[month].count,
+      },
+      {
+        key: `emploiNonSal_${month}_rate`,
+        header: `Emploi non-salarié ${monthLabel} (%)`,
+        accessor: (row) =>
+          row.emploiNonSal[month].rate !== null ? `${row.emploiNonSal[month].rate}%` : '',
+      },
+      {
+        key: `emploiStable_${month}_count`,
+        header: `Emploi stable ${monthLabel} (nb)`,
+        accessor: (row) => row.emploiStable[month].count,
+      },
+      {
+        key: `emploiStable_${month}_rate`,
+        header: `Emploi stable ${monthLabel} (%)`,
+        accessor: (row) =>
+          row.emploiStable[month].rate !== null ? `${row.emploiStable[month].rate}%` : '',
+      }
+    );
+  }
+
+  return baseColumns;
+}
+
 export function ProgramsTable({ yearData }: ProgramsTableProps) {
+  const { id: workspaceId = '' } = useParams<{ id: string }>();
+  const { data: workspace } = useWorkspace(workspaceId);
+
   const {
     programTableData,
     table,
@@ -442,6 +509,26 @@ export function ProgramsTable({ yearData }: ProgramsTableProps) {
     visibleMonths,
     handleToggleMonth,
   } = useProgramTableData(yearData);
+
+  const handleExport = useCallback(() => {
+    const exportDate = new Date().toISOString().slice(0, 10);
+    const sortedData = table.getSortedRowModel().rows.map((row) => row.original);
+
+    const exportData: ExportRow[] = sortedData.map((row) => ({
+      ...row,
+      workspaceName: workspace.name,
+      exportDate,
+    }));
+
+    const filename = `${toSnakeCase(workspace.name)}_insertion_${yearData.promo}.xlsx`;
+
+    exportToXlsx({
+      data: exportData,
+      columns: buildExportColumns(),
+      filename,
+      sheetName: `Insertion ${yearData.promo}`,
+    });
+  }, [table, yearData.promo, workspace.name]);
 
   if (programTableData.length === 0) {
     return null;
@@ -465,6 +552,10 @@ export function ProgramsTable({ yearData }: ProgramsTableProps) {
             }}
           />
           <MonthVisibilityToggle visibleMonths={visibleMonths} onToggleMonth={handleToggleMonth} />
+          <ExportButton
+            onExport={handleExport}
+            disabled={programTableData.length === 0}
+          />
         </div>
       </div>
       <div

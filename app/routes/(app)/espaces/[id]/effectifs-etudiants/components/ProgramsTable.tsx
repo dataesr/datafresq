@@ -7,14 +7,20 @@ import {
   type SortingState,
   useReactTable,
 } from '@tanstack/react-table';
-import { useMemo, useState } from 'react';
+import { useCallback, useMemo, useState } from 'react';
 import { Link, useParams } from 'react-router';
-import { useWorkspacePrograms } from '@/api/workspaces';
-import { PageSizeSelector, Pagination } from '@/components/table';
+import { useWorkspace, useWorkspacePrograms } from '@/api/workspaces';
+import { ExportButton, PageSizeSelector, Pagination } from '@/components/table';
+import { type ExportColumn, exportToXlsx, toSnakeCase } from '@/utils/export-xlsx';
 import type { SiseProgramData, SiseYearStats } from '~/schemas/aggregations';
 
 interface ProgramsTableProps {
   yearData: SiseYearStats;
+}
+
+interface ExportRow extends ProgramTableRow {
+  workspaceName: string;
+  exportDate: string;
 }
 
 interface ProgramTableRow {
@@ -259,7 +265,29 @@ function useProgramTableData(yearData: SiseYearStats) {
   };
 }
 
+const EXPORT_COLUMNS: ExportColumn<ExportRow>[] = [
+  { key: 'workspaceName', header: 'Espace de travail' },
+  { key: 'exportDate', header: "Date d'export" },
+  { key: 'inf', header: 'Identifiant' },
+  { key: 'label', header: 'Formation' },
+  { key: 'etablissement', header: 'Établissement' },
+  { key: 'typeDiplome', header: 'Type de diplôme' },
+  { key: 'cycle', header: 'Cycle' },
+  { key: 'hasSiseData', header: 'Données SISE disponibles' },
+  { key: 'totalStudents', header: 'Effectif total' },
+  { key: 'totalFemale', header: 'Effectif femmes' },
+  { key: 'totalMale', header: 'Effectif hommes' },
+  {
+    key: 'femalePercent',
+    header: '% Femmes',
+    accessor: (row) => (row.femalePercent !== null ? `${row.femalePercent}%` : ''),
+  },
+];
+
 export function ProgramsTable({ yearData }: ProgramsTableProps) {
+  const { id: workspaceId = '' } = useParams<{ id: string }>();
+  const { data: workspace } = useWorkspace(workspaceId);
+
   const {
     programTableData,
     table,
@@ -269,6 +297,26 @@ export function ProgramsTable({ yearData }: ProgramsTableProps) {
     setPageIndex,
     programsWithSiseCount,
   } = useProgramTableData(yearData);
+
+  const handleExport = useCallback(() => {
+    const exportDate = new Date().toISOString().slice(0, 10);
+    const sortedData = table.getSortedRowModel().rows.map((row) => row.original);
+
+    const exportData: ExportRow[] = sortedData.map((row) => ({
+      ...row,
+      workspaceName: workspace.name,
+      exportDate,
+    }));
+
+    const filename = `${toSnakeCase(workspace.name)}_effectifs_${yearData.year}.xlsx`;
+
+    exportToXlsx({
+      data: exportData,
+      columns: EXPORT_COLUMNS,
+      filename,
+      sheetName: `Effectifs ${yearData.year}`,
+    });
+  }, [table, yearData.year, workspace.name]);
 
   if (programTableData.length === 0) {
     return null;
@@ -291,6 +339,10 @@ export function ProgramsTable({ yearData }: ProgramsTableProps) {
               setPageSize(Number(size));
               setPageIndex(0);
             }}
+          />
+          <ExportButton
+            onExport={handleExport}
+            disabled={programTableData.length === 0}
           />
         </div>
       </div>

@@ -1,45 +1,26 @@
 import { useRevokeAllSessions, useRevokeSession, useSessions } from '@/api/users';
-import { useToast } from '@/hooks/useToast';
+import { toast } from '@/components/ui/Toast';
 
 export default function ManageSessions() {
-  const { toast } = useToast();
   const { data: sessions, isLoading, error } = useSessions();
-  const { mutate: revokeSession, isPending: isRevokingSession } = useRevokeSession();
-  const { mutate: revokeAllSessions, isPending: isRevokingAll } = useRevokeAllSessions();
+  const { mutateAsync: revokeSession, isPending: isRevokingSession } = useRevokeSession();
+  const { mutateAsync: revokeAllSessions, isPending: isRevokingAll } = useRevokeAllSessions();
 
   const sessionCount = sessions.length;
 
   const handleRevokeSession = (sessionId: string) => {
-    revokeSession(sessionId, {
-      onSuccess: () => {
-        toast({
-          description: 'La session a été supprimée avec succès.',
-          type: 'success',
-        });
-      },
-      onError: () => {
-        toast({
-          description: 'Erreur lors de la suppression de la session',
-          type: 'error',
-        });
-      },
+    toast.promise(revokeSession(sessionId), {
+      loading: { title: 'Suppression de la session...' },
+      success: { title: 'La session a été supprimée avec succès' },
+      error: { title: 'Erreur lors de la suppression de la session' },
     });
   };
 
   const handleRevokeAllSessions = () => {
-    revokeAllSessions(undefined, {
-      onSuccess: () => {
-        toast({
-          description: 'Toutes les sessions ont été supprimées avec succès.',
-          type: 'success',
-        });
-      },
-      onError: () => {
-        toast({
-          description: 'Erreur lors de la suppression des sessions',
-          type: 'error',
-        });
-      },
+    toast.promise(revokeAllSessions(), {
+      loading: { title: 'Révocation des sessions...' },
+      success: { title: 'Toutes les sessions ont été supprimées avec succès' },
+      error: { title: 'Erreur lors de la suppression des sessions' },
     });
   };
 

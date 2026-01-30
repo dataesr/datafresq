@@ -3,7 +3,8 @@ import { z } from 'zod';
 
 import { useChangePassword } from '@/api/users';
 import { Password } from '@/components/Password';
-import { useToast } from '@/hooks/useToast';
+import { toast } from '@/components/ui/Toast';
+import { getErrorMessage } from '@/utils/getErrorMessage';
 import { passwordSchema as passwordFieldSchema } from '@/utils/password';
 
 const passwordSchema = z
@@ -18,8 +19,7 @@ const passwordSchema = z
   });
 
 export default function ChangePassword() {
-  const { toast } = useToast();
-  const { mutate: changePassword, isPending } = useChangePassword();
+  const { mutateAsync: changePassword, isPending } = useChangePassword();
 
   const passwordForm = useForm({
     defaultValues: {
@@ -28,21 +28,21 @@ export default function ChangePassword() {
       confirmPassword: '',
     },
     onSubmit: async ({ value }) => {
-      changePassword(
-        {
+      toast.promise(
+        changePassword({
           currentPassword: value.currentPassword,
           newPassword: value.newPassword,
-        },
+        }),
         {
-          onSuccess: () => {
-            toast({ type: 'success', description: 'Mot de passe modifié avec succès' });
-            passwordForm.reset();
-          },
-          onError: (error: Error) => {
-            toast({ type: 'error', description: error.message });
-          },
+          loading: { title: 'Modification en cours...' },
+          success: { title: 'Mot de passe modifié avec succès' },
+          error: (err) => ({
+            title: 'Erreur',
+            description: getErrorMessage(err),
+          }),
         },
       );
+      passwordForm.reset();
     },
     validators: {
       onSubmit: passwordSchema,

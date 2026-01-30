@@ -1,8 +1,9 @@
-import { useMemo } from 'react';
+import { useMemo, useRef } from 'react';
 import { AnalyticsGraph } from '@/components/AnalyticsGraph';
 import { ChoroplethMap } from '@/components/charts/MapChart';
 import { regionToHcKey } from '@/components/effectifs';
 import { FRESQ_SOURCE } from '../constants';
+import type { HighchartsReactRefObject } from '@highcharts/react';
 
 interface RegionData {
   region: string;
@@ -34,6 +35,7 @@ function useMapData(data: RegionData[]) {
  * Choropleth map showing program distribution by region
  */
 export function RegionChoroplethMap({ data }: RegionChoroplethMapProps) {
+  const chartRef = useRef<HighchartsReactRefObject | null>(null);
   const { hasData, choroplethData } = useMapData(data);
 
   if (!hasData) {
@@ -45,6 +47,7 @@ export function RegionChoroplethMap({ data }: RegionChoroplethMapProps) {
       title="Carte des régions (formations)"
       description="Répartition géographique des formations par région."
       source={FRESQ_SOURCE}
+      chartRef={chartRef}
     >
       <ChoroplethMap
         data={choroplethData}

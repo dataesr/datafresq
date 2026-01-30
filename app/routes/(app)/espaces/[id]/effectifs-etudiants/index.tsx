@@ -1,4 +1,4 @@
-import { Activity, useMemo, useState } from 'react';
+import { Activity, memo, useMemo, useState } from 'react';
 import { useParams } from 'react-router';
 import { useWorkspaceAggregations, useWorkspacePermissions } from '@/api/workspaces';
 import { EffectifsEvolutionChart, EmptyState } from '@/components/effectifs';
@@ -16,11 +16,73 @@ import { ProgramsTable } from './components/ProgramsTable';
 import { RegionChoroplethMap } from './components/RegionChoroplethMap';
 import { StudentsStatsCards } from './components/StudentsStatsCards';
 
-function useCanShowEvolution(byYear: SiseYearStats[]) {
-  return useMemo(() => {
-    return byYear.length >= 2;
-  }, [byYear]);
-}
+type YearContentProps = {
+  yearData: SiseYearStats;
+  totalPrograms: number;
+};
+
+const YearContent = memo(function YearContent({ yearData, totalPrograms }: YearContentProps) {
+  return (
+    <>
+      <StudentsStatsCards
+        programs={totalPrograms}
+        totalPrograms={yearData.totalPrograms}
+        totalStudents={yearData.totalStudents}
+        totalFemale={yearData.totalFemale}
+        totalMale={yearData.totalMale}
+      />
+
+      <AutoGrid min={500}>
+        {yearData.byCycle && yearData.byCycle.length > 0 && (
+          <CycleDistributionChart data={yearData.byCycle} />
+        )}
+
+        {yearData.byDiploma && yearData.byDiploma.length > 0 && (
+          <DiplomaDistributionChart data={yearData.byDiploma} />
+        )}
+
+        {yearData.byAcademy && yearData.byAcademy.length > 0 && (
+          <AcademyDistributionChart data={yearData.byAcademy} />
+        )}
+
+        {yearData.byRegion && yearData.byRegion.length > 0 && (
+          <RegionChoroplethMap data={yearData.byRegion} />
+        )}
+
+        {yearData.byLargeDiscipline && yearData.byLargeDiscipline.length > 2 && (
+          <DisciplineSpiderChart data={yearData.byLargeDiscipline} />
+        )}
+
+        {yearData.byDiscipline && yearData.byDiscipline.length > 0 && (
+          <DisciplineDistributionChart data={yearData.byDiscipline} />
+        )}
+      </AutoGrid>
+
+      <ProgramsTable yearData={yearData} />
+    </>
+  );
+});
+
+
+
+const EvolutionContent = memo(function EvolutionContent({ byYear }: { byYear: SiseYearStats[]}) {
+  const sortedByYear = [...byYear]
+    .sort((a, b) => a.year.localeCompare(b.year));
+  const years = sortedByYear.map((y) => y.year);
+  const totalTrend = sortedByYear.map((y) => y.totalStudents);
+  const womenTrend = sortedByYear.map((y) => y.totalFemale);
+  const menTrend = sortedByYear.map((y) => y.totalMale);
+  return (
+    <AutoGrid min={600}>
+      <EffectifsEvolutionChart
+        years={years}
+        totalTrend={totalTrend}
+        womenTrend={womenTrend}
+        menTrend={menTrend}
+      />
+    </AutoGrid>
+  );
+});
 
 export default function EffectifsEtudiants() {
   const { id: workspaceId = '' } = useParams<{ id: string }>();
@@ -44,12 +106,7 @@ export default function EffectifsEtudiants() {
     return map;
   }, [byYear]);
 
-  const sortedByYear = useMemo(
-    () => [...byYear].sort((a, b) => a.year.localeCompare(b.year)),
-    [byYear],
-  );
-
-  const canShowEvolution = useCanShowEvolution(byYear);
+  const canShowEvolution = byYear.length >= 2;
 
   const [selectedYear, setSelectedYear] = useState<string | null>(() => availableYears[0] || null);
 
@@ -65,13 +122,6 @@ export default function EffectifsEtudiants() {
   if (!studentsAggregations || byYear.length === 0) {
     return <EmptyState message="Aucune donnée d'effectifs étudiants disponible pour cet espace." />;
   }
-
-  const evolutionData = {
-    years: sortedByYear.map((y) => y.year),
-    totalTrend: sortedByYear.map((y) => y.totalStudents),
-    womenTrend: sortedByYear.map((y) => y.totalFemale),
-    menTrend: sortedByYear.map((y) => y.totalMale),
-  };
 
   return (
     <div>
@@ -89,58 +139,15 @@ export default function EffectifsEtudiants() {
       {availableYears.map((year: string) => {
         const yearData = yearDataMap.get(year);
         if (!yearData) return null;
-
         return (
           <Activity key={year} mode={selectedYear === year ? 'visible' : 'hidden'}>
-            <StudentsStatsCards
-              programs={aggregations.programCount}
-              totalPrograms={yearData.totalPrograms}
-              totalStudents={yearData.totalStudents}
-              totalFemale={yearData.totalFemale}
-              totalMale={yearData.totalMale}
-            />
-
-            <AutoGrid min={500}>
-              {yearData.byCycle && yearData.byCycle.length > 0 && (
-                <CycleDistributionChart data={yearData.byCycle} />
-              )}
-
-              {yearData.byDiploma && yearData.byDiploma.length > 0 && (
-                <DiplomaDistributionChart data={yearData.byDiploma} />
-              )}
-
-              {yearData.byAcademy && yearData.byAcademy.length > 0 && (
-                <AcademyDistributionChart data={yearData.byAcademy} />
-              )}
-
-              {yearData.byRegion && yearData.byRegion.length > 0 && (
-                <RegionChoroplethMap data={yearData.byRegion} />
-              )}
-
-              {yearData.byLargeDiscipline && yearData.byLargeDiscipline.length > 2 && (
-                <DisciplineSpiderChart data={yearData.byLargeDiscipline} />
-              )}
-
-              {yearData.byDiscipline && yearData.byDiscipline.length > 0 && (
-                <DisciplineDistributionChart data={yearData.byDiscipline} />
-              )}
-            </AutoGrid>
-
-            <ProgramsTable yearData={yearData} />
+            <YearContent yearData={yearData} totalPrograms={aggregations.programCount} />
           </Activity>
         );
       })}
 
-      {/* Evolution View - shown when no specific year is selected */}
-      <Activity mode={selectedYear ? 'hidden' : 'visible'}>
-        <AutoGrid min={600}>
-          <EffectifsEvolutionChart
-            years={evolutionData.years}
-            totalTrend={evolutionData.totalTrend}
-            womenTrend={evolutionData.womenTrend}
-            menTrend={evolutionData.menTrend}
-          />
-        </AutoGrid>
+      <Activity mode={(canShowEvolution && selectedYear === null) ? 'visible' : 'hidden'}>
+        <EvolutionContent byYear={byYear} />
       </Activity>
     </div>
   );

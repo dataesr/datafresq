@@ -3,7 +3,8 @@ import { useNavigate } from 'react-router';
 import { useDeleteWorkspace } from '@/api/workspaces';
 import { Input } from '@/components/Input';
 import { Modal, useModal } from '@/components/Modal';
-import { useToast } from '@/hooks/useToast';
+import { toast } from '@/components/ui/Toast';
+import { getErrorMessage } from '@/utils/getErrorMessage';
 import type { ReadWorkspace } from '~/schemas/workspaces';
 
 interface DangerZoneProps {
@@ -11,28 +12,23 @@ interface DangerZoneProps {
 }
 
 export function DangerZone({ workspace }: DangerZoneProps) {
-  const { toast } = useToast();
   const navigate = useNavigate();
   const deleteWorkspace = useDeleteWorkspace();
   const { modalProps, open, close } = useModal();
   const [confirmName, setConfirmName] = useState('');
 
   const handleDelete = () => {
-    deleteWorkspace.mutate(workspace.id, {
-      onSuccess: () => {
-        toast({
-          type: 'success',
-          description: 'Espace de travail supprimé',
-        });
-        navigate('/espaces');
+    toast.promise(deleteWorkspace.mutateAsync(workspace.id), {
+      loading: { title: 'Suppression en cours...' },
+      success: {
+        title: 'Espace de travail supprimé',
       },
-      onError: (error) => {
-        toast({
-          type: 'error',
-          description: error.message,
-        });
-      },
+      error: (err) => ({
+        title: 'Erreur',
+        description: getErrorMessage(err),
+      }),
     });
+    navigate('/espaces');
   };
 
   const canDelete = confirmName === workspace.name;

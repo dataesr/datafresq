@@ -223,17 +223,19 @@ function MultiselectValuePicker({
         {sortedOptions.length === 0 ? (
           <Select.Empty>Aucune option</Select.Empty>
         ) : (
-          sortedOptions.map((option) => (
-            <Select.Checkbox
-              key={option.key}
-              value={option.key}
-              checked={selectedValues.includes(option.key)}
-              onChange={(checked) => handleToggle(option.key, checked)}
-              count={option.count}
-            >
-              {option.key}
-            </Select.Checkbox>
-          ))
+          <Select.Content>
+            {sortedOptions.map((option) => (
+              <Select.Checkbox
+                key={option.key}
+                value={option.key}
+                checked={selectedValues.includes(option.key)}
+                onChange={(checked) => handleToggle(option.key, checked)}
+                count={option.count}
+              >
+                {option.key}
+              </Select.Checkbox>
+            ))}
+          </Select.Content>
         )}
       </Select>
       <SelectionBadges items={badgeItems} onRemove={handleRemoveBadge} />
@@ -333,31 +335,32 @@ function AsyncSearchValuePicker({
         {!isLoading && showMinLengthMessage && (
           <Select.Empty>Saisissez au moins 2 caractères</Select.Empty>
         )}
-
-        {!isLoading &&
-          displayOptions.length > 0 &&
-          displayOptions.map((inst) => {
-            const subLabel = [inst.nature, inst.city].filter(Boolean).join(' - ');
-            return (
-              <Select.Checkbox
-                key={inst.id}
-                value={inst.id}
-                checked={selectedValues.includes(inst.id)}
-                onChange={(checked) => handleToggle(inst, checked)}
-              >
-                <div className="fx-flex fx-flex-col" style={{ flex: 1, minWidth: 0 }}>
-                  <span className="fx-clamp-1" title={inst.label}>
-                    {inst.label}
-                  </span>
-                  {subLabel && (
-                    <span className="fr-text--xs fr-text-mention--grey fr-mb-0 fx-clamp-1">
-                      {subLabel}
+        <Select.Content>
+          {!isLoading &&
+            displayOptions.length > 0 &&
+            displayOptions.map((inst) => {
+              const subLabel = [inst.nature, inst.city].filter(Boolean).join(' - ');
+              return (
+                <Select.Checkbox
+                  key={inst.id}
+                  value={inst.id}
+                  checked={selectedValues.includes(inst.id)}
+                  onChange={(checked) => handleToggle(inst, checked)}
+                >
+                  <div className="fx-flex fx-flex-col" style={{ flex: 1, minWidth: 0 }}>
+                    <span className="fx-clamp-1" title={inst.label}>
+                      {inst.label}
                     </span>
-                  )}
-                </div>
-              </Select.Checkbox>
-            );
-          })}
+                    {subLabel && (
+                      <span className="fr-text--xs fr-text-mention--grey fr-mb-0 fx-clamp-1">
+                        {subLabel}
+                      </span>
+                    )}
+                  </div>
+                </Select.Checkbox>
+              );
+            })}
+        </Select.Content>
       </Select>
       <SelectionBadges items={badgeItems} onRemove={handleRemoveBadge} />
     </div>
@@ -380,20 +383,22 @@ function BooleanValuePicker({ value, onChange, counts }: BooleanValuePickerProps
 
   return (
     <Select label={displayLabel} outline>
-      {options.map((option) => (
-        <Select.Radio
-          key={option.key}
-          value={option.key}
-          name="boolean-filter"
-          checked={value === option.key}
-          onChange={() => onChange(value === option.key ? null : option.key)}
-        >
-          <span style={{ flex: 1 }}>{option.label}</span>
-          <span className="fr-badge fr-badge--sm fr-badge--no-icon">
-            {option.count.toLocaleString('fr-FR')}
-          </span>
-        </Select.Radio>
-      ))}
+      <Select.Content>
+        {options.map((option) => (
+          <Select.Radio
+            key={option.key}
+            value={option.key}
+            name="boolean-filter"
+            checked={value === option.key}
+            onChange={() => onChange(value === option.key ? null : option.key)}
+          >
+            <span style={{ flex: 1 }}>{option.label}</span>
+            <span className="fr-badge fr-badge--sm fr-badge--no-icon">
+              {option.count.toLocaleString('fr-FR')}
+            </span>
+          </Select.Radio>
+        ))}
+      </Select.Content>
     </Select>
   );
 }
@@ -555,58 +560,60 @@ function AddFilterDropdown({ availableFilters, onAddFilter }: AddFilterDropdownP
 
   return (
     <Select label="Ajouter un filtre" outline={false} icon="add-line">
-      {typeDiplomeFilters.length > 0 && (
-        <Select.Group label="Types de diplôme">
-          {typeDiplomeFilters.map((config) => (
-            <Select.Option
-              key={config.key}
-              value={config.key}
-              onClick={() => onAddFilter(config.key)}
-            >
-              {config.label}
-            </Select.Option>
-          ))}
-        </Select.Group>
-      )}
-      {etablissementFilters.length > 0 && (
-        <Select.Group label="Établissements">
-          {etablissementFilters.map((config) => (
-            <Select.Option
-              key={config.key}
-              value={config.key}
-              onClick={() => onAddFilter(config.key)}
-            >
-              {config.label}
-            </Select.Option>
-          ))}
-        </Select.Group>
-      )}
-      {domainFilters.length > 0 && (
-        <Select.Group label="Domaines">
-          {domainFilters.map((config) => (
-            <Select.Option
-              key={config.key}
-              value={config.key}
-              onClick={() => onAddFilter(config.key)}
-            >
-              {config.label}
-            </Select.Option>
-          ))}
-        </Select.Group>
-      )}
-      {donneesDispoFilters.length > 0 && (
-        <Select.Group label="Données disponibles">
-          {donneesDispoFilters.map((config) => (
-            <Select.Option
-              key={config.key}
-              value={config.key}
-              onClick={() => onAddFilter(config.key)}
-            >
-              {config.label}
-            </Select.Option>
-          ))}
-        </Select.Group>
-      )}
+      <Select.Content>
+        {typeDiplomeFilters.length > 0 && (
+          <Select.Group label="Types de diplôme">
+            {typeDiplomeFilters.map((config) => (
+              <Select.Option
+                key={config.key}
+                value={config.key}
+                onClick={() => onAddFilter(config.key)}
+              >
+                {config.label}
+              </Select.Option>
+            ))}
+          </Select.Group>
+        )}
+        {etablissementFilters.length > 0 && (
+          <Select.Group label="Établissements">
+            {etablissementFilters.map((config) => (
+              <Select.Option
+                key={config.key}
+                value={config.key}
+                onClick={() => onAddFilter(config.key)}
+              >
+                {config.label}
+              </Select.Option>
+            ))}
+          </Select.Group>
+        )}
+        {domainFilters.length > 0 && (
+          <Select.Group label="Domaines">
+            {domainFilters.map((config) => (
+              <Select.Option
+                key={config.key}
+                value={config.key}
+                onClick={() => onAddFilter(config.key)}
+              >
+                {config.label}
+              </Select.Option>
+            ))}
+          </Select.Group>
+        )}
+        {donneesDispoFilters.length > 0 && (
+          <Select.Group label="Données disponibles">
+            {donneesDispoFilters.map((config) => (
+              <Select.Option
+                key={config.key}
+                value={config.key}
+                onClick={() => onAddFilter(config.key)}
+              >
+                {config.label}
+              </Select.Option>
+            ))}
+          </Select.Group>
+        )}
+      </Select.Content>
     </Select>
   );
 }

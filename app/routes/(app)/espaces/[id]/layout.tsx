@@ -5,7 +5,8 @@ import { useLeaveWorkspace, useWorkspace, useWorkspacePermissions } from '@/api/
 import { Avatars } from '@/components/Avatar';
 import ErrorBoundary from '@/components/errors/ErrorBoundary';
 import FullPageLoader from '@/components/FullPageLoader';
-import { useToast } from '@/hooks/useToast';
+import { toast } from '@/components/ui/Toast';
+import { getErrorMessage } from '@/utils/getErrorMessage';
 
 interface TabErrorFallbackProps {
   tabName: string;
@@ -40,28 +41,23 @@ export default function EspaceLayout() {
     tab?: string;
   }>();
   const navigate = useNavigate();
-  const { toast } = useToast();
 
   const { data: workspace } = useWorkspace(workspaceId);
   const { isOwner, isMember, canEdit } = useWorkspacePermissions(workspaceId);
   const leaveWorkspace = useLeaveWorkspace();
 
   const handleLeave = () => {
-    leaveWorkspace.mutate(workspaceId, {
-      onSuccess: () => {
-        toast({
-          type: 'success',
-          description: "Vous avez quitté l'espace de travail",
-        });
-        navigate('/espaces');
+    toast.promise(leaveWorkspace.mutateAsync(workspaceId), {
+      loading: { title: "Quitter l'espace..." },
+      success: {
+        title: "Vous avez quitté l'espace de travail",
       },
-      onError: (err) => {
-        toast({
-          type: 'error',
-          description: err.message,
-        });
-      },
+      error: (err) => ({
+        title: 'Erreur',
+        description: getErrorMessage(err),
+      }),
     });
+    navigate('/espaces');
   };
 
   const allUsers = [

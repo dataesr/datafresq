@@ -31,10 +31,10 @@ import {
 } from '@/components/table';
 import { Dropdown } from '@/components/ui/Dropdown';
 import { Select } from '@/components/ui/Select';
-import { useToast } from '@/hooks/useToast';
+import { toast } from '@/components/ui/Toast';
+import { getErrorMessage } from '@/utils/getErrorMessage';
 import type { UserAdmin } from '~/schemas/users';
 
-// All columns available in this table
 const AVAILABLE_COLUMNS: Exclude<UserColumnId, 'actions'>[] = [
   USER_COLUMN_IDS.email,
   USER_COLUMN_IDS.name,
@@ -44,7 +44,6 @@ const AVAILABLE_COLUMNS: Exclude<UserColumnId, 'actions'>[] = [
   USER_COLUMN_IDS.lastLogin,
 ];
 
-// Columns visible by default (user can show others via toggle)
 const DEFAULT_VISIBLE_COLUMNS: UserColumnId[] = [
   USER_COLUMN_IDS.email,
   USER_COLUMN_IDS.name,
@@ -53,7 +52,6 @@ const DEFAULT_VISIBLE_COLUMNS: UserColumnId[] = [
   USER_COLUMN_IDS.actions,
 ];
 
-// Columns users can toggle visibility for
 const TOGGLEABLE_COLUMNS: UserColumnId[] = [
   USER_COLUMN_IDS.name,
   USER_COLUMN_IDS.role,
@@ -62,7 +60,6 @@ const TOGGLEABLE_COLUMNS: UserColumnId[] = [
   USER_COLUMN_IDS.lastLogin,
 ];
 
-// Role filter options
 const ROLE_FILTER_OPTIONS = ['all', 'admin', 'user'] as const;
 const ROLE_FILTER_LABELS: Record<string, string> = {
   all: 'Tous les rôles',
@@ -71,13 +68,10 @@ const ROLE_FILTER_LABELS: Record<string, string> = {
 };
 
 export default function AdminUsers() {
-  const { toast } = useToast();
   const queryClient = useQueryClient();
 
-  // Data fetching
   const { users, isLoading } = useAdminUsers();
 
-  // Mutations
   const changeRole = useChangeUserRole();
   const deleteUser = useDeleteUser();
   const revokeSessions = useRevokeUserSessions();
@@ -87,7 +81,6 @@ export default function AdminUsers() {
     },
   });
 
-  // Invite modal
   const {
     modalProps: inviteModalProps,
     open: openInviteModal,
@@ -95,117 +88,86 @@ export default function AdminUsers() {
   } = useModal();
   const [inviteEmail, setInviteEmail] = useState('');
 
-  // Table state
   const [globalFilter, setGlobalFilter] = useState('');
   const [roleFilter, setRoleFilter] = useState('all');
   const [pageSize, setPageSize] = useState(25);
   const [pageIndex, setPageIndex] = useState(0);
 
-  // Filter users by role
   const filteredUsers = useMemo(() => {
     if (roleFilter === 'all') return users;
     return users.filter((user) => user.role === roleFilter);
   }, [users, roleFilter]);
 
-  // Handle role change
   const handleRoleChange = useCallback(
     (userId: string, newRole: 'user' | 'admin') => {
-      changeRole.mutate(
-        { userId, role: newRole },
-        {
-          onSuccess: () => {
-            toast({
-              type: 'success',
-              description: 'Rôle modifié avec succès',
-            });
-          },
-          onError: (error) => {
-            toast({
-              type: 'error',
-              description: error.message || 'Erreur lors de la modification du rôle',
-            });
-          },
-        },
-      );
+      toast.promise(changeRole.mutateAsync({ userId, role: newRole }), {
+        loading: { title: 'Modification du rôle...' },
+        success: { title: 'Rôle modifié avec succès' },
+        error: (err) => ({
+          title: 'Erreur',
+          description: getErrorMessage(err),
+        }),
+      });
     },
-    [changeRole, toast],
+    [changeRole],
   );
 
-  // Handle user deletion
   const handleDeleteUser = useCallback(
     (userId: string) => {
       if (!confirm('Êtes-vous sûr de vouloir désactiver cet utilisateur ?')) return;
 
-      deleteUser.mutate(userId, {
-        onSuccess: () => {
-          toast({
-            type: 'success',
-            description: 'Utilisateur désactivé avec succès',
-          });
-        },
-        onError: (error) => {
-          toast({
-            type: 'error',
-            description: error.message || "Erreur lors de la désactivation de l'utilisateur",
-          });
-        },
+      toast.promise(deleteUser.mutateAsync(userId), {
+        loading: { title: 'Désactivation...' },
+        success: { title: 'Utilisateur désactivé avec succès' },
+        error: (err) => ({
+          title: 'Erreur',
+          description: getErrorMessage(err),
+        }),
       });
     },
-    [deleteUser, toast],
+    [deleteUser],
   );
 
-  // Handle session revocation
   const handleRevokeSessions = useCallback(
     (userId: string) => {
-      revokeSessions.mutate(userId, {
-        onSuccess: (data) => {
-          toast({
-            type: 'success',
-            description: data.message || 'Sessions révoquées avec succès',
-          });
-        },
-        onError: (error) => {
-          toast({
-            type: 'error',
-            description: error.message || 'Erreur lors de la révocation des sessions',
-          });
-        },
+      toast.promise(revokeSessions.mutateAsync(userId), {
+        loading: { title: 'Révocation des sessions...' },
+        success: (data) => ({
+          title: 'Sessions révoquées',
+          description: data.message,
+        }),
+        error: (err) => ({
+          title: 'Erreur',
+          description: getErrorMessage(err),
+        }),
       });
     },
-    [revokeSessions, toast],
+    [revokeSessions],
   );
 
-  // Handle invite
   const handleInvite = (e: React.FormEvent) => {
     e.preventDefault();
     if (!inviteEmail.trim()) return;
 
-    inviteUser.mutate(
-      { email: inviteEmail.trim().toLowerCase() },
-      {
-        onSuccess: () => {
-          toast({
-            type: 'success',
-            description: 'Invitation envoyée avec succès',
-          });
-          setInviteEmail('');
-          closeInviteModal();
-        },
-        onError: (error) => {
-          toast({
-            type: 'error',
-            description: error.message || "Erreur lors de l'envoi de l'invitation",
-          });
-        },
+    toast.promise(inviteUser.mutateAsync({ email: inviteEmail.trim().toLowerCase() }), {
+      loading: { title: "Envoi de l'invitation..." },
+      success: {
+        title: 'Invitation envoyée',
+        description: `Un email a été envoyé à ${inviteEmail}`,
       },
-    );
+      error: (err) => ({
+        title: "Erreur lors de l'envoi",
+        description: getErrorMessage(err),
+      }),
+    });
+
+    setInviteEmail('');
+    closeInviteModal();
   };
 
-  // Create columns with actions
   const columns = useMemo<ColumnDef<UserAdmin>[]>(() => {
     const baseColumns = createUserColumns(AVAILABLE_COLUMNS);
 
-    // Add actions column
     const actionsColumn: ColumnDef<UserAdmin> = {
       id: USER_COLUMN_IDS.actions,
       size: 80,
@@ -258,10 +220,8 @@ export default function AdminUsers() {
     handleDeleteUser,
   ]);
 
-  // Get labels for toggleable columns
   const columnLabels = useMemo(() => getToggleableUserColumnLabels(TOGGLEABLE_COLUMNS), []);
 
-  // Define default column visibility
   const defaultColumnVisibility: VisibilityState = useMemo(
     () =>
       createDefaultUserColumnVisibility(
@@ -352,7 +312,6 @@ export default function AdminUsers() {
         </div>
       </div>
 
-      {/* Loading state */}
       {isLoading ? (
         <div className="fr-py-8w" style={{ textAlign: 'center' }}>
           <p className="fr-text-mention--grey">Chargement...</p>
@@ -367,7 +326,6 @@ export default function AdminUsers() {
         </div>
       ) : (
         <>
-          {/* Table */}
           <div style={{ overflowX: 'auto' }}>
             <table className="fr-table fr-my-1w" style={{ width: '100%' }}>
               <thead>
@@ -420,7 +378,6 @@ export default function AdminUsers() {
             </table>
           </div>
 
-          {/* Pagination */}
           <Pagination
             currentPage={currentPage}
             totalPages={totalPages}
@@ -431,7 +388,6 @@ export default function AdminUsers() {
         </>
       )}
 
-      {/* Invite Modal */}
       <Modal {...inviteModalProps}>
         <div className="fr-container fr-container--fluid fr-container-md">
           <div className="fr-grid-row fr-grid-row--center">

@@ -4,7 +4,8 @@ import { z } from 'zod';
 import { useAuth } from '@/api/auth';
 import { useUpdateProfile } from '@/api/users';
 import { Input } from '@/components/Input';
-import { useToast } from '@/hooks/useToast';
+import { toast } from '@/components/ui/Toast';
+import { getErrorMessage } from '@/utils/getErrorMessage';
 
 // Zod schemas for validation
 const profileSchema = z.object({
@@ -22,9 +23,8 @@ type ProfileForm = z.infer<typeof profileSchema>;
 
 export default function UpdateProfile() {
   const { user } = useAuth();
-  const { toast } = useToast();
 
-  const { mutate: updateProfile, isPending } = useUpdateProfile();
+  const { mutateAsync: updateProfile, isPending } = useUpdateProfile();
 
   const form = useForm({
     defaultValues: {
@@ -32,13 +32,13 @@ export default function UpdateProfile() {
       lastName: user?.lastName || '',
     } as ProfileForm,
     onSubmit: async ({ value }) => {
-      updateProfile(value, {
-        onSuccess: () => {
-          toast({ type: 'success', title: 'Profil mis à jour avec succès' });
-        },
-        onError: (error: Error) => {
-          toast({ type: 'error', title: error.message });
-        },
+      toast.promise(updateProfile(value), {
+        loading: { title: 'Mise à jour...' },
+        success: { title: 'Profil mis à jour avec succès' },
+        error: (err) => ({
+          title: 'Erreur',
+          description: getErrorMessage(err),
+        }),
       });
     },
     validators: {

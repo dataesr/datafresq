@@ -1,6 +1,7 @@
 // Components
 
 export { ColumnVisibilityToggle } from './ColumnVisibilityToggle';
+export { ExportButton, type ExportButtonProps } from './ExportButton';
 // Column definitions - Programs
 export {
   createDefaultColumnVisibility,

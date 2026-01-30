@@ -1,5 +1,6 @@
 import { useUpdateWorkspace } from '@/api/workspaces';
-import { useToast } from '@/hooks/useToast';
+import { toast } from '@/components/ui/Toast';
+import { getErrorMessage } from '@/utils/getErrorMessage';
 import type { ReadWorkspace } from '~/schemas/workspaces';
 
 interface VisibilitySettingsProps {
@@ -7,29 +8,20 @@ interface VisibilitySettingsProps {
 }
 
 export function VisibilitySettings({ workspace }: VisibilitySettingsProps) {
-  const { toast } = useToast();
   const updateWorkspace = useUpdateWorkspace();
 
   const handleToggle = (isPublic: boolean) => {
     if (isPublic === workspace.isPublic) return;
 
-    updateWorkspace.mutate(
-      { id: workspace.id, isPublic },
-      {
-        onSuccess: () => {
-          toast({
-            type: 'success',
-            description: `L'espace est maintenant ${isPublic ? 'public' : 'privé'}`,
-          });
-        },
-        onError: (error) => {
-          toast({
-            type: 'error',
-            description: error.message,
-          });
-        },
-      },
-    );
+    const visibilityLabel = isPublic ? 'public' : 'privé';
+    toast.promise(updateWorkspace.mutateAsync({ id: workspace.id, isPublic }), {
+      loading: { title: 'Modification en cours...' },
+      success: { title: `L'espace est maintenant ${visibilityLabel}` },
+      error: (err) => ({
+        title: 'Erreur',
+        description: getErrorMessage(err),
+      }),
+    });
   };
 
   return (

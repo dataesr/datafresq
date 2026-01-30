@@ -4,12 +4,12 @@ import { useAuth } from '@/api/auth';
 import { useCreateWorkspace } from '@/api/workspaces';
 import ColorPicker from '@/components/ColorPicker';
 import { Input } from '@/components/Input';
-import { useToast } from '@/hooks/useToast';
+import { toast } from '@/components/ui/Toast';
+import { getErrorMessage } from '@/utils/getErrorMessage';
 import { PendingUserManager, usePendingUsers } from './components/PendingUserManager';
 
 export default function NouveauEspacePage() {
   const navigate = useNavigate();
-  const { toast } = useToast();
   const { user } = useAuth();
   const createMutation = useCreateWorkspace();
   const [searchParams] = useSearchParams();
@@ -30,40 +30,33 @@ export default function NouveauEspacePage() {
     e.preventDefault();
 
     if (!name.trim()) {
-      toast({
-        type: 'error',
-        description: "Le nom de l'espace est requis",
-      });
+      toast.error({ title: "Le nom de l'espace est requis" });
       return;
     }
 
-    createMutation.mutate(
-      {
+    toast.promise(
+      createMutation.mutateAsync({
         name: name.trim(),
         description: description.trim() || undefined,
         color,
         isPublic,
         users: pendingUsers.map((u) => ({ userId: u.userId, role: u.role })),
         programs: formationIds.length > 0 ? formationIds : undefined,
-      },
+      }),
       {
-        onSuccess: (data) => {
+        loading: { title: "Création de l'espace..." },
+        success: (data) => {
           const successMessage =
             formationIds.length > 0
               ? `L'espace "${data.name}" a été créé avec ${formationIds.length} formation${formationIds.length > 1 ? 's' : ''}`
               : `L'espace "${data.name}" a été créé`;
-          toast({
-            type: 'success',
-            description: successMessage,
-          });
           navigate(`/espaces/${data.id}`);
+          return { title: successMessage };
         },
-        onError: (error: Error) => {
-          toast({
-            type: 'error',
-            description: error.message || "Erreur lors de la création de l'espace",
-          });
-        },
+        error: (err) => ({
+          title: "Erreur lors de la création",
+          description: getErrorMessage(err),
+        }),
       },
     );
   };

@@ -4,7 +4,7 @@ import { StrictMode, useEffect } from 'react';
 import { createRoot } from 'react-dom/client';
 import { BrowserRouter, useLocation } from 'react-router';
 import { queryClient } from '@/api/query-client';
-import { ToastContextProvider } from '@/hooks/useToast';
+import { Toaster } from '@/components/ui/Toast';
 import AppRouter from '@/routes';
 import '@/components/highcharts';
 
@@ -39,10 +39,9 @@ const app = (
       <NuqsAdapter>
         <QueryClientProvider client={queryClient}>
           <DSFRInitializer>
-            <ToastContextProvider>
-              <ScrollToTop />
-              <AppRouter />
-            </ToastContextProvider>
+            <ScrollToTop />
+            <AppRouter />
+            <Toaster />
           </DSFRInitializer>
         </QueryClientProvider>
       </NuqsAdapter>

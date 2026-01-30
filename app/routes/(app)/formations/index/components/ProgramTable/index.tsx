@@ -20,6 +20,7 @@ import {
   type ProgramColumnId,
 } from '@/components/table';
 import { useProgramsFilters } from '../../hooks/useProgramsFilters';
+import { CreateWorkspaceFromSearchModal } from '../CreateWorkspaceFromSearchModal';
 import ExportButton from '../ExportButton';
 
 interface ProgramsTableProps {
@@ -159,6 +160,12 @@ export default function ProgramsTable({ selectedPrograms, onSelectionChange }: P
           <PageSizeSelector onChange={handlePageSizeChange} value={pageSize.toString()} />
           <ColumnVisibilityToggle table={table} columnLabels={columnLabels} />
           <ExportButton totalCount={totalCount} />
+          <CreateWorkspaceFromSearchModal
+            searchQuery={params.q}
+            filters={currentFilters}
+            totalCount={totalCount}
+            disabled={isFetching}
+          />
         </div>
       </div>
       <div style={{ overflowX: 'auto' }}>
@@ -198,7 +205,11 @@ export default function ProgramsTable({ selectedPrograms, onSelectionChange }: P
           </thead>
           <tbody>
             {table.getRowModel().rows.map((row) => (
-              <tr className={row.getIsSelected() ? 'selected-row' : 'unselected-row'} key={row.id}>
+              <tr
+                style={{ minHeight: '69px' }}
+                className={row.getIsSelected() ? 'selected-row' : 'unselected-row'}
+                key={row.id}
+              >
                 {row.getVisibleCells().map((cell) => (
                   <td
                     key={cell.id}
@@ -215,7 +226,7 @@ export default function ProgramsTable({ selectedPrograms, onSelectionChange }: P
                           <span className="skeleton-text skeleton-text--xl" />
                           <span
                             className="skeleton-text skeleton-text--lg"
-                            style={{ height: '.75rem' }}
+                            style={{ height: '.65rem' }}
                           />
                         </div>
                       ) : (

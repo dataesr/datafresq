@@ -13,6 +13,8 @@ import {
   addProgramsSchema,
   addUsersSchema,
   createWorkspaceSchema,
+  createWorkspaceFromSearchResponseSchema,
+  createWorkspaceFromSearchSchema,
   type ReadWorkspace,
   readWorkspaceSchema,
   removeProgramsSchema,
@@ -23,6 +25,7 @@ import {
   workspaceHistoryResponseSchema,
 } from '~/schemas/workspaces';
 import { generateId } from '~/utils/id';
+import { fetchAllProgramIds, SEARCH_CONFIG } from '~/utils/programs-search';
 import { getOrComputeWorkspaceCache, refreshWorkspaceCache } from './utils/cache';
 import {
   logProgramsAdded,
@@ -175,6 +178,91 @@ const workspaces = new Elysia()
         summary: 'Créer un espace de travail',
         description:
           "**Permet à l'utilisateur connecté de créer un espace de travail avec les informations fournies.**",
+        tags: ['Espaces de travail'],
+      },
+    },
+  )
+  // Create a workspace from search results
+  .post(
+    '/workspaces/from-search',
+    async ({ body: { name, description, isPublic = false, color, searchParams }, user }) => {
+      const { q, ...filterParams } = searchParams;
+
+      // Require at least a query or one filter
+      const hasQuery = q && q.trim().length > 0;
+      const hasFilters = Object.values(filterParams).some(
+        (v) => v !== undefined && v !== null && (Array.isArray(v) ? v.length > 0 : true)
+      );
+
+      if (!hasQuery && !hasFilters) {
+        throw new BadRequestError(
+          'Au moins une requête de recherche ou un filtre est requis pour créer un espace depuis une recherche.'
+        );
+      }
+
+      // Fetch all matching program IDs from Elasticsearch
+      const { programIds, totalCount } = await fetchAllProgramIds(
+        { q, ...filterParams },
+        SEARCH_CONFIG.maxWorkspacePrograms
+      );
+
+      if (programIds.length === 0) {
+        throw new BadRequestError('Aucune formation ne correspond à cette recherche.');
+      }
+
+      if (totalCount > SEARCH_CONFIG.maxWorkspacePrograms) {
+        throw new BadRequestError(
+          `Cette recherche contient ${totalCount.toLocaleString('fr-FR')} formations, ce qui dépasse la limite de ${SEARCH_CONFIG.maxWorkspacePrograms.toLocaleString('fr-FR')}. Veuillez affiner votre recherche.`
+        );
+      }
+
+      // Create the workspace with the program IDs
+      const workspaceId = generateId();
+
+      const { insertedId } = await collections.workspaces.insertOne({
+        id: workspaceId,
+        createdAt: new Date(),
+        color: color ?? 'yellow-tournesol',
+        description,
+        isPublic,
+        name,
+        owner: user.id,
+        programs: programIds,
+        updatedAt: new Date(),
+        users: [],
+      });
+
+      if (!insertedId) throw new DatabaseError();
+
+      // Log creation event
+      await logWorkspaceCreated(workspaceId, name, user.id);
+
+      // Log programs added and refresh cache
+      if (programIds.length > 0) {
+        await logProgramsAdded(workspaceId, user.id, programIds);
+        await refreshWorkspaceCache(workspaceId);
+      }
+
+      return {
+        id: workspaceId,
+        name,
+        programCount: programIds.length,
+      };
+    },
+    {
+      isAuth: true,
+      body: createWorkspaceFromSearchSchema,
+      response: {
+        200: createWorkspaceFromSearchResponseSchema,
+        400: errorResponseSchema,
+        401: errorResponseSchema,
+        422: errorResponseSchema,
+        500: errorResponseSchema,
+      },
+      detail: {
+        summary: 'Créer un espace de travail depuis une recherche',
+        description:
+          "**Crée un espace de travail contenant toutes les formations correspondant aux critères de recherche.** Limité à 5000 formations maximum.",
         tags: ['Espaces de travail'],
       },
     },

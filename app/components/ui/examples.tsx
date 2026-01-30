@@ -3,6 +3,7 @@ import { type Institution, useInstitutionsSearch } from '@/api/institutions';
 import { Dropdown } from './Dropdown';
 import { useDebounce } from './hooks/useDebounce';
 import { Select } from './Select';
+import { toast } from './Toast';
 
 // =============================================================================
 // EXAMPLE WRAPPER COMPONENT
@@ -771,6 +772,98 @@ export function SelectExamples() {
 
       <ExampleSection title="Select icône seule (trigger)">
         <SelectIconOnlyTrigger />
+      </ExampleSection>
+    </div>
+  );
+}
+
+export function ToastExamples() {
+  const handleSuccess = () => {
+    toast.success({ title: 'Succès', description: 'Opération réussie' });
+  };
+
+  const handleError = () => {
+    toast.error({
+      title: 'Erreur',
+      description:
+        'Une erreur est survenue Une erreur est survenue Une erreur est survenue Une erreur est survenue',
+      duration: 0,
+    });
+  };
+
+  const handleWarning = () => {
+    toast.warning({ title: 'Attention', description: 'Vérifiez les informations' });
+  };
+
+  const handleInfo = () => {
+    toast.info({ title: 'Information', description: 'Voici une information utile' });
+  };
+
+  const handlePromise = () => {
+    const fakePromise = new Promise<{ name: string }>((resolve, reject) => {
+      setTimeout(() => {
+        Math.random() > 0.5 ? resolve({ name: 'Formation' }) : reject(new Error('Échec'));
+      }, 2000);
+    });
+
+    toast.promise(fakePromise, {
+      loading: { title: 'Chargement...', description: 'Veuillez patienter' },
+      success: (data) => ({ title: 'Succès', description: `${data.name} chargé` }),
+      error: () => ({ title: 'Erreur', description: 'Le chargement a échoué' }),
+    });
+  };
+
+  const handlePositions = () => {
+    toast.info({ title: 'Top Left', position: 'top-left' });
+    setTimeout(() => toast({ title: 'Top Center', position: 'top-center' }), 100);
+    setTimeout(() => toast.success({ title: 'Top Center', position: 'top-center' }), 100);
+    setTimeout(() => toast.warning({ title: 'Top Right', position: 'top-right' }), 200);
+    setTimeout(() => toast.error({ title: 'Bottom Left', position: 'bottom-left' }), 300);
+    setTimeout(() => toast.info({ title: 'Bottom Center', position: 'bottom-center' }), 400);
+    setTimeout(() => toast.success({ title: 'Bottom Right', position: 'bottom-right' }), 500);
+  };
+
+  const handleMultiple = () => {
+    toast.success({ title: 'Premier toast' });
+    setTimeout(() => toast.info({ title: 'Deuxième toast' }), 300);
+    setTimeout(() => toast.warning({ title: 'Troisième toast' }), 600);
+  };
+
+  return (
+    <div>
+      <ExampleSection title="Types de toast">
+        <div className="fr-btns-group fr-btns-group--inline">
+          <button type="button" className="fr-btn fr-btn--secondary" onClick={handleSuccess}>
+            Success
+          </button>
+          <button type="button" className="fr-btn fr-btn--secondary" onClick={handleError}>
+            Error
+          </button>
+          <button type="button" className="fr-btn fr-btn--secondary" onClick={handleWarning}>
+            Warning
+          </button>
+          <button type="button" className="fr-btn fr-btn--secondary" onClick={handleInfo}>
+            Info
+          </button>
+        </div>
+      </ExampleSection>
+
+      <ExampleSection title="Toast avec promesse">
+        <button type="button" className="fr-btn fr-btn--secondary" onClick={handlePromise}>
+          Lancer une promesse (aléatoire)
+        </button>
+      </ExampleSection>
+
+      <ExampleSection title="Positions">
+        <button type="button" className="fr-btn fr-btn--secondary" onClick={handlePositions}>
+          Afficher toutes les positions
+        </button>
+      </ExampleSection>
+
+      <ExampleSection title="Toasts multiples">
+        <button type="button" className="fr-btn fr-btn--secondary" onClick={handleMultiple}>
+          Afficher plusieurs toasts
+        </button>
       </ExampleSection>
     </div>
   );

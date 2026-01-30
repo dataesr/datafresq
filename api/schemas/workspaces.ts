@@ -1,4 +1,5 @@
 import { t } from 'elysia';
+import { programsParamsSchema } from './programs';
 import { userLightSchema } from './users';
 
 // ============================================================================
@@ -46,6 +47,20 @@ export const updateWorkspaceSchema = t.Partial(
     color: t.String(),
   }),
 );
+
+export const createWorkspaceFromSearchSchema = t.Object({
+  name: t.String({ minLength: 1, maxLength: 255 }),
+  description: t.Optional(t.String({ maxLength: 2000 })),
+  isPublic: t.Optional(t.Boolean({ default: false })),
+  color: t.Optional(t.String({ default: 'yellow-tournesol' })),
+  searchParams: t.Omit(programsParamsSchema, ['page', 'pageSize', 'sort']),
+});
+
+export const createWorkspaceFromSearchResponseSchema = t.Object({
+  id: t.String(),
+  name: t.String(),
+  programCount: t.Number(),
+});
 
 export const readWorkspaceSchema = t.Object({
   id: t.String(),
@@ -186,6 +201,8 @@ export type WorkspaceUserRole = typeof workspaceUserRoleSchema.static;
 export type WorkspaceUser = typeof workspaceUserSchema.static;
 export type WorkspaceUserWithInfo = typeof workspaceUserWithInfoSchema.static;
 export type CreateWorkspace = typeof createWorkspaceSchema.static;
+export type CreateWorkspaceFromSearch = typeof createWorkspaceFromSearchSchema.static;
+export type CreateWorkspaceFromSearchResponse = typeof createWorkspaceFromSearchResponseSchema.static;
 export type UpdateWorkspace = typeof updateWorkspaceSchema.static;
 export type ReadWorkspace = typeof readWorkspaceSchema.static;
 export type WorkspaceEventType = typeof workspaceEventTypeSchema.static;

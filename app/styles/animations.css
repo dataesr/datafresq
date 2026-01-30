@@ -37,3 +37,18 @@
 [class*="fr-icon-"].fr-icon--spin::before {
   animation: spin 1s linear infinite !important;
 }
+
+/* Support for DSFR buttons with spinning icons (dropdown triggers) */
+.fr-btn.fr-icon--spin::before {
+  animation: spin 1s linear infinite !important;
+}
+
+/* Dropdown trigger with spinning icon */
+.fx-dropdown__trigger.fr-icon--spin::before {
+  animation: spin 1s linear infinite !important;
+}
+
+/* Dropdown container with loading state - spin the trigger icon */
+.fx-dropdown.fx-dropdown--loading .fx-dropdown__trigger::before {
+  animation: spin 1s linear infinite !important;
+}
