@@ -27,6 +27,7 @@ const defaultTheme = {
     align: 'left',
     text: '',
     style: {
+      display: 'none',
       fontFamily: 'Marianne',
       color: 'var(--text-default-grey)',
     },
@@ -133,6 +134,22 @@ const defaultTheme = {
     chartOptions: {
       chart: {
         backgroundColor: 'var(--background-default-grey)',
+      },
+      DataView: {
+        enabled: true,
+        type: 'table',
+        tableOptions: {
+          header: {
+            style: {
+              color: 'var(--text-title-grey)',
+            },
+          },
+          row: {
+            style: {
+              color: 'var(--text-default-grey)',
+            },
+          },
+        },
       },
       credits: {
         enabled: true,

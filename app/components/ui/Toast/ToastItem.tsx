@@ -35,39 +35,39 @@ export function ToastItem({ toast: toastData }: ToastItemProps) {
 
   const typeClass = {
     default: null,
-    success: 'fx-toast__icon--success',
-    error: 'fx-toast__icon--error',
-    warning: 'fx-toast__icon--warning',
-    info: 'fx-toast__icon--info',
-    loading: 'fx-toast__icon--loading',
+    success: 'toast__icon--success',
+    error: 'toast__icon--error',
+    warning: 'toast__icon--warning',
+    info: 'toast__icon--info',
+    loading: 'toast__icon--loading',
   }[toastData.type];
 
   const icon = ICONS[toastData.type];
 
   return (
     <div
-      className={cn('fx-toast', {
-        'fx-toast--exiting': isExiting,
+      className={cn('toast', {
+        'toast--exiting': isExiting,
       })}
       role="alert"
       aria-live={toastData.type === 'error' ? 'assertive' : 'polite'}
     >
       {icon && (
         <span
-          className={cn(icon, 'fx-toast__icon', typeClass, {
-            'fx-toast__icon--spin': toastData.type === 'loading',
+          className={cn(icon, 'toast__icon', typeClass, {
+            'toast__icon--spin': toastData.type === 'loading',
           })}
           aria-hidden="true"
         />
       )}
-      <div className="fx-toast__content">
-        {toastData.title && <p className="fx-toast__title">{toastData.title}</p>}
-        {toastData.description && <p className="fx-toast__description">{toastData.description}</p>}
+      <div className="toast__content">
+        {toastData.title && <p className="toast__title">{toastData.title}</p>}
+        {toastData.description && <p className="toast__description">{toastData.description}</p>}
       </div>
       {(toastData.duration === 0 || toastData.type === 'loading') && (
         <button
           type="button"
-          className="fx-toast__close fr-icon-close-line"
+          className="toast__close fr-icon-close-line"
           aria-label="Fermer"
           onClick={handleDismiss}
         />

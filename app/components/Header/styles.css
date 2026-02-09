@@ -1,0 +1,4 @@
+.header--menu-user::before {
+  -webkit-mask-image: url("data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCIgd2lkdGg9IjI0IiBoZWlnaHQ9IjI0Ij48cGF0aCBkPSJNNCAyMmE4IDggMCAxIDEgMTYgMEg0Wm04LTljLTMuMzE1IDAtNi0yLjY4NS02LTZzMi42ODUtNiA2LTYgNiAyLjY4NSA2IDYtMi42ODUgNi02IDZaIi8+PC9zdmc+") !important;
+  mask-image: url("data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCIgd2lkdGg9IjI0IiBoZWlnaHQ9IjI0Ij48cGF0aCBkPSJNNCAyMmE4IDggMCAxIDEgMTYgMEg0Wm04LTljLTMuMzE1IDAtNi0yLjY4NS02LTZzMi42ODUtNiA2LTYgNiAyLjY4NSA2IDYtMi42ODUgNi02IDZaIi8+PC9zdmc+") !important;
+}

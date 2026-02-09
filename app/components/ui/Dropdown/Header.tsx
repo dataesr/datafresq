@@ -7,5 +7,5 @@ export interface DropdownHeaderProps {
 }
 
 export function Header({ children, className }: DropdownHeaderProps) {
-  return <div className={cn('fx-dropdown__header', className)}>{children}</div>;
+  return <div className={cn('dropdown__header', className)}>{children}</div>;
 }

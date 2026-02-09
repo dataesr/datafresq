@@ -10,15 +10,15 @@ export interface SelectSearchProps
 export function Search({ className, placeholder = 'Rechercher...', ...props }: SelectSearchProps) {
   const { size } = useSelectContext();
 
-  const sizeClass = size !== 'md' ? `fx-select__search--${size}` : null;
+  const sizeClass = size !== 'md' ? `select__search--${size}` : null;
 
   return (
-    <div className={cn('fx-select__search', sizeClass, className)}>
+    <div className={cn('select__search', sizeClass, className)}>
       <input
         type="search"
         data-autofocus
         placeholder={placeholder}
-        className="fx-select__search-input"
+        className="select__search-input"
         {...props}
       />
     </div>

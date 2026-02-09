@@ -1,5 +1,6 @@
 import { useEffect } from 'react';
 import { Link, useLocation } from 'react-router';
+import { Breadcrumb } from '@/components/Breadcrumb';
 
 function useScrollToAnchor() {
   const { hash } = useLocation();
@@ -58,31 +59,13 @@ export default function Faq() {
   useScrollToAnchor();
 
   return (
-    <div className="page">
-      <nav className="fr-breadcrumb" aria-label="vous êtes ici :">
-        <button
-          type="button"
-          className="fr-breadcrumb__button"
-          aria-expanded="false"
-          aria-controls="breadcrumb-1"
-        >
-          Voir le fil d'Ariane
-        </button>
-        <div className="fr-collapse" id="breadcrumb-1">
-          <ol className="fr-breadcrumb__list">
-            <li>
-              <Link className="fr-breadcrumb__link" to="/">
-                Accueil
-              </Link>
-            </li>
-            <li>
-              <Link to="#" className="fr-breadcrumb__link" aria-current="page">
-                Foire aux questions
-              </Link>
-            </li>
-          </ol>
-        </div>
-      </nav>
+    <div>
+      <Breadcrumb
+        items={[
+          { label: 'Accueil', href: '/' },
+          { label: 'Foire aux questions', current: true },
+        ]}
+      />
       <nav className="fr-summary fr-mb-4w" aria-labelledby="fr-summary-title">
         <h2 className="fr-summary__title" id="fr-summary-title">
           Sommaire

@@ -6,9 +6,9 @@ import {
   type VisibilityState,
 } from '@tanstack/react-table';
 import cn from 'classnames';
-import { Activity, useMemo, useState } from 'react';
+import { useMemo, useState } from 'react';
 import { useProgramsSearch } from '@/api/programs';
-import AddToWorkspace from '@/components/AddToWorkspace';
+import { AddToActiveWorkspace } from '@/components/AddToActiveWorkspace';
 import {
   ColumnVisibilityToggle,
   createDefaultColumnVisibility,
@@ -20,7 +20,6 @@ import {
   type ProgramColumnId,
 } from '@/components/table';
 import { useProgramsFilters } from '../../hooks/useProgramsFilters';
-import { CreateWorkspaceFromSearchModal } from '../CreateWorkspaceFromSearchModal';
 import ExportButton from '../ExportButton';
 
 interface ProgramsTableProps {
@@ -149,23 +148,39 @@ export default function ProgramsTable({ selectedPrograms, onSelectionChange }: P
     <div>
       <div className="fx-spacer">
         <div>
-          <Activity mode={selectedPrograms.length ? 'visible' : 'hidden'}>
-            <AddToWorkspace
-              formationIds={selectedPrograms}
-              onSuccess={() => onSelectionChange([])}
-            />
-          </Activity>
+          <AddToActiveWorkspace
+            programIds={selectedPrograms}
+            searchParams={{
+              q: params.q || undefined,
+              cycle: currentFilters.cycle.length > 0 ? currentFilters.cycle : undefined,
+              diplomaType:
+                currentFilters.diplomaType.length > 0 ? currentFilters.diplomaType : undefined,
+              diplomaCategory:
+                currentFilters.diplomaCategory.length > 0
+                  ? currentFilters.diplomaCategory
+                  : undefined,
+              academy: currentFilters.academy.length > 0 ? currentFilters.academy : undefined,
+              region: currentFilters.region.length > 0 ? currentFilters.region : undefined,
+              paysageId: currentFilters.paysageId.length > 0 ? currentFilters.paysageId : undefined,
+              sector: currentFilters.sector.length > 0 ? currentFilters.sector : undefined,
+              disciplinarySector:
+                currentFilters.disciplinarySector.length > 0
+                  ? currentFilters.disciplinarySector
+                  : undefined,
+              domain: currentFilters.domain.length > 0 ? currentFilters.domain : undefined,
+              hasSiseInfos: currentFilters.hasSiseInfos || undefined,
+              hasRncpInfos: currentFilters.hasRncpInfos || undefined,
+              hasRomeInfos: currentFilters.hasRomeInfos || undefined,
+            }}
+            totalCount={totalCount}
+            onSuccess={() => onSelectionChange([])}
+            disabled={isFetching}
+          />
         </div>
         <div className="fx-flex fx-gap-2w fx-items-center">
           <PageSizeSelector onChange={handlePageSizeChange} value={pageSize.toString()} />
           <ColumnVisibilityToggle table={table} columnLabels={columnLabels} />
           <ExportButton totalCount={totalCount} />
-          <CreateWorkspaceFromSearchModal
-            searchQuery={params.q}
-            filters={currentFilters}
-            totalCount={totalCount}
-            disabled={isFetching}
-          />
         </div>
       </div>
       <div style={{ overflowX: 'auto' }}>

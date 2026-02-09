@@ -83,28 +83,28 @@ export function Dropdown({
 
   const triggerClasses = cn(
     'fr-btn',
-    'fx-dropdown__trigger',
+    'dropdown__trigger',
     sizeClass,
     variantClass,
     iconClass,
     iconPositionClass,
-    showArrow && 'fx-dropdown__trigger--has-arrow',
-    fullWidth && 'fx-dropdown__trigger--full-width',
+    showArrow && 'dropdown__trigger--has-arrow',
+    fullWidth && 'dropdown__trigger--full-width',
   );
 
   const containerClasses = cn(
-    'fx-dropdown',
-    size !== 'md' && `fx-dropdown--${size}`,
-    fullWidth && 'fx-dropdown--full-width',
+    'dropdown',
+    size !== 'md' && `dropdown--${size}`,
+    fullWidth && 'dropdown--full-width',
     className,
   );
 
   const popoverClasses = cn(
-    'fx-dropdown__popover',
-    isOpen && 'fx-dropdown__popover--expanded',
-    computedAlign === 'end' && 'fx-dropdown__popover--align-end',
-    computedPlacement === 'top' && 'fx-dropdown__popover--placement-top',
-    portal && 'fx-dropdown__popover--portal',
+    'dropdown__popover',
+    isOpen && 'dropdown__popover--expanded',
+    computedAlign === 'end' && 'dropdown__popover--align-end',
+    computedPlacement === 'top' && 'dropdown__popover--placement-top',
+    portal && 'dropdown__popover--portal',
   );
 
   const popoverStyle: CSSProperties = {
@@ -114,16 +114,8 @@ export function Dropdown({
     ...(portal &&
       position && {
         position: 'absolute',
-        top: computedPlacement === 'bottom' ? position.top : 'auto',
-        bottom:
-          computedPlacement === 'top'
-            ? `${document.documentElement.scrollHeight - position.top}px`
-            : 'auto',
-        left: computedAlign === 'start' ? position.left : 'auto',
-        right:
-          computedAlign === 'end'
-            ? `${document.documentElement.scrollWidth - position.left}px`
-            : 'auto',
+        top: position.top,
+        left: position.left,
         minWidth: position.minWidth,
       }),
   } as CSSProperties;
@@ -132,6 +124,7 @@ export function Dropdown({
     close,
     size,
     closeOnAction,
+    isOpen,
   };
 
   const popoverContent = (
@@ -146,7 +139,7 @@ export function Dropdown({
     >
       {/* biome-ignore lint/a11y/useKeyWithClickEvents: event delegation for action behavior */}
       {/* biome-ignore lint/a11y/noStaticElementInteractions: event delegation pattern */}
-      <div className="fx-dropdown__popover-inner" onClick={handleMenuClick}>
+      <div className="dropdown__popover-inner" onClick={handleMenuClick}>
         {children}
       </div>
     </div>

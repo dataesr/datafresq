@@ -28,14 +28,14 @@ export function Link(props: LinkComponentProps) {
   const { children, icon, iconPosition = 'left', className, active = false, ...rest } = props;
 
   const iconClass = icon ? `fr-icon-${icon}` : null;
-  const iconPosClass = icon && iconPosition === 'right' ? 'fx-dropdown__item--icon-right' : null;
+  const iconPosClass = icon && iconPosition === 'right' ? 'dropdown__item--icon-right' : null;
 
   const classes = cn(
-    'fx-dropdown__item',
+    'dropdown__item',
     iconClass,
     iconPosClass,
     {
-      'fx-dropdown__item--active': active,
+      'dropdown__item--active': active,
     },
     className,
   );

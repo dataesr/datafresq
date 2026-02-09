@@ -7,5 +7,5 @@ export interface SelectEmptyProps {
 }
 
 export function Empty({ children = 'Aucun résultat', className }: SelectEmptyProps) {
-  return <div className={cn('fx-select__empty', className)}>{children}</div>;
+  return <div className={cn('select__empty', className)}>{children}</div>;
 }

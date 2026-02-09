@@ -46,9 +46,9 @@ export function Radio({
       aria-disabled={disabled}
       data-value={value}
       tabIndex={disabled ? -1 : 0}
-      className={cn('fx-select__radio', className, {
-        'fx-select__radio--checked': checked,
-        'fx-select__radio--disabled': disabled,
+      className={cn('select__radio', className, {
+        'select__radio--checked': checked,
+        'select__radio--disabled': disabled,
       })}
       onClick={handleClick}
       onKeyDown={handleKeyDown}
@@ -62,7 +62,7 @@ export function Radio({
         tabIndex={-1}
         aria-hidden="true"
       />
-      <span className="fx-select__radio-label">{children}</span>
+      <span className="select__radio-label">{children}</span>
     </div>
   );
 }

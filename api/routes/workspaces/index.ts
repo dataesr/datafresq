@@ -12,9 +12,11 @@ import { USER_LIGHT_PROJECTION } from '~/schemas/users';
 import {
   addProgramsSchema,
   addUsersSchema,
-  createWorkspaceSchema,
   createWorkspaceFromSearchResponseSchema,
   createWorkspaceFromSearchSchema,
+  createWorkspaceSchema,
+  previewAddProgramsResponseSchema,
+  previewAddProgramsSchema,
   type ReadWorkspace,
   readWorkspaceSchema,
   removeProgramsSchema,
@@ -191,19 +193,19 @@ const workspaces = new Elysia()
       // Require at least a query or one filter
       const hasQuery = q && q.trim().length > 0;
       const hasFilters = Object.values(filterParams).some(
-        (v) => v !== undefined && v !== null && (Array.isArray(v) ? v.length > 0 : true)
+        (v) => v !== undefined && v !== null && (Array.isArray(v) ? v.length > 0 : true),
       );
 
       if (!hasQuery && !hasFilters) {
         throw new BadRequestError(
-          'Au moins une requête de recherche ou un filtre est requis pour créer un espace depuis une recherche.'
+          'Au moins une requête de recherche ou un filtre est requis pour créer un espace depuis une recherche.',
         );
       }
 
       // Fetch all matching program IDs from Elasticsearch
       const { programIds, totalCount } = await fetchAllProgramIds(
         { q, ...filterParams },
-        SEARCH_CONFIG.maxWorkspacePrograms
+        SEARCH_CONFIG.maxWorkspacePrograms,
       );
 
       if (programIds.length === 0) {
@@ -212,7 +214,7 @@ const workspaces = new Elysia()
 
       if (totalCount > SEARCH_CONFIG.maxWorkspacePrograms) {
         throw new BadRequestError(
-          `Cette recherche contient ${totalCount.toLocaleString('fr-FR')} formations, ce qui dépasse la limite de ${SEARCH_CONFIG.maxWorkspacePrograms.toLocaleString('fr-FR')}. Veuillez affiner votre recherche.`
+          `Cette recherche contient ${totalCount.toLocaleString('fr-FR')} formations, ce qui dépasse la limite de ${SEARCH_CONFIG.maxWorkspacePrograms.toLocaleString('fr-FR')}. Veuillez affiner votre recherche.`,
         );
       }
 
@@ -262,7 +264,7 @@ const workspaces = new Elysia()
       detail: {
         summary: 'Créer un espace de travail depuis une recherche',
         description:
-          "**Crée un espace de travail contenant toutes les formations correspondant aux critères de recherche.** Limité à 5000 formations maximum.",
+          '**Crée un espace de travail contenant toutes les formations correspondant aux critères de recherche.** Limité à 5000 formations maximum.',
         tags: ['Espaces de travail'],
       },
     },
@@ -322,21 +324,13 @@ const workspaces = new Elysia()
   .get(
     '/me/workspaces',
     async ({ user, query: { query, filter = 'all' } }) => {
-      // Build base match based on filter
-      let baseMatch: Record<string, unknown>;
-      switch (filter) {
-        case 'owned':
-          baseMatch = { owner: user.id };
-          break;
-        case 'shared':
-          // Workspaces where user is a member but NOT the owner
-          baseMatch = { 'users.userId': user.id, owner: { $ne: user.id } };
-          break;
-        case 'all':
-        default:
-          baseMatch = { $or: [{ owner: user.id }, { 'users.userId': user.id }] };
-          break;
-      }
+      const matches = new Map([
+        ['owned', { owner: user.id }],
+        ['shared', { 'users.userId': user.id, owner: { $ne: user.id } }],
+        ['all', { $or: [{ owner: user.id }, { 'users.userId': user.id }] }],
+      ]);
+
+      const baseMatch = matches.get(filter);
 
       const queryFilter = query
         ? {
@@ -795,19 +789,92 @@ const workspacePrograms = new Elysia()
     return { workspace };
   })
   .post(
+    '/workspaces/:id/programs/preview',
+    async ({ workspace, body: { programIds, searchParams } }) => {
+      const currentPrograms = new Set(workspace.programs || []);
+
+      let requestedIds: string[];
+
+      if (programIds && programIds.length > 0) {
+        requestedIds = programIds;
+      } else if (searchParams) {
+        const { programIds: fetchedIds } = await fetchAllProgramIds(
+          searchParams,
+          SEARCH_CONFIG.maxWorkspacePrograms,
+        );
+        requestedIds = fetchedIds;
+      } else {
+        throw new BadRequestError('Either programIds or searchParams must be provided');
+      }
+
+      const alreadyPresent = requestedIds.filter((id) => currentPrograms.has(id)).length;
+      const toAdd = requestedIds.length - alreadyPresent;
+
+      return {
+        toAdd,
+        alreadyPresent,
+        total: requestedIds.length,
+      };
+    },
+    {
+      isAuth: true,
+      params: t.Object({
+        id: t.String(),
+      }),
+      body: previewAddProgramsSchema,
+      response: {
+        200: previewAddProgramsResponseSchema,
+        400: errorResponseSchema,
+        403: errorResponseSchema,
+        404: errorResponseSchema,
+        500: errorResponseSchema,
+      },
+      detail: {
+        summary: "Prévisualiser l'ajout de formations",
+        description: 'Retourne le nombre de formations à ajouter et déjà présentes',
+        tags: ['Espaces de travail'],
+      },
+    },
+  )
+  .post(
     '/workspaces/:id/programs',
-    async ({ params: { id }, body: { programs }, user }) => {
+    async ({ params: { id }, body: { programs, searchParams }, user }) => {
+      let programIds: string[];
+
+      if (programs && programs.length > 0) {
+        programIds = programs;
+      } else if (searchParams) {
+        const { programIds: fetchedIds, totalCount } = await fetchAllProgramIds(
+          searchParams,
+          SEARCH_CONFIG.maxWorkspacePrograms,
+        );
+
+        if (totalCount > SEARCH_CONFIG.maxWorkspacePrograms) {
+          throw new BadRequestError(
+            `Cette recherche contient ${totalCount} résultats. Maximum autorisé: ${SEARCH_CONFIG.maxWorkspacePrograms}`,
+          );
+        }
+
+        programIds = fetchedIds;
+      } else {
+        throw new BadRequestError('Either programs or searchParams must be provided');
+      }
+
+      if (programIds.length === 0) {
+        throw new BadRequestError('No programs to add');
+      }
+
       const { acknowledged } = await collections.workspaces.updateOne(
         { id },
         {
-          $addToSet: { programs: { $each: programs } },
+          $addToSet: { programs: { $each: programIds } },
           $set: { updatedAt: new Date() },
         },
       );
 
       if (!acknowledged) throw new InternalServerError();
 
-      await logProgramsAdded(id, user.id, programs);
+      await logProgramsAdded(id, user.id, programIds);
       await refreshWorkspaceCache(id);
 
       const workspace = await collections.workspaces
@@ -825,13 +892,15 @@ const workspacePrograms = new Elysia()
       body: addProgramsSchema,
       response: {
         200: readWorkspaceSchema,
+        400: errorResponseSchema,
         403: errorResponseSchema,
         404: errorResponseSchema,
         500: errorResponseSchema,
       },
       detail: {
         summary: 'Ajouter des formations à un espace de travail',
-        description: 'Ajouter des formations par leur identifiant INF - propriétaire et éditeurs',
+        description:
+          'Ajouter des formations par IDs ou depuis une recherche - propriétaire et éditeurs',
         tags: ['Espaces de travail'],
       },
     },

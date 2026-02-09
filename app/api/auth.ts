@@ -1,4 +1,4 @@
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { useMutation, useQuery, useQueryClient, useSuspenseQuery } from '@tanstack/react-query';
 import { APIError, api } from '@/api/eden-treaty';
 import { queryClient } from '@/api/query-client';
 import { hasAuthCookie } from '@/utils/hasAuthCookie';
@@ -45,7 +45,7 @@ async function checkAuth() {
 // =============================================================================
 
 export function useAuth() {
-  const { data: user, isLoading } = useQuery({
+  const { data: user, isLoading } = useSuspenseQuery({
     queryKey: authKeys.user,
     queryFn: checkAuth,
     staleTime: 5 * 60 * 1000,

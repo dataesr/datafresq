@@ -11,7 +11,7 @@ export function Content({ children, className, maxHeight }: DropdownContentProps
   const style: CSSProperties | undefined = maxHeight ? { maxHeight } : undefined;
 
   return (
-    <div className={cn('fx-dropdown__content', className)} style={style}>
+    <div className={cn('dropdown__content', className)} style={style}>
       {children}
     </div>
   );

@@ -1,6 +1,6 @@
 import { useState } from 'react';
-import { Link } from 'react-router';
 import { useProgramsSearch } from '@/api/programs';
+import { Breadcrumb } from '@/components/Breadcrumb';
 import { FilterBuilder } from './components/FilterBuilder';
 import ProgramsTable from './components/ProgramTable';
 import { useProgramsFilters } from './hooks/useProgramsFilters';
@@ -25,31 +25,13 @@ export default function FormationsListPage() {
 
   return (
     <section>
-      <div className="page">
-        <nav className="fr-breadcrumb" aria-label="vous êtes ici :">
-          <button
-            type="button"
-            className="fr-breadcrumb__button"
-            aria-expanded="false"
-            aria-controls="breadcrumb-1"
-          >
-            Voir le fil d'Ariane
-          </button>
-          <div className="fr-collapse" id="breadcrumb-1">
-            <ol className="fr-breadcrumb__list">
-              <li>
-                <Link className="fr-breadcrumb__link" to="/">
-                  Accueil
-                </Link>
-              </li>
-              <li>
-                <span className="fr-breadcrumb__link" aria-current="page">
-                  Explorer les formations
-                </span>
-              </li>
-            </ol>
-          </div>
-        </nav>
+      <div>
+        <Breadcrumb
+          items={[
+            { label: 'Accueil', href: '/' },
+            { label: 'Formations', current: true },
+          ]}
+        />
 
         <h1 className="fr-h2">Explorer les formations</h1>
 

@@ -46,9 +46,9 @@ export function Checkbox({
       aria-disabled={disabled}
       data-value={value}
       tabIndex={disabled ? -1 : 0}
-      className={cn('fx-select__checkbox', className, {
-        'fx-select__checkbox--checked': checked,
-        'fx-select__checkbox--disabled': disabled,
+      className={cn('select__checkbox', className, {
+        'select__checkbox--checked': checked,
+        'select__checkbox--disabled': disabled,
       })}
       onClick={handleClick}
       onKeyDown={handleKeyDown}
@@ -61,7 +61,7 @@ export function Checkbox({
         tabIndex={-1}
         aria-hidden="true"
       />
-      <span className="fx-select__checkbox-label">{children}</span>
+      <span className="select__checkbox-label">{children}</span>
       {count !== undefined && (
         <span className="fr-badge fr-badge--sm fr-badge--no-icon">
           {count.toLocaleString('fr-FR')}

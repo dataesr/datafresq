@@ -2,6 +2,9 @@ import { t } from 'elysia';
 import { programsParamsSchema } from './programs';
 import { userLightSchema } from './users';
 
+// Search params for workspace operations (without pagination)
+export const workspaceSearchParamsSchema = t.Omit(programsParamsSchema, ['page', 'pageSize', 'sort']);
+
 // ============================================================================
 // Schemas
 // ============================================================================
@@ -186,7 +189,19 @@ export const updateUserRoleSchema = t.Object({
 });
 
 export const addProgramsSchema = t.Object({
-  programs: t.Array(t.String()),
+  programs: t.Optional(t.Array(t.String())),
+  searchParams: t.Optional(workspaceSearchParamsSchema),
+});
+
+export const previewAddProgramsSchema = t.Object({
+  programIds: t.Optional(t.Array(t.String())),
+  searchParams: t.Optional(workspaceSearchParamsSchema),
+});
+
+export const previewAddProgramsResponseSchema = t.Object({
+  toAdd: t.Number(),
+  alreadyPresent: t.Number(),
+  total: t.Number(),
 });
 
 export const removeProgramsSchema = t.Object({
@@ -215,3 +230,6 @@ export type RemoveUsers = typeof removeUsersSchema.static;
 export type UpdateUserRole = typeof updateUserRoleSchema.static;
 export type AddPrograms = typeof addProgramsSchema.static;
 export type RemovePrograms = typeof removeProgramsSchema.static;
+export type PreviewAddPrograms = typeof previewAddProgramsSchema.static;
+export type PreviewAddProgramsResponse = typeof previewAddProgramsResponseSchema.static;
+export type WorkspaceSearchParams = typeof workspaceSearchParamsSchema.static;

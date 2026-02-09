@@ -2,21 +2,21 @@
    Shared Popover Styles for Dropdown and Select
 
    Uses multi-selector pattern to share styles while keeping semantic class names.
-   - fx-dropdown__* for Dropdown component
-   - fx-select__* for Select component
+   - dropdown__* for Dropdown component
+   - select__* for Select component
    ============================================================================ */
 
 /* -----------------------------------------------------------------------------
    Container - provides positioning context
    ----------------------------------------------------------------------------- */
-.fx-dropdown,
-.fx-select {
+.dropdown,
+.select {
   position: relative;
   display: inline-block;
 }
 
-.fx-dropdown--full-width,
-.fx-select--full-width {
+.dropdown--full-width,
+.select--full-width {
   display: block;
   width: 100%;
 }
@@ -24,8 +24,8 @@
 /* -----------------------------------------------------------------------------
    Trigger button - with arrow indicator
    ----------------------------------------------------------------------------- */
-.fr-btn.fx-dropdown__trigger--full-width,
-.fr-btn.fx-select__trigger--full-width {
+.fr-btn.dropdown__trigger--full-width,
+.fr-btn.select__trigger--full-width {
   display: inline-flex;
   flex-direction: row;
   align-items: center;
@@ -33,14 +33,14 @@
   text-align: left;
 }
 
-.fx-dropdown .fr-btn.fx-dropdown__trigger--full-width.fx-dropdown__trigger--has-arrow::after,
-.fx-select .fr-btn.fx-select__trigger--full-width.fx-select__trigger--has-arrow::after {
+.dropdown .fr-btn.dropdown__trigger--full-width.dropdown__trigger--has-arrow::after,
+.select .fr-btn.select__trigger--full-width.select__trigger--has-arrow::after {
   margin-left: auto;
   margin-right: 0;
 }
 
-.fx-dropdown .fx-dropdown__trigger.fx-dropdown__trigger--has-arrow::after,
-.fx-select .fx-select__trigger.fx-select__trigger--has-arrow::after {
+.dropdown .dropdown__trigger.dropdown__trigger--has-arrow::after,
+.select .select__trigger.select__trigger--has-arrow::after {
   --icon-size: 1rem;
   flex: 0 0 auto;
   display: inline-block;
@@ -59,32 +59,32 @@
 }
 
 /* Override for DSFR icon buttons */
-.fx-dropdown .fx-dropdown__trigger.fx-dropdown__trigger--has-arrow[class*="fr-icon-"]::after,
-.fx-select .fx-select__trigger.fx-select__trigger--has-arrow[class*="fr-icon-"]::after {
+.dropdown .dropdown__trigger.dropdown__trigger--has-arrow[class*="fr-icon-"]::after,
+.select .select__trigger.select__trigger--has-arrow[class*="fr-icon-"]::after {
   -webkit-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='m12 13.172 4.95-4.95 1.414 1.414L12 16 5.636 9.636 7.05 8.222l4.95 4.95z'/%3E%3C/svg%3E");
   mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='m12 13.172 4.95-4.95 1.414 1.414L12 16 5.636 9.636 7.05 8.222l4.95 4.95z'/%3E%3C/svg%3E");
   content: "";
 }
 
-.fx-dropdown .fx-dropdown__trigger.fx-dropdown__trigger--has-arrow[aria-expanded="true"]::after,
-.fx-select .fx-select__trigger.fx-select__trigger--has-arrow[aria-expanded="true"]::after {
+.dropdown .dropdown__trigger.dropdown__trigger--has-arrow[aria-expanded="true"]::after,
+.select .select__trigger.select__trigger--has-arrow[aria-expanded="true"]::after {
   transform: rotate(-180deg);
 }
 
 /* Arrow size variants */
-.fx-dropdown--sm .fx-dropdown__trigger.fx-dropdown__trigger--has-arrow::after,
-.fx-select--sm .fx-select__trigger.fx-select__trigger--has-arrow::after {
+.dropdown--sm .dropdown__trigger.dropdown__trigger--has-arrow::after,
+.select--sm .select__trigger.select__trigger--has-arrow::after {
   --icon-size: 0.875rem;
 }
 
-.fx-dropdown--lg .fx-dropdown__trigger.fx-dropdown__trigger--has-arrow::after,
-.fx-select--lg .fx-select__trigger.fx-select__trigger--has-arrow::after {
+.dropdown--lg .dropdown__trigger.dropdown__trigger--has-arrow::after,
+.select--lg .select__trigger.select__trigger--has-arrow::after {
   --icon-size: 1.25rem;
 }
 
 /* Open state styling */
-.fx-dropdown__trigger[aria-expanded="true"],
-.fx-select__trigger[aria-expanded="true"] {
+.dropdown__trigger[aria-expanded="true"],
+.select__trigger[aria-expanded="true"] {
   color: var(--text-active-blue-france);
   background-color: var(--background-open-blue-france);
   --idle: transparent;
@@ -92,21 +92,21 @@
   --active: var(--background-open-blue-france-active);
 }
 
-.fx-dropdown__trigger[aria-expanded="true"]:hover,
-.fx-select__trigger[aria-expanded="true"]:hover {
+.dropdown__trigger[aria-expanded="true"]:hover,
+.select__trigger[aria-expanded="true"]:hover {
   background-color: var(--hover-tint);
 }
 
-.fx-dropdown__trigger[aria-expanded="true"]:active,
-.fx-select__trigger[aria-expanded="true"]:active {
+.dropdown__trigger[aria-expanded="true"]:active,
+.select__trigger[aria-expanded="true"]:active {
   background-color: var(--active-tint);
 }
 
 /* -----------------------------------------------------------------------------
    Popover - collapse mechanism + positioning
    ----------------------------------------------------------------------------- */
-.fx-dropdown__popover,
-.fx-select__popover {
+.dropdown__popover,
+.select__popover {
   --collapse-max-height: none;
   overflow: hidden;
   max-height: var(--collapse-max-height);
@@ -129,36 +129,37 @@
   min-width: 100%;
 }
 
-.fx-dropdown--full-width .fx-dropdown__popover,
-.fx-select--full-width .fx-select__popover {
+.dropdown--full-width .dropdown__popover,
+.select--full-width .select__popover {
   width: 100%;
 }
 
-.fx-dropdown__popover:not(.fx-dropdown__popover--expanded),
-.fx-select__popover:not(.fx-select__popover--expanded) {
+.dropdown__popover:not(.dropdown__popover--expanded),
+.select__popover:not(.select__popover--expanded) {
   --collapse-max-height: 0;
 }
 
-.fx-dropdown__popover--expanded,
-.fx-select__popover--expanded {
+.dropdown__popover--expanded,
+.select__popover--expanded {
   visibility: visible;
   opacity: 1;
   pointer-events: auto;
   overflow: hidden;
   max-height: var(--popover-max-height, calc(100vh - 10rem));
+  max-width: calc(100vw - 1rem);
 }
 
 /* -----------------------------------------------------------------------------
    Placement modifiers - top vs bottom positioning
    ----------------------------------------------------------------------------- */
-.fx-dropdown__popover.fx-dropdown__popover--placement-top,
-.fx-select__popover.fx-select__popover--placement-top {
+.dropdown__popover.dropdown__popover--placement-top,
+.select__popover.select__popover--placement-top {
   top: auto;
   bottom: 100%;
 }
 
-.fx-dropdown__popover--align-end,
-.fx-select__popover--align-end {
+.dropdown__popover--align-end,
+.select__popover--align-end {
   left: auto;
   right: 0;
 }
@@ -166,8 +167,8 @@
 /* -----------------------------------------------------------------------------
    Portal mode - positioning handled by inline styles
    ----------------------------------------------------------------------------- */
-.fx-dropdown__popover--portal,
-.fx-select__popover--portal {
+.dropdown__popover--portal,
+.select__popover--portal {
   position: absolute;
   top: auto;
   left: auto;
@@ -176,14 +177,14 @@
   z-index: 10000;
 }
 
-.fx-dropdown__popover--portal.fx-dropdown__popover--placement-top,
-.fx-select__popover--portal.fx-select__popover--placement-top {
+.dropdown__popover--portal.dropdown__popover--placement-top,
+.select__popover--portal.select__popover--placement-top {
   top: auto;
   bottom: auto;
 }
 
-.fx-dropdown__popover--portal.fx-dropdown__popover--align-end,
-.fx-select__popover--portal.fx-select__popover--align-end {
+.dropdown__popover--portal.dropdown__popover--align-end,
+.select__popover--portal.select__popover--align-end {
   left: auto;
   right: auto;
 }
@@ -191,8 +192,8 @@
 /* -----------------------------------------------------------------------------
    Popover inner - the visible content area
    ----------------------------------------------------------------------------- */
-.fx-dropdown__popover-inner,
-.fx-select__popover-inner {
+.dropdown__popover-inner,
+.select__popover-inner {
   display: flex;
   flex-direction: column;
   max-height: inherit;
@@ -218,16 +219,16 @@
 }
 
 /* Placement modifier for popover-inner - move accent bar to bottom when opening upward */
-.fx-dropdown__popover--placement-top .fx-dropdown__popover-inner,
-.fx-select__popover--placement-top .fx-select__popover-inner {
+.dropdown__popover--placement-top .dropdown__popover-inner,
+.select__popover--placement-top .select__popover-inner {
   background-position: 0 100%;
 }
 
 /* -----------------------------------------------------------------------------
    Content - scrollable container for items (primary scroll area)
    ----------------------------------------------------------------------------- */
-.fx-dropdown__content,
-.fx-select__content {
+.dropdown__content,
+.select__content {
   flex: 1 1 auto;
   min-height: 0;
   max-height: inherit;
@@ -237,17 +238,17 @@
 }
 
 /* List reset */
-.fx-dropdown__popover-inner ul,
-.fx-dropdown__popover-inner ol,
-.fx-select__popover-inner ul,
-.fx-select__popover-inner ol {
+.dropdown__popover-inner ul,
+.dropdown__popover-inner ol,
+.select__popover-inner ul,
+.select__popover-inner ol {
   list-style: none;
   padding: 0;
   margin: 0;
 }
 
-.fx-dropdown__popover-inner li,
-.fx-select__popover-inner li {
+.dropdown__popover-inner li,
+.select__popover-inner li {
   padding: 0;
   margin: 0;
 }
@@ -255,16 +256,16 @@
 /* -----------------------------------------------------------------------------
    Group - for grouping related items
    ----------------------------------------------------------------------------- */
-.fx-dropdown__group,
-.fx-select__group {
+.dropdown__group,
+.select__group {
   margin: 0;
   padding: 0.25rem 0;
 
   box-shadow: inset 0px 1px 0px 0px var(--border-default-grey);
 }
 
-.fx-dropdown__group-label,
-.fx-select__group-label {
+.dropdown__group-label,
+.select__group-label {
   padding: 0.5rem 1rem 0.25rem;
   font-size: 0.75rem;
   font-weight: 400;
@@ -272,20 +273,20 @@
   color: var(--text-mention-grey);
 }
 
-.fx-dropdown__group-content,
-.fx-select__group-content {
+.dropdown__group-content,
+.select__group-content {
   padding: 0;
   margin: 0;
 }
 
-.fx-dropdown--sm .fx-dropdown__group-label,
-.fx-select--sm .fx-select__group-label {
+.dropdown--sm .dropdown__group-label,
+.select--sm .select__group-label {
   padding: 0.375rem 0.75rem 0.25rem;
   font-size: 0.6875rem;
 }
 
-.fx-dropdown--lg .fx-dropdown__group-label,
-.fx-select--lg .fx-select__group-label {
+.dropdown--lg .dropdown__group-label,
+.select--lg .select__group-label {
   padding: 0.625rem 1.5rem 0.25rem;
   font-size: 0.8125rem;
 }
@@ -293,21 +294,21 @@
 /* -----------------------------------------------------------------------------
    Header - title section at top
    ----------------------------------------------------------------------------- */
-.fx-dropdown__header,
-.fx-select__header {
+.dropdown__header,
+.select__header {
   flex: 0 0 auto;
   padding: 0.625rem 1rem;
   box-shadow: inset 0 -1px 0 0 var(--border-default-grey);
 }
 
-.fx-dropdown--sm .fx-dropdown__header,
-.fx-select--sm .fx-select__header {
+.dropdown--sm .dropdown__header,
+.select--sm .select__header {
   padding: 0.375rem 0.75rem;
   font-size: 0.75rem;
 }
 
-.fx-dropdown--lg .fx-dropdown__header,
-.fx-select--lg .fx-select__header {
+.dropdown--lg .dropdown__header,
+.select--lg .select__header {
   padding: 0.625rem 1.5rem;
   font-size: 1rem;
 }
@@ -315,8 +316,8 @@
 /* -----------------------------------------------------------------------------
    Footer - actions at the bottom
    ----------------------------------------------------------------------------- */
-.fx-dropdown__footer,
-.fx-select__footer {
+.dropdown__footer,
+.select__footer {
   flex: 0 0 auto;
   display: flex;
   align-items: center;
@@ -326,30 +327,30 @@
   justify-content: space-between;
 }
 
-.fx-dropdown__footer--start,
-.fx-select__footer--start {
+.dropdown__footer--start,
+.select__footer--start {
   justify-content: flex-start;
 }
 
-.fx-dropdown__footer--center,
-.fx-select__footer--center {
+.dropdown__footer--center,
+.select__footer--center {
   justify-content: center;
 }
 
-.fx-dropdown__footer--end,
-.fx-select__footer--end {
+.dropdown__footer--end,
+.select__footer--end {
   justify-content: flex-end;
 }
 
-.fx-dropdown--sm .fx-dropdown__footer,
-.fx-select--sm .fx-select__footer {
+.dropdown--sm .dropdown__footer,
+.select--sm .select__footer {
   padding: 0.25rem 0.75rem;
   gap: 0.5rem;
   font-size: 0.875rem;
 }
 
-.fx-dropdown--lg .fx-dropdown__footer,
-.fx-select--lg .fx-select__footer {
+.dropdown--lg .dropdown__footer,
+.select--lg .select__footer {
   padding: 0.5rem 1.5rem;
   gap: 0.625rem;
   font-size: 1.125rem;
@@ -358,16 +359,16 @@
 /* -----------------------------------------------------------------------------
    Search input
    ----------------------------------------------------------------------------- */
-.fx-dropdown__search,
-.fx-select__search {
+.dropdown__search,
+.select__search {
   flex: 0 0 auto;
   padding: 0.5rem;
   background-color: var(--background-overlap-grey, #fff);
   border-bottom: 2px solid var(--border-default-grey);
 }
 
-.fx-dropdown__search-input,
-.fx-select__search-input {
+.dropdown__search-input,
+.select__search-input {
   width: 100%;
   padding: 0.375rem 0.5rem;
   font-size: 0.875rem;
@@ -377,40 +378,40 @@
   outline: none;
 }
 
-.fx-dropdown__search-input:focus,
-.fx-select__search-input:focus {
+.dropdown__search-input:focus,
+.select__search-input:focus {
   outline: none !important;
 }
 
-.fx-dropdown__search:focus-within,
-.fx-select__search:focus-within {
+.dropdown__search:focus-within,
+.select__search:focus-within {
   outline: 2px solid #0a76f6 !important;
   outline-offset: -2px !important;
 }
 
-.fx-dropdown__search-input::placeholder,
-.fx-select__search-input::placeholder {
+.dropdown__search-input::placeholder,
+.select__search-input::placeholder {
   color: var(--text-mention-grey);
 }
 
-.fx-dropdown--sm .fx-dropdown__search,
-.fx-select--sm .fx-select__search {
+.dropdown--sm .dropdown__search,
+.select--sm .select__search {
   padding: 0.375rem;
 }
 
-.fx-dropdown--sm .fx-dropdown__search-input,
-.fx-select--sm .fx-select__search-input {
+.dropdown--sm .dropdown__search-input,
+.select--sm .select__search-input {
   font-size: 0.875rem;
   padding: 0.25rem 0.75rem;
 }
 
-.fx-dropdown--lg .fx-dropdown__search,
-.fx-select--lg .fx-select__search {
+.dropdown--lg .dropdown__search,
+.select--lg .select__search {
   padding: 0.625rem;
 }
 
-.fx-dropdown--lg .fx-dropdown__search-input,
-.fx-select--lg .fx-select__search-input {
+.dropdown--lg .dropdown__search-input,
+.select--lg .select__search-input {
   font-size: 1.125rem;
   padding: 0.5rem 1.5rem;
 }
@@ -418,8 +419,8 @@
 /* -----------------------------------------------------------------------------
    Empty state
    ----------------------------------------------------------------------------- */
-.fx-dropdown__empty,
-.fx-select__empty {
+.dropdown__empty,
+.select__empty {
   display: flex;
   align-items: center;
   justify-content: center;
@@ -430,14 +431,14 @@
   font-style: italic;
 }
 
-.fx-dropdown--sm .fx-dropdown__empty,
-.fx-select--sm .fx-select__empty {
+.dropdown--sm .dropdown__empty,
+.select--sm .select__empty {
   padding: 1rem 0.75rem;
   font-size: 0.875rem;
 }
 
-.fx-dropdown--lg .fx-dropdown__empty,
-.fx-select--lg .fx-select__empty {
+.dropdown--lg .dropdown__empty,
+.select--lg .select__empty {
   padding: 2rem 1.5rem;
   font-size: 1.125rem;
 }
@@ -445,8 +446,8 @@
 /* -----------------------------------------------------------------------------
    Loading state
    ----------------------------------------------------------------------------- */
-.fx-dropdown__loading,
-.fx-select__loading {
+.dropdown__loading,
+.select__loading {
   display: flex;
   align-items: center;
   justify-content: center;
@@ -457,14 +458,14 @@
   font-size: 1rem;
 }
 
-.fx-dropdown__loading [class^="fr-icon-"],
-.fx-dropdown__loading [class*=" fr-icon-"],
-.fx-select__loading [class^="fr-icon-"],
-.fx-select__loading [class*=" fr-icon-"] {
-  animation: fx-popover-spin 1s linear infinite;
+.dropdown__loading [class^="fr-icon-"],
+.dropdown__loading [class*=" fr-icon-"],
+.select__loading [class^="fr-icon-"],
+.select__loading [class*=" fr-icon-"] {
+  animation: popover-spin 1s linear infinite;
 }
 
-@keyframes fx-popover-spin {
+@keyframes popover-spin {
   from {
     transform: rotate(0deg);
   }
@@ -473,15 +474,15 @@
   }
 }
 
-.fx-dropdown--sm .fx-dropdown__loading,
-.fx-select--sm .fx-select__loading {
+.dropdown--sm .dropdown__loading,
+.select--sm .select__loading {
   padding: 1rem 0.75rem;
   gap: 0.5rem;
   font-size: 0.875rem;
 }
 
-.fx-dropdown--lg .fx-dropdown__loading,
-.fx-select--lg .fx-select__loading {
+.dropdown--lg .dropdown__loading,
+.select--lg .select__loading {
   padding: 2rem 1.5rem;
   gap: 0.625rem;
   font-size: 1.125rem;
@@ -490,8 +491,8 @@
 /* -----------------------------------------------------------------------------
    Separator
    ----------------------------------------------------------------------------- */
-.fx-dropdown__separator,
-.fx-select__separator {
+.dropdown__separator,
+.select__separator {
   height: 1px;
   margin: 0.25rem 0;
   padding: 0;
@@ -502,15 +503,15 @@
 /* -----------------------------------------------------------------------------
    Content container - scrollable area (default max-height)
    ----------------------------------------------------------------------------- */
-.fx-dropdown__content,
-.fx-select__content {
+.dropdown__content,
+.select__content {
   overflow-y: auto;
 }
 
 /* -----------------------------------------------------------------------------
    Dropdown Item - button/link action
    ----------------------------------------------------------------------------- */
-.fx-dropdown__item {
+.dropdown__item {
   display: flex;
   flex-direction: row;
   align-items: center;
@@ -529,41 +530,41 @@
   text-decoration: none;
 }
 
-.fx-dropdown--sm .fx-dropdown__item {
+.dropdown--sm .dropdown__item {
   padding: 0.25rem 0.75rem;
   font-size: 0.875rem;
 }
 
-.fx-dropdown--lg .fx-dropdown__item {
+.dropdown--lg .dropdown__item {
   padding: 0.5rem 1.5rem;
   font-size: 1.125rem;
 }
 
-.fx-dropdown__item:hover {
+.dropdown__item:hover {
   background-color: var(--hover) !important;
 }
 
-.fx-dropdown__item:active {
+.dropdown__item:active {
   background-color: var(--active) !important;
 }
 
-.fx-dropdown__item:focus {
+.dropdown__item:focus {
   outline: 2px solid #0a76f6 !important;
   outline-offset: -2px !important;
 }
 
-.fx-dropdown__item:focus:not(:focus-visible) {
+.dropdown__item:focus:not(:focus-visible) {
   outline: none !important;
 }
 
-.fx-dropdown__item:focus-visible {
+.dropdown__item:focus-visible {
   outline: 2px solid #0a76f6 !important;
   outline-offset: -2px !important;
 }
 
 /* Disable DSFR underline on links */
-a.fx-dropdown__item[href],
-.fx-dropdown__item a[href] {
+a.dropdown__item[href],
+.dropdown__item a[href] {
   background-image: none;
   background-size: 0;
   --underline-idle-width: 0;
@@ -571,34 +572,34 @@ a.fx-dropdown__item[href],
 }
 
 /* Shadow separator between items (only at root level, not in groups) */
-.fx-dropdown__popover-inner > .fx-dropdown__item + .fx-dropdown__item {
+.dropdown__popover-inner > .dropdown__item + .dropdown__item {
   box-shadow: inset 0 1px 0 0 var(--border-default-grey);
 }
 
 /* Active/selected state */
-.fx-dropdown__item--active,
-.fx-dropdown__item[aria-current="true"] {
+.dropdown__item--active,
+.dropdown__item[aria-current="true"] {
   color: var(--text-active-blue-france);
   background-color: var(--background-contrast-blue-france);
 }
 
-.fx-dropdown__item--active:hover,
-.fx-dropdown__item[aria-current="true"]:hover {
+.dropdown__item--active:hover,
+.dropdown__item[aria-current="true"]:hover {
   background-color: var(--background-contrast-blue-france-hover);
 }
 
 /* Destructive action (red) */
-.fx-dropdown__item--destructive {
+.dropdown__item--destructive {
   color: var(--text-default-error);
 }
 
-.fx-dropdown__item--destructive:hover {
+.dropdown__item--destructive:hover {
   background-color: var(--background-contrast-error-hover, rgba(206, 5, 0, 0.1));
   color: var(--text-default-error);
 }
 
 /* Icon positioning */
-.fx-dropdown__item[class*="fr-icon-"]::before {
+.dropdown__item[class*="fr-icon-"]::before {
   --icon-size: 1rem;
   flex: 0 0 auto;
   display: inline-block;
@@ -611,20 +612,20 @@ a.fx-dropdown__item[href],
   order: -1;
 }
 
-.fx-dropdown__item--icon-right[class*="fr-icon-"]::before {
+.dropdown__item--icon-right[class*="fr-icon-"]::before {
   order: 1;
   margin-left: auto;
 }
 
-.fx-dropdown--sm .fx-dropdown__item[class*="fr-icon-"]::before {
+.dropdown--sm .dropdown__item[class*="fr-icon-"]::before {
   --icon-size: 0.875rem;
 }
 
-.fx-dropdown--lg .fx-dropdown__item[class*="fr-icon-"]::before {
+.dropdown--lg .dropdown__item[class*="fr-icon-"]::before {
   --icon-size: 1.125rem;
 }
 
-.fx-select__option[class*="fr-icon-"]::before {
+.select__option[class*="fr-icon-"]::before {
   --icon-size: 1rem;
   flex: 0 0 auto;
   display: inline-block;
@@ -636,23 +637,23 @@ a.fx-dropdown__item[href],
   order: -1;
 }
 
-.fx-select__option--icon-right[class*="fr-icon-"]::before {
+.select__option--icon-right[class*="fr-icon-"]::before {
   order: 1;
   margin-left: auto;
 }
 
-.fx-select--sm .fx-select__option[class*="fr-icon-"]::before {
+.select--sm .select__option[class*="fr-icon-"]::before {
   --icon-size: 0.875rem;
 }
 
-.fx-select--lg .fx-select__option[class*="fr-icon-"]::before {
+.select--lg .select__option[class*="fr-icon-"]::before {
   --icon-size: 1.125rem;
 }
 
 /* -----------------------------------------------------------------------------
    Select Option - simple selectable item
    ----------------------------------------------------------------------------- */
-.fx-select__option {
+.select__option {
   display: flex;
   flex-direction: row;
   align-items: center;
@@ -672,56 +673,56 @@ a.fx-dropdown__item[href],
   position: relative;
 }
 
-.fx-select--sm .fx-select__option {
+.select--sm .select__option {
   padding: 0.25rem 0.75rem;
   font-size: 0.875rem;
   line-height: 1.5rem;
 }
 
-.fx-select--lg .fx-select__option {
+.select--lg .select__option {
   padding: 0.5rem 1.5rem;
   font-size: 1.125rem;
   line-height: 1.75rem;
   gap: 0.625rem;
 }
 
-.fx-select__option:hover {
+.select__option:hover {
   background-color: var(--hover);
 }
 
-.fx-select__option:active {
+.select__option:active {
   background-color: var(--active);
 }
 
-.fx-select__option:focus {
+.select__option:focus {
   outline: 2px solid #0a76f6 !important;
   outline-offset: -2px !important;
 }
 
-.fx-select__option:focus:not(:focus-visible) {
+.select__option:focus:not(:focus-visible) {
   outline: none !important;
 }
 
-.fx-select__option:focus-visible {
+.select__option:focus-visible {
   outline: 2px solid #0a76f6 !important;
   outline-offset: -2px !important;
 }
 
-.fx-select__option--disabled,
-.fx-select__option[aria-disabled="true"] {
+.select__option--disabled,
+.select__option[aria-disabled="true"] {
   opacity: 0.5;
   cursor: not-allowed;
   pointer-events: none;
 }
 
 /* Selected state with blue bar */
-.fx-select__option--selected,
-.fx-select__option[aria-selected="true"] {
+.select__option--selected,
+.select__option[aria-selected="true"] {
   color: var(--text-active-blue-france);
 }
 
-.fx-select__option--selected::before,
-.fx-select__option[aria-selected="true"]::before {
+.select__option--selected::before,
+.select__option[aria-selected="true"]::before {
   content: "";
   display: block;
   position: absolute;
@@ -733,15 +734,15 @@ a.fx-dropdown__item[href],
   background-color: var(--background-active-blue-france);
 }
 
-.fx-select__option--selected:hover,
-.fx-select__option[aria-selected="true"]:hover {
+.select__option--selected:hover,
+.select__option[aria-selected="true"]:hover {
   background-color: var(--hover);
 }
 
 /* -----------------------------------------------------------------------------
    Select Checkbox - multi-select option
    ----------------------------------------------------------------------------- */
-.fx-select__checkbox {
+.select__checkbox {
   display: flex;
   flex-direction: row;
   align-items: center;
@@ -757,25 +758,25 @@ a.fx-dropdown__item[href],
   text-align: left;
 }
 
-.fx-select__checkbox:hover {
+.select__checkbox:hover {
   background-color: var(--hover);
 }
 
-.fx-select__checkbox:focus {
+.select__checkbox:focus {
   outline: 2px solid #0a76f6 !important;
   outline-offset: -2px !important;
 }
 
-.fx-select__checkbox:focus:not(:focus-visible) {
+.select__checkbox:focus:not(:focus-visible) {
   outline: none !important;
 }
 
-.fx-select__checkbox:focus-visible {
+.select__checkbox:focus-visible {
   outline: 2px solid #0a76f6 !important;
   outline-offset: -2px !important;
 }
 
-.fx-select__checkbox input[type="checkbox"] {
+.select__checkbox input[type="checkbox"] {
   flex: 0 0 auto;
   width: 1rem;
   height: 1rem;
@@ -784,38 +785,38 @@ a.fx-dropdown__item[href],
   accent-color: var(--background-active-blue-france);
 }
 
-.fx-select__checkbox-label {
+.select__checkbox-label {
   flex: 1 1 auto;
   cursor: pointer;
 }
 
-.fx-select--sm .fx-select__checkbox {
+.select--sm .select__checkbox {
   padding: 0.25rem 0.75rem;
   font-size: 0.875rem;
   line-height: 1.5rem;
   gap: 0.5rem;
 }
 
-.fx-select--lg .fx-select__checkbox {
+.select--lg .select__checkbox {
   padding: 0.5rem 1.5rem;
   font-size: 1.125rem;
   line-height: 1.75rem;
   gap: 0.75rem;
 }
 
-.fx-select__checkbox--disabled {
+.select__checkbox--disabled {
   opacity: 0.5;
   cursor: not-allowed;
 }
 
-.fx-select__checkbox--disabled:hover {
+.select__checkbox--disabled:hover {
   background-color: transparent;
 }
 
 /* -----------------------------------------------------------------------------
    Select Radio - single-select with radio visual
    ----------------------------------------------------------------------------- */
-.fx-select__radio {
+.select__radio {
   display: flex;
   flex-direction: row;
   align-items: center;
@@ -831,25 +832,25 @@ a.fx-dropdown__item[href],
   text-align: left;
 }
 
-.fx-select__radio:hover {
+.select__radio:hover {
   background-color: var(--hover);
 }
 
-.fx-select__radio:focus {
+.select__radio:focus {
   outline: 2px solid #0a76f6 !important;
   outline-offset: -2px !important;
 }
 
-.fx-select__radio:focus:not(:focus-visible) {
+.select__radio:focus:not(:focus-visible) {
   outline: none !important;
 }
 
-.fx-select__radio:focus-visible {
+.select__radio:focus-visible {
   outline: 2px solid #0a76f6 !important;
   outline-offset: -2px !important;
 }
 
-.fx-select__radio input[type="radio"] {
+.select__radio input[type="radio"] {
   flex: 0 0 auto;
   width: 1rem;
   height: 1rem;
@@ -858,30 +859,30 @@ a.fx-dropdown__item[href],
   accent-color: var(--background-active-blue-france);
 }
 
-.fx-select__radio-label {
+.select__radio-label {
   flex: 1 1 auto;
   cursor: pointer;
 }
 
-.fx-select--sm .fx-select__radio {
+.select--sm .select__radio {
   padding: 0.25rem 0.75rem;
   font-size: 0.875rem;
   line-height: 1.5rem;
   gap: 0.5rem;
 }
 
-.fx-select--lg .fx-select__radio {
+.select--lg .select__radio {
   padding: 0.5rem 1.5rem;
   font-size: 1.125rem;
   line-height: 1.75rem;
   gap: 0.75rem;
 }
 
-.fx-select__radio--disabled {
+.select__radio--disabled {
   opacity: 0.5;
   cursor: not-allowed;
 }
 
-.fx-select__radio--disabled:hover {
+.select__radio--disabled:hover {
   background-color: transparent;
 }

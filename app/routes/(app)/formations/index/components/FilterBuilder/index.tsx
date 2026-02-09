@@ -431,13 +431,12 @@ function FilterRow({
 
   return (
     <div className="filter-builder__row fx-flex fx-items-baseline fx-gap-4w fr-px-3v fr-py-1w fr-mb-1w">
-      <span
-        className="fr-text fr-text--bold fx-flex-shrink-0 fr-mb-0"
-        style={{ minWidth: '120px' }}
-      >
+      <span className="fr-text fr-text--bold fx-flex-shrink-0 fr-mb-0" style={{ width: '10rem' }}>
         {config.label}
       </span>
-      <i className="fr-text--sm fr-text-mention--grey fx-flex-shrink-0 fr-mb-0">{operator}</i>
+      <i className="fr-hidden fr-unhidden-sm fr-text--sm fr-text-mention--grey fx-flex-shrink-0 fr-mb-0">
+        {operator}
+      </i>
       <div style={{ flex: 1, minWidth: 0 }}>
         {config.type === 'multiselect' && (
           <MultiselectValuePicker

@@ -5,5 +5,5 @@ export interface SelectSeparatorProps {
 }
 
 export function Separator({ className }: SelectSeparatorProps) {
-  return <hr className={cn('fx-select__separator', className)} />;
+  return <hr className={cn('select__separator', className)} />;
 }

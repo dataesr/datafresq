@@ -1,54 +1,32 @@
-import {
-  Component,
-  type ErrorInfo,
-  forwardRef,
-  type ReactNode,
-  useEffect,
-  useImperativeHandle,
-  useRef,
-} from 'react';
+import { Component, type ErrorInfo, type ReactNode, useEffect, useRef } from 'react';
 import { useLocation } from 'react-router';
 import { APIError } from '@/api/eden-treaty';
 import Error403 from './Error403';
 import Error404 from './Error404';
 import Error500 from './Error500';
 
-// =============================================================================
-// ERROR FALLBACK
-// =============================================================================
-
 interface ErrorFallbackProps {
   error: Error;
-  resetError: () => void;
 }
 
-function ErrorFallback({ error, resetError }: ErrorFallbackProps) {
+function ErrorFallback({ error }: ErrorFallbackProps) {
   if (error instanceof APIError) {
     if (error.is(403)) return <Error403 />;
     if (error.is(404)) return <Error404 />;
   }
 
-  return <Error500 resetError={resetError} />;
+  return <Error500 />;
 }
-
-// =============================================================================
-// ERROR BOUNDARY CLASS
-// =============================================================================
 
 interface Props {
   children: ReactNode;
   fallback?: ReactNode | ((props: ErrorFallbackProps) => ReactNode);
   onError?: (error: Error, errorInfo: ErrorInfo) => void;
-  onReset?: () => void;
 }
 
 interface State {
   hasError: boolean;
   error: Error | null;
-}
-
-interface ErrorBoundaryHandle {
-  resetError: () => void;
 }
 
 class ErrorBoundaryClass extends Component<Props, State> {
@@ -67,7 +45,6 @@ class ErrorBoundaryClass extends Component<Props, State> {
   }
 
   resetError = () => {
-    this.props.onReset?.();
     this.setState({ hasError: false, error: null });
   };
 
@@ -75,42 +52,21 @@ class ErrorBoundaryClass extends Component<Props, State> {
     if (this.state.hasError && this.state.error) {
       if (this.props.fallback) {
         if (typeof this.props.fallback === 'function') {
-          return this.props.fallback({
-            error: this.state.error,
-            resetError: this.resetError,
-          });
+          return this.props.fallback({ error: this.state.error });
         }
         return this.props.fallback;
       }
 
-      return <ErrorFallback error={this.state.error} resetError={this.resetError} />;
+      return <ErrorFallback error={this.state.error} />;
     }
 
     return this.props.children;
   }
 }
 
-// =============================================================================
-// ERROR BOUNDARY WITH ROUTE RESET
-// =============================================================================
-
-const ErrorBoundaryInner = forwardRef<ErrorBoundaryHandle, Props>(
-  function ErrorBoundaryInner(props, ref) {
-    const classRef = useRef<ErrorBoundaryClass>(null);
-
-    useImperativeHandle(ref, () => ({
-      resetError: () => {
-        classRef.current?.resetError();
-      },
-    }));
-
-    return <ErrorBoundaryClass ref={classRef} {...props} />;
-  },
-);
-
-function ErrorBoundaryWithReset(props: Props) {
+function ErrorBoundaryWithRouteReset(props: Props) {
   const location = useLocation();
-  const errorBoundaryRef = useRef<ErrorBoundaryHandle>(null);
+  const errorBoundaryRef = useRef<ErrorBoundaryClass>(null);
   const prevPathRef = useRef(location.pathname);
 
   useEffect(() => {
@@ -120,15 +76,11 @@ function ErrorBoundaryWithReset(props: Props) {
     }
   }, [location.pathname]);
 
-  return <ErrorBoundaryInner ref={errorBoundaryRef} {...props} />;
+  return <ErrorBoundaryClass ref={errorBoundaryRef} {...props} />;
 }
 
-// =============================================================================
-// EXPORTS
-// =============================================================================
-
 export function ErrorBoundary(props: Props) {
-  return <ErrorBoundaryWithReset {...props} />;
+  return <ErrorBoundaryWithRouteReset {...props} />;
 }
 
 export default ErrorBoundary;

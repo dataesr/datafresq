@@ -7,5 +7,5 @@ export interface SelectHeaderProps {
 }
 
 export function Header({ children, className }: SelectHeaderProps) {
-  return <div className={cn('fx-select__header', className)}>{children}</div>;
+  return <div className={cn('select__header', className)}>{children}</div>;
 }

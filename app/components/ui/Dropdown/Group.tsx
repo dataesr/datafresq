@@ -10,9 +10,9 @@ export interface DropdownGroupProps {
 export function Group({ label, children, className }: DropdownGroupProps) {
   return (
     /* biome-ignore lint/a11y/useSemanticElements: role="group" is intentional */
-    <div role="group" aria-label={label} className={cn('fx-dropdown__group', className)}>
-      {label && <div className="fx-dropdown__group-label">{label}</div>}
-      <div className="fx-dropdown__group-content">{children}</div>
+    <div role="group" aria-label={label} className={cn('dropdown__group', className)}>
+      {label && <div className="dropdown__group-label">{label}</div>}
+      <div className="dropdown__group-content">{children}</div>
     </div>
   );
 }

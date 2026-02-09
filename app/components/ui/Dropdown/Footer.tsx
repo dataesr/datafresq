@@ -11,8 +11,8 @@ export function Footer({ children, className, align = 'between' }: DropdownFoote
   return (
     <div
       className={cn(
-        'fx-dropdown__footer',
-        align !== 'between' && `fx-dropdown__footer--${align}`,
+        'dropdown__footer',
+        align !== 'between' && `dropdown__footer--${align}`,
         className,
       )}
     >

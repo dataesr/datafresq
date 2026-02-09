@@ -5,5 +5,5 @@ export interface DropdownSeparatorProps {
 }
 
 export function Separator({ className }: DropdownSeparatorProps) {
-  return <hr className={cn('fx-dropdown__separator', className)} />;
+  return <hr className={cn('dropdown__separator', className)} />;
 }

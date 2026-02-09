@@ -1,5 +1,5 @@
 import type { HighchartsReactRefObject } from '@highcharts/react';
-import { useId, useState } from 'react';
+import { Activity, useEffect, useId, useState } from 'react';
 import { Modal, useModal } from '@/components/Modal';
 import { Dropdown } from '@/components/ui/Dropdown';
 import './styles.css';
@@ -27,6 +27,7 @@ export interface AnalyticsGraphProps {
   details?: React.ReactNode;
   source?: React.ReactNode;
   children: React.ReactNode;
+  tooltip?: React.ReactNode;
   chartRef?: ChartRef;
   hideMenu?: boolean;
 }
@@ -37,6 +38,7 @@ export function AnalyticsGraph({
   details,
   source,
   children,
+  tooltip,
   chartRef,
   hideMenu = false,
 }: AnalyticsGraphProps) {
@@ -46,6 +48,15 @@ export function AnalyticsGraph({
   const [tableHtml, setTableHtml] = useState<string | null>(null);
 
   const showMenu = chartRef && !hideMenu;
+
+  useEffect(() => {
+    if (!chartRef) return;
+    const chart = getChartWithExporting(chartRef);
+    if (!chart) return;
+    chart.setTitle({ text: title, style: { display: 'none' } });
+    typeof description === 'string' &&
+      chart.setSubtitle({ text: description, style: { display: 'none' } });
+  }, [chartRef, title, description]);
 
   const handleExportPng = () => {
     if (!chartRef) return;
@@ -99,38 +110,42 @@ export function AnalyticsGraph({
               </p>
             )}
           </div>
-          {showMenu && (
-            <div>
-              <Dropdown
-                icon="settings-5-line"
-                size="sm"
-                outline={false}
-                title="Options"
-                aria-label="Options"
-              >
-                <Dropdown.Header>Affichage</Dropdown.Header>
-                <Dropdown.Item icon="fullscreen-line" onClick={handleFullscreen}>
-                  Plein écran
-                </Dropdown.Item>
-                <Dropdown.Item icon="table-line" onClick={handleViewTable}>
-                  Voir en tableau
-                </Dropdown.Item>
-                <Dropdown.Separator />
-                <Dropdown.Header>Exporter</Dropdown.Header>
-                <Dropdown.Item icon="image-line" onClick={handleExportPng}>
-                  Export PNG
-                </Dropdown.Item>
-                <Dropdown.Item icon="file-pdf-line" onClick={handleExportPdf}>
-                  Export PDF
-                </Dropdown.Item>
-                <Dropdown.Separator />
-                <Dropdown.Header>Télécharger</Dropdown.Header>
-                <Dropdown.Item icon="download-line" onClick={handleDownloadCsv}>
-                  Télécharger CSV
-                </Dropdown.Item>
-              </Dropdown>
-            </div>
-          )}
+          <div>
+          <Activity mode={tooltip ? 'visible' : 'hidden'}>
+            <button aria-describedby={`${titleId}-tooltip`} type="button" className="fr-btn--tooltip fr-btn">infobulle</button>
+            <span className="fr-tooltip fr-placement" id={`${titleId}-tooltip`} role="tooltip">{tooltip}</span>
+          </Activity>
+          <Activity mode={showMenu ? 'visible' : 'hidden'}>
+            <Dropdown
+              icon="settings-5-line"
+              size="sm"
+              outline={false}
+              title="Options"
+              aria-label="Options"
+            >
+              <Dropdown.Header>Affichage</Dropdown.Header>
+              <Dropdown.Item icon="fullscreen-line" onClick={handleFullscreen}>
+                Plein écran
+              </Dropdown.Item>
+              <Dropdown.Item icon="table-line" onClick={handleViewTable}>
+                Voir en tableau
+              </Dropdown.Item>
+              <Dropdown.Separator />
+              <Dropdown.Header>Exporter</Dropdown.Header>
+              <Dropdown.Item icon="image-line" onClick={handleExportPng}>
+                Export PNG
+              </Dropdown.Item>
+              <Dropdown.Item icon="file-pdf-line" onClick={handleExportPdf}>
+                Export PDF
+              </Dropdown.Item>
+              <Dropdown.Separator />
+              <Dropdown.Header>Télécharger</Dropdown.Header>
+              <Dropdown.Item icon="download-line" onClick={handleDownloadCsv}>
+                Télécharger CSV
+              </Dropdown.Item>
+            </Dropdown>
+          </Activity>
+          </div>
         </div>
 
         {/* Chart content area - grows to fill available space */}
@@ -180,7 +195,6 @@ export function AnalyticsGraph({
                       </button>
                     </div>
                     <div className="fr-modal__content">
-                      <h1 className="fr-modal__title">{title}</h1>
                       {tableHtml && (
                         <div
                           className="fr-table fr-table--bordered"

@@ -71,28 +71,28 @@ export function Select({
 
   const triggerClasses = cn(
     'fr-btn',
-    'fx-select__trigger',
+    'select__trigger',
     sizeClass,
     variantClass,
     iconClass,
     iconPositionClass,
-    showArrow && 'fx-select__trigger--has-arrow',
-    fullWidth && 'fx-select__trigger--full-width',
+    showArrow && 'select__trigger--has-arrow',
+    fullWidth && 'select__trigger--full-width',
   );
 
   const containerClasses = cn(
-    'fx-select',
-    size !== 'md' && `fx-select--${size}`,
-    fullWidth && 'fx-select--full-width',
+    'select',
+    size !== 'md' && `select--${size}`,
+    fullWidth && 'select--full-width',
     className,
   );
 
   const popoverClasses = cn(
-    'fx-select__popover',
-    isOpen && 'fx-select__popover--expanded',
-    computedAlign === 'end' && 'fx-select__popover--align-end',
-    computedPlacement === 'top' && 'fx-select__popover--placement-top',
-    portal && 'fx-select__popover--portal',
+    'select__popover',
+    isOpen && 'select__popover--expanded',
+    computedAlign === 'end' && 'select__popover--align-end',
+    computedPlacement === 'top' && 'select__popover--placement-top',
+    portal && 'select__popover--portal',
   );
 
   const popoverStyle: CSSProperties = {
@@ -102,16 +102,8 @@ export function Select({
     ...(portal &&
       position && {
         position: 'absolute',
-        top: computedPlacement === 'bottom' ? position.top : 'auto',
-        bottom:
-          computedPlacement === 'top'
-            ? `${document.documentElement.scrollHeight - position.top}px`
-            : 'auto',
-        left: computedAlign === 'start' ? position.left : 'auto',
-        right:
-          computedAlign === 'end'
-            ? `${document.documentElement.scrollWidth - position.left}px`
-            : 'auto',
+        top: position.top,
+        left: position.left,
         minWidth: position.minWidth,
       }),
   } as CSSProperties;
@@ -133,7 +125,7 @@ export function Select({
       className={popoverClasses}
       style={popoverStyle}
     >
-      <div className="fx-select__popover-inner">{children}</div>
+      <div className="select__popover-inner">{children}</div>
     </div>
   );
 

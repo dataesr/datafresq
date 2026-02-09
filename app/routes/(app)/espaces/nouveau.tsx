@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { Link, useNavigate, useSearchParams } from 'react-router';
 import { useAuth } from '@/api/auth';
 import { useCreateWorkspace } from '@/api/workspaces';
+import { Breadcrumb } from '@/components/Breadcrumb';
 import ColorPicker from '@/components/ColorPicker';
 import { Input } from '@/components/Input';
 import { toast } from '@/components/ui/Toast';
@@ -54,7 +55,7 @@ export default function NouveauEspacePage() {
           return { title: successMessage };
         },
         error: (err) => ({
-          title: "Erreur lors de la création",
+          title: 'Erreur lors de la création',
           description: getErrorMessage(err),
         }),
       },
@@ -62,38 +63,17 @@ export default function NouveauEspacePage() {
   };
 
   return (
-    <div className="page">
-      <nav className="fr-breadcrumb" aria-label="vous êtes ici :">
-        <button
-          type="button"
-          className="fr-breadcrumb__button"
-          aria-expanded="false"
-          aria-controls="breadcrumb-1"
-        >
-          Voir le fil d'Ariane
-        </button>
-        <div className="fr-collapse" id="breadcrumb-1">
-          <ol className="fr-breadcrumb__list">
-            <li>
-              <Link className="fr-breadcrumb__link" to="/">
-                Accueil
-              </Link>
-            </li>
-            <li>
-              <Link className="fr-breadcrumb__link" to="/espaces">
-                Espaces
-              </Link>
-            </li>
-            <li>
-              <Link to="#" className="fr-breadcrumb__link" aria-current="page">
-                Nouvel espace
-              </Link>
-            </li>
-          </ol>
-        </div>
-      </nav>
+    <div className="fx-content-container">
+      <Breadcrumb
+        items={[
+          { label: 'Accueil', href: '/' },
+          { label: 'Espaces', href: '/espaces' },
+          { label: 'Nouvel espace', current: true },
+        ]}
+      />
 
-      <h1 className="fr-h2 fr-mb-4w">Créer un espace de travail</h1>
+      <h1 className="fr-h2">Créer un espace de travail</h1>
+      <hr className="fr-mt-6w fr-pb-6w" />
 
       {formationIds.length > 0 && (
         <div className="fr-alert fr-alert--info fr-mb-3w">
@@ -106,14 +86,14 @@ export default function NouveauEspacePage() {
       )}
 
       <form onSubmit={handleSubmit}>
-        <div className="fr-grid-row fr-pb-6w">
-          <div className="fr-col-12 fr-col-md-4 fr-px-1w">
+        <div className="fr-grid-row fr-grid-row--gutters">
+          <div className="fr-col-12 fr-col-md-4">
             <p className="fr-text--lead fr-text--bold fr-mb-1w">Général</p>
             <p className="fr-text--sm fr-text-mention--grey fr-mb-0">
               Informations de base de votre espace de travail
             </p>
           </div>
-          <div className="fr-col-12 fr-col-md-6 fr-col-offset-md-2 fr-px-2w">
+          <div className="fr-col-12 fr-col-md-6 fr-col-offset-md-2">
             <Input
               required
               label="Nom"
@@ -144,16 +124,16 @@ export default function NouveauEspacePage() {
           </div>
         </div>
 
-        <hr />
+        <hr className="fr-mt-6w fr-pb-6w" />
 
-        <div className="fr-grid-row fr-py-6w">
-          <div className="fr-col-12 fr-col-md-4 fr-px-1w">
+        <div className="fr-grid-row fr-grid-row--gutters">
+          <div className="fr-col-12 fr-col-md-4">
             <p className="fr-text--lead fr-text--bold fr-mb-1w">Visibilité</p>
             <p className="fr-text--sm fr-text-mention--grey fr-mb-0">
               Définissez qui peut voir cet espace
             </p>
           </div>
-          <div className="fr-col-12 fr-col-md-6 fr-col-offset-md-2 fr-px-2w">
+          <div className="fr-col-12 fr-col-md-6 fr-col-offset-md-2">
             <fieldset className="fr-fieldset">
               <div className="fr-fieldset__content">
                 <div className="fr-radio-group">
@@ -189,17 +169,17 @@ export default function NouveauEspacePage() {
           </div>
         </div>
 
-        <hr />
+        <hr className="fr-mt-6w fr-pb-6w" />
 
-        <div className="fr-grid-row fr-py-6w">
-          <div className="fr-col-12 fr-col-md-4 fr-px-1w">
+        <div className="fr-grid-row fr-grid-row--gutters">
+          <div className="fr-col-12 fr-col-md-4">
             <p className="fr-text--lead fr-text--bold fr-mb-1w">Collaborateurs</p>
             <p className="fr-text--sm fr-text-mention--grey fr-mb-0">
               Ajoutez des utilisateurs qui pourront accéder à cet espace. Vous pourrez en ajouter
               d'autres plus tard.
             </p>
           </div>
-          <div className="fr-col-12 fr-col-md-6 fr-col-offset-md-2 fr-px-2w">
+          <div className="fr-col-12 fr-col-md-6 fr-col-offset-md-2">
             <PendingUserManager
               pendingUsers={pendingUsers}
               onAddUser={addUser}
@@ -210,11 +190,10 @@ export default function NouveauEspacePage() {
           </div>
         </div>
 
-        <hr />
+        <hr className="fr-mt-6w fr-pb-6w" />
 
-        <div className="fr-grid-row fr-py-6w">
-          <div className="fr-col-12 fr-col-md-4 fr-px-1w" />
-          <div className="fr-col-12 fr-col-md-6 fr-col-offset-md-2 fr-px-2w">
+        <div className="fr-grid-row fr-grid-row--gutters fr-grid-row--right">
+          <div className="fr-col-12">
             <div className="fx-flex fx-gap-4w fx-justify-end">
               <Link to="/espaces" className="fr-btn fr-btn--secondary">
                 Annuler

@@ -19,19 +19,19 @@ export function Item({
   ...props
 }: DropdownItemProps) {
   const iconClass = icon ? `fr-icon-${icon}` : null;
-  const iconPosClass = icon && iconPosition === 'right' ? 'fx-dropdown__item--icon-right' : null;
+  const iconPosClass = icon && iconPosition === 'right' ? 'dropdown__item--icon-right' : null;
 
   return (
     <button
       type="button"
       role="menuitem"
       className={cn(
-        'fx-dropdown__item',
+        'dropdown__item',
         iconClass,
         iconPosClass,
         {
-          'fx-dropdown__item--destructive': destructive,
-          'fx-dropdown__item--active': active,
+          'dropdown__item--destructive': destructive,
+          'dropdown__item--active': active,
         },
         className,
       )}

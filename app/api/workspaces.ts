@@ -1,7 +1,12 @@
-import { useMutation, useQueryClient, useSuspenseQuery } from '@tanstack/react-query';
+import { useMutation, useQuery, useQueryClient, useSuspenseQuery } from '@tanstack/react-query';
 import { useAuth } from '@/api/auth';
 import { APIError, api } from '@/api/eden-treaty';
-import type { CreateWorkspaceFromSearchResponse, ReadWorkspace } from '~/schemas/workspaces';
+import type {
+  CreateWorkspaceFromSearchResponse,
+  PreviewAddProgramsResponse,
+  ReadWorkspace,
+  WorkspaceSearchParams,
+} from '~/schemas/workspaces';
 
 // =============================================================================
 // QUERY KEYS
@@ -82,7 +87,7 @@ interface CreateWorkspaceFromSearchInput {
 async function createWorkspaceFromSearch(
   input: CreateWorkspaceFromSearchInput
 ): Promise<CreateWorkspaceFromSearchResponse> {
-  const { data, error } = await api.workspaces['from-search'].post(input);
+  const { data, error } = await (api.workspaces as any)['from-search'].post(input);
   if (error) throw new APIError(error);
   return data;
 }
@@ -147,12 +152,32 @@ async function leaveWorkspace(workspaceId: string) {
 async function addPrograms({
   workspaceId,
   programIds,
+  searchParams,
 }: {
   workspaceId: string;
-  programIds: string[];
+  programIds?: string[];
+  searchParams?: WorkspaceSearchParams;
 }) {
   const { data, error } = await api.workspaces({ id: workspaceId }).programs.post({
     programs: programIds,
+    searchParams,
+  });
+  if (error) throw new APIError(error);
+  return data;
+}
+
+async function previewAddPrograms({
+  workspaceId,
+  programIds,
+  searchParams,
+}: {
+  workspaceId: string;
+  programIds?: string[];
+  searchParams?: WorkspaceSearchParams;
+}): Promise<PreviewAddProgramsResponse> {
+  const { data, error } = await api.workspaces({ id: workspaceId }).programs.preview.post({
+    programIds,
+    searchParams,
   });
   if (error) throw new APIError(error);
   return data;
@@ -252,6 +277,21 @@ export function useWorkspaceHistory(
   return useSuspenseQuery({
     queryKey: workspaceQueryKeys.history(workspaceId, options),
     queryFn: () => getWorkspaceHistory(workspaceId, options),
+  });
+}
+
+export function usePreviewAddPrograms(
+  workspaceId: string,
+  programIds?: string[],
+  searchParams?: WorkspaceSearchParams,
+  enabled = true,
+) {
+  return useQuery({
+    queryKey: ['workspace', workspaceId, 'preview', programIds, searchParams] as const,
+    queryFn: () => previewAddPrograms({ workspaceId, programIds, searchParams }),
+    enabled: enabled && !!workspaceId && (!!programIds?.length || !!searchParams),
+    staleTime: 1000 * 30,
+    gcTime: 5000 * 60 * 10,
   });
 }
 
@@ -430,6 +470,7 @@ export function useAddPrograms() {
         queryKey: workspaceQueryKeys.history(updatedWorkspace.id),
       });
       queryClient.invalidateQueries({ queryKey: workspaceQueryKeys.user });
+      queryClient.invalidateQueries({ queryKey: ['workspace', updatedWorkspace.id] });
     },
   });
 }

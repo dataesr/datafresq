@@ -1,7 +1,7 @@
 import { parseAsStringLiteral, useQueryState } from 'nuqs';
 import { Activity, Suspense } from 'react';
-import { Link } from 'react-router';
 import { usePublicWorkspaces, useSharedWorkspaces, useWorkspaces } from '@/api/workspaces';
+import { Breadcrumb } from '@/components/Breadcrumb';
 import { AutoGrid } from '@/components/Grids/AutoGrid';
 import { CreateWorkspaceCard, WorkspaceCard } from './components/WorkspaceCard';
 import { WorkspaceSkeleton } from './components/WorkspaceSkeleton';
@@ -68,31 +68,13 @@ export default function EspacesPage() {
   );
 
   return (
-    <div className="page">
-      <nav className="fr-breadcrumb" aria-label="vous êtes ici :">
-        <button
-          type="button"
-          className="fr-breadcrumb__button"
-          aria-expanded="false"
-          aria-controls="breadcrumb-1"
-        >
-          Voir le fil d'Ariane
-        </button>
-        <div className="fr-collapse" id="breadcrumb-1">
-          <ol className="fr-breadcrumb__list">
-            <li>
-              <Link className="fr-breadcrumb__link" to="/">
-                Accueil
-              </Link>
-            </li>
-            <li>
-              <Link to="#" className="fr-breadcrumb__link" aria-current="page">
-                Espaces
-              </Link>
-            </li>
-          </ol>
-        </div>
-      </nav>
+    <div>
+      <Breadcrumb
+        items={[
+          { label: 'Accueil', href: '/' },
+          { label: 'Espaces de travail', current: true },
+        ]}
+      />
 
       <div className="fr-grid-row fr-grid-row--middle fr-mb-4w">
         <div className="fr-col">

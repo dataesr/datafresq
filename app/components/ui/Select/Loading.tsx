@@ -13,7 +13,7 @@ export function Loading({ children = 'Chargement...', className }: SelectLoading
   const iconSizeClass = size === 'sm' ? 'fr-icon--sm' : size === 'lg' ? 'fr-icon--lg' : undefined;
 
   return (
-    <div className={cn('fx-select__loading', className)}>
+    <div className={cn('select__loading', className)}>
       <span className={cn('fr-icon-refresh-line', iconSizeClass)} aria-hidden="true" />
       <span>{children}</span>
     </div>

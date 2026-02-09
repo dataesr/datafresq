@@ -42,7 +42,7 @@ export function Option({
   };
 
   const iconClass = icon ? `fr-icon-${icon}` : null;
-  const iconPosClass = icon && iconPosition === 'right' ? 'fx-select__option--icon-right' : null;
+  const iconPosClass = icon && iconPosition === 'right' ? 'select__option--icon-right' : null;
 
   return (
     <div
@@ -51,9 +51,9 @@ export function Option({
       aria-disabled={disabled}
       data-value={value}
       tabIndex={disabled ? -1 : 0}
-      className={cn('fx-select__option', iconClass, iconPosClass, className, {
-        'fx-select__option--selected': selected,
-        'fx-select__option--disabled': disabled,
+      className={cn('select__option', iconClass, iconPosClass, className, {
+        'select__option--selected': selected,
+        'select__option--disabled': disabled,
       })}
       onClick={handleClick}
       onKeyDown={handleKeyDown}

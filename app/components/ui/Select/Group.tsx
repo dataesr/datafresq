@@ -10,9 +10,9 @@ export interface SelectGroupProps {
 export function Group({ label, children, className }: SelectGroupProps) {
   return (
     /* biome-ignore lint/a11y/useSemanticElements: role="group" is intentional */
-    <div role="group" aria-label={label} className={cn('fx-select__group', className)}>
-      {label && <div className="fx-select__group-label">{label}</div>}
-      <div className="fx-select__group-content">{children}</div>
+    <div role="group" aria-label={label} className={cn('select__group', className)}>
+      {label && <div className="select__group-label">{label}</div>}
+      <div className="select__group-content">{children}</div>
     </div>
   );
 }

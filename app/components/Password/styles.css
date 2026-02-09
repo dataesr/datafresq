@@ -1,0 +1,15 @@
+.password__show-hide-checkbox {
+  position: absolute;
+  bottom: 0.25rem;
+  margin: auto;
+  right: 0.25rem;
+  top: 0.25rem;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  appearance: none !important;
+  -webkit-appearance: none !important;
+  -moz-appearance: none !important;
+}

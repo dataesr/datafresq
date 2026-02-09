@@ -1,10 +1,9 @@
 import { Link } from 'react-router';
 
-interface Error500Props {
-  resetError?: () => void;
-}
-
-export default function Error500({ resetError }: Error500Props) {
+export default function Error500() {
+  const handleRefresh = () => {
+    window.location.reload();
+  };
   return (
     <div className="fr-container">
       <div className="fr-my-7w fr-mt-md-12w fr-mb-md-10w fr-grid-row fr-grid-row--gutters fr-grid-row--middle fr-grid-row--center">
@@ -19,13 +18,11 @@ export default function Error500({ resetError }: Error500Props) {
             Essayez de rafraîchir la page ou bien réessayez plus tard.
           </p>
           <ul className="fr-btns-group fr-btns-group--inline-md">
-            {resetError && (
-              <li>
-                <button type="button" className="fr-btn" onClick={resetError}>
-                  Rafraîchir la page
-                </button>
-              </li>
-            )}
+            <li>
+              <button type="button" className="fr-btn" onClick={handleRefresh}>
+                Rafraîchir la page
+              </button>
+            </li>
             <li>
               <Link to="/" className="fr-btn fr-btn--secondary">
                 Page d'accueil

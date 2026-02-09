@@ -6,6 +6,7 @@ export interface DropdownContextValue {
   close: () => void;
   size: DropdownSize;
   closeOnAction: boolean;
+  isOpen: boolean;
 }
 
 export const DropdownContext = createContext<DropdownContextValue | null>(null);
