@@ -21,6 +21,7 @@ export interface SelectProps {
   fullWidth?: boolean;
   multiple?: boolean;
   portal?: boolean;
+  popoverMinWidth?: string;
 }
 
 export function Select({
@@ -40,6 +41,7 @@ export function Select({
   fullWidth = false,
   multiple = false,
   portal = true,
+  popoverMinWidth,
 }: SelectProps) {
   const {
     isOpen,
@@ -104,7 +106,11 @@ export function Select({
         position: 'absolute',
         top: position.top,
         left: position.left,
-        minWidth: position.minWidth,
+        minWidth: popoverMinWidth ?? position.minWidth,
+      }),
+    ...(!portal &&
+      popoverMinWidth && {
+        minWidth: popoverMinWidth,
       }),
   } as CSSProperties;
 

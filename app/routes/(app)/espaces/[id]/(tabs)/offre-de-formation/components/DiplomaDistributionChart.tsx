@@ -9,9 +9,10 @@ import {
 } from '@highcharts/react';
 import { Bar } from '@highcharts/react/series';
 import { useMemo, useRef } from 'react';
-import { AnalyticsGraph } from '@/components/AnalyticsGraph';
-import { getChartColor } from '@/components/highcharts';
-import { FRESQ_SOURCE, TOP_DIPLOMAS_LIMIT } from '../constants';
+import { Link } from 'react-router';
+import { ChartBox } from '@/components/charts/ChartBox';
+import { getChartColor } from '@/components/charts/highcharts/colors';
+import { TOP_DIPLOMAS_LIMIT } from '../constants';
 
 interface DiplomaData {
   diploma: string;
@@ -60,11 +61,17 @@ export function DiplomaDistributionChart({
   }
 
   return (
-    <AnalyticsGraph
-      title="Formations par type de diplôme"
+    <ChartBox
+      title="Formations par diplôme"
       description="Répartition des formations par type de diplôme préparé."
       chartRef={chartRef}
-      source={FRESQ_SOURCE}
+      source="fresq"
+      tooltip={
+        <span>
+          Nombre de formations regroupées par type de diplôme.
+          {' '}<Link to="/guide/donnees/fresq">En savoir plus</Link> sur les données Fresq.
+        </span>
+      }
     >
       <Chart ref={chartRef}>
         <Credits enabled={false} />
@@ -84,6 +91,6 @@ export function DiplomaDistributionChart({
           }}
         />
       </Chart>
-    </AnalyticsGraph>
+    </ChartBox>
   );
 }

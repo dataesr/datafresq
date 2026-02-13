@@ -11,7 +11,7 @@ const client = new Client(esConfig);
 
 // Index mapping
 const indexMap = {
-  programs: 'fresq-2025-staging',
+  programs: 'fresq-20260213',
   institutions: 'fresq-etablissements-2025-staging',
   specializations: 'fresq-mentions-2025-staging',
   careers: 'fresq-metiers-2025-staging',

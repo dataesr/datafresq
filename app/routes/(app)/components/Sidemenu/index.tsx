@@ -56,7 +56,6 @@ function ActiveWorkspaceSection() {
         <span className="fr-text--md fr-mb-0 fr-text--heavy fx-flex-grow">ESPACE ACTIF</span>
         <WorkspaceSelector
           title="Définir l'espace actif"
-          description="Sélectionnez un espace pour y ajouter des formations depuis la recherche"
           buttonIcon="fr-icon-arrow-left-right-fill"
         />
         {activeWorkspace && (
@@ -111,9 +110,9 @@ const menuLinks = [
     path: '/espaces',
   },
   {
-    label: 'FAQ',
-    icon: 'fr-icon-questionnaire',
-    path: '/faq',
+    label: 'Guide',
+    icon: 'fr-icon-book-2',
+    path: '/guide',
   },
 ];
 

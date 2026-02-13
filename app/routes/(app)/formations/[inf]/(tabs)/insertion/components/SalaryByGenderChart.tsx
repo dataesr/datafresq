@@ -9,9 +9,10 @@ import {
 } from '@highcharts/react';
 import { Line } from '@highcharts/react/series';
 import { useMemo, useRef } from 'react';
-import { AnalyticsGraph } from '@/components/AnalyticsGraph';
-import { getChartColor } from '@/components/highcharts';
-import { BlurredNoData, MONTH_KEYS, MONTHS } from '@/components/insersup';
+import { Link } from 'react-router';
+import { ChartBox } from '@/components/charts/ChartBox';
+import { getChartColor } from '@/components/charts/highcharts/colors';
+import { MONTH_KEYS, MONTHS } from '@/components/insersup';
 import type { InsersupYearStats } from '~/schemas/programs';
 
 interface SalaryByGenderChartProps {
@@ -50,47 +51,48 @@ export function SalaryByGenderChart({ yearData, year }: SalaryByGenderChartProps
   const hasData = genderSalaryData !== null;
 
   return (
-    <AnalyticsGraph
-      title={`Comparaison des salaires F/H - ${year}`}
-      description="Salaire net mensuel médian par genre"
-      chartRef={hasData ? chartRef : undefined}
-      source="InserSup (MESR)"
+    <ChartBox
+      title="Salaires par genre"
+      description={`Comparaison du salaire net mensuel médian entre femmes et hommes pour la promotion ${year}, après l'obtention du diplôme.`}
+      chartRef={chartRef}
+      source="insersup"
+      tooltip={
+        <span>
+          Salaire net mensuel médian calculé séparément pour les femmes et les hommes de la promotion.
+          {' '}<Link to="/guide/indicateurs/salaires">En savoir plus</Link> sur le calcul des salaires.
+        </span>
+      }
+      noData={!hasData ? { message: 'Données insuffisantes pour comparer les salaires par genre.', icon: 'fr-icon-money-euro-circle-line' } : undefined}
     >
-      <BlurredNoData
-        noData={!hasData}
-        icon="fr-icon-money-euro-circle-line"
-        message="Données insuffisantes pour comparer les salaires par genre."
-      >
-        <Chart ref={chartRef}>
-          <Credits enabled={false} />
-          <Legend align="center" />
-          <Tooltip shared valuePrefix="" valueSuffix=" €" />
-          <XAxis categories={MONTHS} title={{ text: 'Temps après diplôme' }} />
-          <YAxis
-            min={0}
-            title={{ text: 'Salaire net mensuel médian (€)' }}
-            labels={{ format: '{value} €' }}
-          />
-          <Line.Series
-            data={genderSalaryData?.femmeMedianData ?? [null, null, null, null, null]}
-            options={{
-              name: 'Femmes',
-              color: getChartColor('pink-macaron'),
-              lineWidth: 2,
-              marker: { enabled: true, symbol: 'circle' },
-            }}
-          />
-          <Line.Series
-            data={genderSalaryData?.hommeMedianData ?? [null, null, null, null, null]}
-            options={{
-              name: 'Hommes',
-              color: getChartColor('blue-cumulus'),
-              lineWidth: 2,
-              marker: { enabled: true, symbol: 'circle' },
-            }}
-          />
-        </Chart>
-      </BlurredNoData>
-    </AnalyticsGraph>
+      <Chart ref={chartRef}>
+        <Credits enabled={false} />
+        <Legend align="center" />
+        <Tooltip shared valuePrefix="" valueSuffix=" €" />
+        <XAxis categories={MONTHS} title={{ text: 'Temps après diplôme' }} />
+        <YAxis
+          min={0}
+          title={{ text: 'Salaire net mensuel médian (€)' }}
+          labels={{ format: '{value} €' }}
+        />
+        <Line.Series
+          data={genderSalaryData?.femmeMedianData ?? [null, null, null, null, null]}
+          options={{
+            name: 'Femmes',
+            color: getChartColor('pink-macaron'),
+            lineWidth: 2,
+            marker: { enabled: true, symbol: 'circle' },
+          }}
+        />
+        <Line.Series
+          data={genderSalaryData?.hommeMedianData ?? [null, null, null, null, null]}
+          options={{
+            name: 'Hommes',
+            color: getChartColor('blue-cumulus'),
+            lineWidth: 2,
+            marker: { enabled: true, symbol: 'circle' },
+          }}
+        />
+      </Chart>
+    </ChartBox>
   );
 }

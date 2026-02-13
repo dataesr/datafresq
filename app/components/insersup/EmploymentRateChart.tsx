@@ -9,10 +9,10 @@ import {
 } from '@highcharts/react';
 import { Line } from '@highcharts/react/series';
 import { useMemo, useRef } from 'react';
-import { AnalyticsGraph } from '@/components/AnalyticsGraph';
-import { getChartColor } from '@/components/highcharts';
+import { Link } from 'react-router';
+import { ChartBox } from '@/components/charts/ChartBox';
+import { getChartColor } from '@/components/charts/highcharts/colors';
 import type { EmploymentCounts } from '~/schemas/aggregations';
-import { BlurredNoData } from './BlurredNoData';
 import { MONTHS, PRIVACY_THRESHOLD } from './constants';
 import { countsToPercentages, ratesToArrayWithTrailingNulls } from './utils';
 
@@ -49,10 +49,6 @@ function useEmploymentData(yearData: YearStatsForEmploymentRate) {
   }, [yearData]);
 }
 
-/**
- * Employment rate chart showing employment rate evolution over time after graduation
- * Works with both program and workspace data
- */
 export function EmploymentRateChart({ yearData, year }: EmploymentRateChartProps) {
   const chartRef = useRef<HighchartsReactRefObject | null>(null);
   const { canShow, emploiSalLine, emploiNonSalLine, nbSortants } = useEmploymentData(yearData);
@@ -60,39 +56,44 @@ export function EmploymentRateChart({ yearData, year }: EmploymentRateChartProps
   const noDataMessage = `Les taux d'emploi ne peuvent pas être affichés pour cette promotion car le nombre de sortants (${nbSortants}) est inférieur à 20.`;
 
   return (
-    <AnalyticsGraph
-      title={`Taux d'emploi - Promotion ${year}`}
-      description="Évolution du taux d'emploi après l'obtention du diplôme"
-      chartRef={canShow ? chartRef : undefined}
-      source="InserSup (MESR)"
+    <ChartBox
+      title="Taux d'emploi"
+      description={`Évolution des taux d'emploi salariés et non salariés pour la promotion ${year}, de 6 à 30 mois après l'obtention du diplôme.`}
+      chartRef={chartRef}
+      source="insersup"
+      tooltip={
+        <span>
+          Calculé en rapportant le nombre de diplômés en emploi au nombre total de sortants, à chaque échéance.
+          {' '}<Link to="/guide/indicateurs/emploi">En savoir plus</Link> sur le calcul des taux d'emploi.
+        </span>
+      }
+      noData={!canShow ? { message: noDataMessage, icon: 'fr-icon-lock-line' } : undefined}
     >
-      <BlurredNoData noData={!canShow} icon="fr-icon-lock-line" message={noDataMessage}>
-        <Chart ref={chartRef}>
-          <Credits enabled={false} />
-          <Legend align="center" />
-          <Tooltip shared valueSuffix="%" />
-          <XAxis categories={MONTHS} title={{ text: 'Temps après diplôme' }} />
-          <YAxis min={0} max={100} title={{ text: "Taux d'emploi (%)" }} />
+      <Chart ref={chartRef}>
+        <Credits enabled={false} />
+        <Legend align="center" />
+        <Tooltip shared valueSuffix="%" />
+        <XAxis categories={MONTHS} title={{ text: 'Temps après diplôme' }} />
+        <YAxis min={0} max={100} title={{ text: "Taux d'emploi (%)" }} />
+        <Line.Series
+          data={ratesToArrayWithTrailingNulls(emploiSalLine)}
+          options={{
+            name: 'Emploi salarié en France',
+            color: getChartColor('green-archipel'),
+            marker: { enabled: true },
+          }}
+        />
+        {emploiNonSalLine && (
           <Line.Series
-            data={ratesToArrayWithTrailingNulls(emploiSalLine)}
+            data={ratesToArrayWithTrailingNulls(emploiNonSalLine)}
             options={{
-              name: 'Emploi salarié en France',
-              color: getChartColor('green-archipel'),
+              name: 'Emploi non salarié',
+              color: getChartColor('blue-cumulus'),
               marker: { enabled: true },
             }}
           />
-          {emploiNonSalLine && (
-            <Line.Series
-              data={ratesToArrayWithTrailingNulls(emploiNonSalLine)}
-              options={{
-                name: 'Emploi non salarié',
-                color: getChartColor('blue-cumulus'),
-                marker: { enabled: true },
-              }}
-            />
-          )}
-        </Chart>
-      </BlurredNoData>
-    </AnalyticsGraph>
+        )}
+      </Chart>
+    </ChartBox>
   );
 }

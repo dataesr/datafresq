@@ -4,7 +4,6 @@ import { createPortal } from 'react-dom';
 import './styles.css';
 
 export { useModal } from './useModal';
-export { useNativeModal } from './useNativeModal.ts';
 
 type ModalProps = ComponentProps<'dialog'>;
 

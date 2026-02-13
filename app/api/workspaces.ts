@@ -1,4 +1,5 @@
 import { useMutation, useQuery, useQueryClient, useSuspenseQuery } from '@tanstack/react-query';
+import { useMemo } from 'react';
 import { useAuth } from '@/api/auth';
 import { APIError, api } from '@/api/eden-treaty';
 import type {
@@ -268,6 +269,24 @@ export function useWorkspaceAggregations(workspaceId: string) {
     queryKey: workspaceQueryKeys.aggregations(workspaceId),
     queryFn: () => getWorkspaceAggregations(workspaceId),
   });
+}
+
+export function useEditableWorkspaces() {
+  const { data: workspaces } = useWorkspaces();
+  const { data: sharedWorkspaces } = useSharedWorkspaces();
+  const { user } = useAuth();
+
+  const data = useMemo(
+    () => [
+      ...workspaces,
+      ...sharedWorkspaces.filter((ws) =>
+        ws.users.some((u) => u.userId === user?.id && u.role === 'editor'),
+      ),
+    ],
+    [workspaces, sharedWorkspaces, user?.id],
+  );
+
+  return { data };
 }
 
 export function useWorkspaceHistory(

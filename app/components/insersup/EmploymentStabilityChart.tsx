@@ -9,10 +9,10 @@ import {
 } from '@highcharts/react';
 import { Line } from '@highcharts/react/series';
 import { useMemo, useRef } from 'react';
-import { AnalyticsGraph } from '@/components/AnalyticsGraph';
-import { getChartColor } from '@/components/highcharts';
+import { Link } from 'react-router';
+import { ChartBox } from '@/components/charts/ChartBox';
+import { getChartColor } from '@/components/charts/highcharts/colors';
 import type { EmploymentCounts } from '~/schemas/aggregations';
-import { BlurredNoData } from './BlurredNoData';
 import { MONTH_KEYS, MONTHS, PRIVACY_THRESHOLD } from './constants';
 
 interface YearStatsForStability {
@@ -54,10 +54,6 @@ function useStabilityData(yearData: YearStatsForStability) {
   }, [yearData]);
 }
 
-/**
- * Employment stability chart showing the share of stable employment (CDI/fonctionnaire)
- * among salaried employment for a given year as a line chart
- */
 export function EmploymentStabilityChart({ yearData, year }: EmploymentStabilityChartProps) {
   const chartRef = useRef<HighchartsReactRefObject | null>(null);
   const stableRateData = useStabilityData(yearData);
@@ -65,32 +61,34 @@ export function EmploymentStabilityChart({ yearData, year }: EmploymentStability
   const hasData = stableRateData !== null;
 
   return (
-    <AnalyticsGraph
-      title={`Part d'emploi stable - ${year}`}
-      description="Part des CDI/fonctionnaires parmi les emplois salariés"
-      chartRef={hasData ? chartRef : undefined}
-      source="InserSup (MESR)"
+    <ChartBox
+      title="Part d'emploi stable"
+      description={`Part des CDI et fonctionnaires parmi les emplois salariés pour la promotion ${year}, après l'obtention du diplôme.`}
+      chartRef={chartRef}
+      source="insersup"
+      tooltip={
+        <span>
+          Part des CDI et postes de fonctionnaire rapportée au nombre total d'emplois salariés.
+          {' '}<Link to="/guide/indicateurs/emploi">En savoir plus</Link> sur le calcul des taux d'emploi.
+        </span>
+      }
+      noData={!hasData ? { message: 'Données insuffisantes pour afficher la part d\'emploi stable.' } : undefined}
     >
-      <BlurredNoData
-        noData={!hasData}
-        message="Données insuffisantes pour afficher la part d'emploi stable."
-      >
-        <Chart ref={chartRef}>
-          <Credits enabled={false} />
-          <Legend align="center" />
-          <Tooltip shared valueSuffix="%" />
-          <XAxis categories={MONTHS} title={{ text: 'Temps après diplôme' }} />
-          <YAxis min={0} max={100} title={{ text: "Part d'emploi stable (%)" }} />
-          <Line.Series
-            data={stableRateData ?? [null, null, null, null, null]}
-            options={{
-              name: 'Emploi stable (CDI/fonctionnaire)',
-              color: getChartColor('green-archipel'),
-              marker: { enabled: true },
-            }}
-          />
-        </Chart>
-      </BlurredNoData>
-    </AnalyticsGraph>
+      <Chart ref={chartRef}>
+        <Credits enabled={false} />
+        <Legend align="center" />
+        <Tooltip shared valueSuffix="%" />
+        <XAxis categories={MONTHS} title={{ text: 'Temps après diplôme' }} />
+        <YAxis min={0} max={100} title={{ text: "Part d'emploi stable (%)" }} />
+        <Line.Series
+          data={stableRateData ?? [null, null, null, null, null]}
+          options={{
+            name: 'Emploi stable (CDI/fonctionnaire)',
+            color: getChartColor('green-archipel'),
+            marker: { enabled: true },
+          }}
+        />
+      </Chart>
+    </ChartBox>
   );
 }

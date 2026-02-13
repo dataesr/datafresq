@@ -9,9 +9,9 @@ import {
 } from '@highcharts/react';
 import { Column } from '@highcharts/react/series';
 import { useMemo, useRef } from 'react';
-import { AnalyticsGraph } from '@/components/AnalyticsGraph';
-import { SISE_SOURCE_SHORT } from '@/components/effectifs';
-import { getChartColor } from '@/components/highcharts';
+import { Link } from 'react-router';
+import { ChartBox } from '@/components/charts/ChartBox';
+import { getChartColor } from '@/components/charts/highcharts/colors';
 
 interface CityChartProps {
   categories: string[];
@@ -30,7 +30,7 @@ function useChartData(props: CityChartProps) {
       categories,
       women,
       men,
-      description: `Distribution des étudiants selon le lieu d'implantation (${latestYear})`,
+      description: `Distribution des étudiants inscrits selon la commune d'implantation de la formation (${latestYear}).`,
     };
   }, [props]);
 }
@@ -48,11 +48,17 @@ export function CityChart(props: CityChartProps) {
   }
 
   return (
-    <AnalyticsGraph
-      title="Répartition par commune d'implantation"
+    <ChartBox
+      title="Répartition par commune"
       description={description}
       chartRef={chartRef}
-      source={SISE_SOURCE_SHORT}
+      source="sise"
+      tooltip={
+        <span>
+          Somme des étudiants inscrits dans chaque commune d'implantation de la formation.
+          {' '}<Link to="/guide/indicateurs/effectifs">En savoir plus</Link> sur le calcul des effectifs.
+        </span>
+      }
     >
       <Chart ref={chartRef}>
         <Credits enabled={false} />
@@ -77,6 +83,6 @@ export function CityChart(props: CityChartProps) {
           }}
         />
       </Chart>
-    </AnalyticsGraph>
+    </ChartBox>
   );
 }

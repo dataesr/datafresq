@@ -72,6 +72,11 @@ export default function Faq() {
         </h2>
         <ol>
           <li>
+            <Link className="fr-summary__link" to="#recherche">
+              Recherche et opérateurs
+            </Link>
+          </li>
+          <li>
             <Link className="fr-summary__link" to="#sources">
               Sources de données
             </Link>
@@ -113,6 +118,99 @@ export default function Faq() {
         Cette page explique les sources de données utilisées dans DataFresq, les méthodes de calcul
         des indicateurs, et les règles de confidentialité appliquées.
       </p>
+
+      <FaqSection id="recherche" title="Recherche et opérateurs" icon="fr-icon-search-line">
+        <FaqItem id="recherche-base" question="Comment fonctionne la recherche ?">
+          <p>
+            Par défaut, lorsque vous saisissez plusieurs mots, la recherche retourne les formations
+            contenant <strong>au moins un</strong> des mots saisis.
+          </p>
+          <p className="fr-mt-2w">
+            La recherche porte sur de nombreux champs : intitulé, mention, domaines, mots-clés,
+            établissements, métiers ROME, etc.
+          </p>
+        </FaqItem>
+
+        <FaqItem id="recherche-operateurs" question="Quels opérateurs puis-je utiliser ?">
+          <p>
+            Vous pouvez combiner des opérateurs pour affiner vos résultats :
+          </p>
+          <div className="fr-table fr-mt-2w">
+            <table>
+              <thead>
+                <tr>
+                  <th>Opérateur</th>
+                  <th>Rôle</th>
+                  <th>Exemple</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><code>&&</code></td>
+                  <td>Les deux termes doivent être présents</td>
+                  <td><code>nucléaire && énergie</code></td>
+                </tr>
+                <tr>
+                  <td><code>||</code></td>
+                  <td>Au moins un des termes (comportement par défaut)</td>
+                  <td><code>physique || chimie</code></td>
+                </tr>
+                <tr>
+                  <td><code>!</code> ou <code>-</code></td>
+                  <td>Exclure un terme</td>
+                  <td><code>nucléaire !médecine</code></td>
+                </tr>
+                <tr>
+                  <td><code>"..."</code></td>
+                  <td>Expression exacte</td>
+                  <td><code>"intelligence artificielle"</code></td>
+                </tr>
+                <tr>
+                  <td><code>*</code></td>
+                  <td>Joker (remplace plusieurs caractères)</td>
+                  <td><code>inform*</code></td>
+                </tr>
+                <tr>
+                  <td><code>?</code></td>
+                  <td>Joker (remplace un seul caractère)</td>
+                  <td><code>chimi?</code></td>
+                </tr>
+                <tr>
+                  <td><code>( )</code></td>
+                  <td>Grouper des conditions</td>
+                  <td><code>(physique || chimie) && !médecine</code></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </FaqItem>
+
+        <FaqItem id="recherche-exemples" question="Quelques exemples de recherches">
+          <ul className="fr-mt-1w">
+            <li>
+              <code>nucléaire && énergie</code> — formations contenant à la fois "nucléaire" et "énergie"
+            </li>
+            <li>
+              <code>"sciences politiques"</code> — l'expression exacte "sciences politiques"
+            </li>
+            <li>
+              <code>informatique !réseau</code> — formations en informatique, en excluant celles liées aux réseaux
+            </li>
+            <li>
+              <code>(droit || juridique) && européen</code> — formations en droit ou juridique, avec une dimension européenne
+            </li>
+            <li>
+              <code>bio*</code> — formations dont un terme commence par "bio" (biologie, biotechnologie, bioéthique…)
+            </li>
+          </ul>
+          <div className="fr-callout fr-callout--brown-caramel fr-mt-2w">
+            <p className="fr-callout__text">
+              <strong>Astuce :</strong> les guillemets sont très utiles pour rechercher un intitulé précis. Sans guillemets,
+              chaque mot est recherché indépendamment.
+            </p>
+          </div>
+        </FaqItem>
+      </FaqSection>
 
       <FaqSection id="sources" title="Sources de données" icon="fr-icon-database-line">
         <FaqItem id="sources-fresq" question="Qu'est-ce que la base Fresq ?">
@@ -461,12 +559,100 @@ export default function Faq() {
         <FaqItem id="espaces-definition" question="Qu'est-ce qu'un espace de travail ?">
           <p>
             Un <strong>espace de travail</strong> permet de regrouper plusieurs formations pour
-            analyser leurs données de manière agrégée.
+            analyser leurs données de manière agrégée. C'est votre outil principal pour comparer,
+            suivre et partager des ensembles de formations.
           </p>
           <p className="fr-mt-2w">
             Vous pouvez par exemple créer un espace regroupant toutes les formations de votre
             établissement, d'une discipline particulière, ou selon tout autre critère.
           </p>
+        </FaqItem>
+
+        <FaqItem id="espaces-creer" question="Comment créer un espace de travail ?">
+          <p>Deux méthodes sont disponibles :</p>
+          <ul className="fr-mt-1w">
+            <li>
+              <strong>Depuis le menu latéral</strong> : cliquez sur le bouton{' '}
+              <strong>+</strong> à côté de « Mes espaces », ou rendez-vous sur la page{' '}
+              <Link to="/espaces">Espaces</Link> et cliquez sur « Créer un espace ».
+            </li>
+            <li>
+              <strong>Depuis les résultats de recherche</strong> : lorsque vous n'avez pas
+              d'espace actif, le bouton <strong>« Nouvel espace »</strong> apparaît au-dessus du
+              tableau de résultats. En cliquant dessus, vous voyez un récapitulatif du nombre de
+              formations concernées, puis le lien <strong>« Créer un espace »</strong> vous
+              redirige vers le formulaire de création pré-rempli avec votre recherche.
+            </li>
+          </ul>
+          <p className="fr-mt-2w">
+            Le formulaire de création vous permet de choisir un nom, une description, une couleur,
+            la visibilité (privé ou public) et d'inviter des collaborateurs.
+          </p>
+          <div className="fr-callout fr-callout--brown-caramel fr-mt-2w">
+            <p className="fr-callout__text">
+              <strong>Astuce :</strong> lorsque vous créez un espace depuis la recherche, deux
+              boutons vous sont proposés après la création :{' '}
+              <strong>« Créer et voir l'espace »</strong> pour accéder directement à votre nouvel
+              espace, ou <strong>« Créer et revenir à la recherche »</strong> pour continuer à
+              explorer les formations.
+            </p>
+          </div>
+        </FaqItem>
+
+        <FaqItem id="espaces-actif" question="Qu'est-ce que l'espace actif ?">
+          <p>
+            L'<strong>espace actif</strong> est l'espace de travail que vous avez sélectionné pour y
+            ajouter rapidement des formations depuis la recherche. Il est affiché en haut du menu
+            latéral, sous la mention « Espace actif ».
+          </p>
+          <p className="fr-mt-2w">Pour définir un espace actif :</p>
+          <ul className="fr-mt-1w">
+            <li>
+              Cliquez sur le bouton de sélection{' '}
+              <span className="fr-icon-arrow-left-right-fill fr-icon--sm" aria-hidden="true" />{' '}
+              dans la section « Espace actif » du menu latéral
+            </li>
+            <li>
+              Ou cliquez sur <strong>« Espace existant »</strong> dans le menu{' '}
+              <strong>« Nouvel espace »</strong> au-dessus du tableau de résultats
+            </li>
+          </ul>
+          <p className="fr-mt-2w">
+            Pour le désélectionner, cliquez sur le bouton{' '}
+            <span className="fr-icon-close-line fr-icon--sm" aria-hidden="true" /> à côté de
+            l'espace actif dans le menu latéral.
+          </p>
+        </FaqItem>
+
+        <FaqItem id="espaces-ajouter" question="Comment ajouter des formations à un espace ?">
+          <p>
+            Lorsqu'un <strong>espace actif</strong> est défini, le bouton{' '}
+            <strong>« Ajouter à [nom de l'espace] »</strong> apparaît au-dessus du tableau de
+            résultats. Deux modes d'ajout sont possibles :
+          </p>
+          <ul className="fr-mt-1w">
+            <li>
+              <strong>Sélection manuelle</strong> : cochez les formations souhaitées dans le
+              tableau, puis cliquez sur le bouton d'ajout. Seules les formations sélectionnées
+              seront ajoutées.
+            </li>
+            <li>
+              <strong>Ajout par recherche</strong> : sans sélection, cochez la case « Je souhaite
+              ajouter tous les résultats de la recherche » pour ajouter l'ensemble des formations
+              correspondant à vos critères de recherche et filtres.
+            </li>
+          </ul>
+          <p className="fr-mt-2w">
+            Avant l'ajout, un récapitulatif vous indique le nombre total de formations, combien
+            sont déjà présentes dans l'espace (elles seront ignorées) et combien seront
+            effectivement ajoutées.
+          </p>
+          <div className="fr-callout fr-callout--brown-caramel fr-mt-2w">
+            <p className="fr-callout__text">
+              <strong>Limite :</strong> un espace peut contenir jusqu'à{' '}
+              <strong>5 000 formations</strong>. Au-delà, le bouton d'ajout est désactivé.
+            </p>
+          </div>
         </FaqItem>
 
         <FaqItem
@@ -502,7 +688,8 @@ export default function Faq() {
           </ul>
           <p className="fr-mt-2w">
             Les espaces peuvent également être rendus publics pour être accessibles à tous les
-            utilisateurs de la plateforme.
+            utilisateurs de la plateforme. Les espaces partagés avec vous apparaissent dans la
+            section « Partagés avec moi » du menu latéral.
           </p>
         </FaqItem>
       </FaqSection>

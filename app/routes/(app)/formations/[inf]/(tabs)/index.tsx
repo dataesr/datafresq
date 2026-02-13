@@ -6,7 +6,7 @@ import { Breadcrumb } from '@/components/Breadcrumb';
 import ErrorBoundary from '@/components/errors/ErrorBoundary';
 import PageContentLoader from '@/components/loaders/PageContentLoader';
 import { TabActivityPanel } from '@/components/TabActivityPanel';
-import { Tabnav, TabnavItem } from '@/components/Tabnav';
+import { Tabnav, TabnavItem } from '@/components/ui/Tabnav';
 import type { Program } from '~/schemas/programs';
 
 import DebouchesTab from './debouches';
@@ -48,30 +48,30 @@ export default function FormationPage() {
       iconLine: 'fr-icon-road-map-line',
       iconFill: 'fr-icon-road-map-fill',
       count: formation.parcours?.length || 0,
-      hide: !formation.parcours?.length,
+      disabled: !formation.parcours?.length,
     },
     {
       id: 'effectifs',
       label: 'Effectifs étudiants',
       iconLine: 'fr-icon-team-line',
       iconFill: 'fr-icon-team-fill',
-      hide: !data.sise?.length,
+      disabled: !data.sise?.length,
     },
     {
       id: 'insertion',
       label: 'Insertion professionnelle',
       iconLine: 'fr-icon-briefcase-line',
       iconFill: 'fr-icon-briefcase-fill',
-      hide: !data.insersup?.byYear?.length,
+      disabled: !data.insersup?.byYear?.length,
     },
     {
       id: 'debouches',
       label: 'Débouchés',
       iconLine: 'fr-icon-compass-3-line',
       iconFill: 'fr-icon-compass-3-fill',
-      hide: !formation.romeInfos?.length,
+      disabled: !formation.romeInfos?.length,
     },
-  ].filter((tab) => !tab.hide);
+  ];
 
   return (
     <ErrorBoundary>
@@ -131,6 +131,7 @@ export default function FormationPage() {
                 icon={tab.iconLine}
                 iconActive={tab.iconFill}
                 active={activeTab === tab.id}
+                disabled={tab.disabled}
               >
                 {tab.label} {tab.count ? `(${tab.count})` : ''}
               </TabnavItem>
@@ -141,15 +142,13 @@ export default function FormationPage() {
             <Informations formation={formation} activeTab={activeTab} />
           </TabActivityPanel>
 
-          {formation.parcours && formation.parcours.length > 0 && (
-            <TabActivityPanel mode={activeTab === 'parcours' ? 'visible' : 'hidden'}>
-              <Parcours
-                parcours={formation.parcours}
-                etapes={formation.etapes}
-                locations={formation.locations}
-              />
-            </TabActivityPanel>
-          )}
+          <TabActivityPanel mode={activeTab === 'parcours' ? 'visible' : 'hidden'}>
+            <Parcours
+              parcours={formation.parcours ?? []}
+              etapes={formation.etapes}
+              locations={formation.locations}
+            />
+          </TabActivityPanel>
 
           <TabActivityPanel mode={activeTab === 'effectifs' ? 'visible' : 'hidden'}>
             <EffectifsTab siseData={data.sise} />

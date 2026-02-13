@@ -259,6 +259,9 @@ export const programsParamsSchema = t.Object({
   hasSiseInfos: t.Optional(t.String({ description: 'Has SISE data (true/false)' })),
   hasRncpInfos: t.Optional(t.String({ description: 'Has RNCP data (true/false)' })),
   hasRomeInfos: t.Optional(t.String({ description: 'Has ROME data (true/false)' })),
+  codeRome: t.Optional(
+    t.Union([t.String(), t.Array(t.String())], { description: 'ROME code filter' }),
+  ),
 });
 
 export const facetItemSchema = t.Object({

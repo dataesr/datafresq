@@ -2,10 +2,10 @@ import type { HighchartsReactRefObject } from '@highcharts/react';
 import { Chart, Credits, Legend, Tooltip, XAxis, YAxis } from '@highcharts/react';
 import { Area } from '@highcharts/react/series';
 import { useMemo, useRef } from 'react';
-import { AnalyticsGraph } from '@/components/AnalyticsGraph';
-import { SISE_SOURCE_SHORT } from '@/components/effectifs';
-import { getColorForSeries } from '@/components/highcharts';
-import '@/components/highcharts';
+import { Link } from 'react-router';
+import { ChartBox } from '@/components/charts/ChartBox';
+import { getColorForSeries } from '@/components/charts/highcharts/colors';
+import '@/components/charts/highcharts';
 
 interface LargeDisciplineData {
   id: string;
@@ -17,6 +17,7 @@ interface LargeDisciplineData {
 
 interface DisciplineSpiderChartProps {
   data: LargeDisciplineData[];
+  year: string;
   limit?: number;
 }
 
@@ -40,7 +41,7 @@ function useChartData(data: LargeDisciplineData[], limit: number) {
   }, [data, limit]);
 }
 
-export function DisciplineSpiderChart({ data, limit = 8 }: DisciplineSpiderChartProps) {
+export function DisciplineSpiderChart({ data, year, limit = 8 }: DisciplineSpiderChartProps) {
   const chartRef = useRef<HighchartsReactRefObject | null>(null);
   const { hasData, categories, femaleValues, maleValues, totalValues } = useChartData(data, limit);
 
@@ -53,11 +54,17 @@ export function DisciplineSpiderChart({ data, limit = 8 }: DisciplineSpiderChart
   const totalColor = getColorForSeries('total');
 
   return (
-    <AnalyticsGraph
-      title="Grandes disciplines (étudiants)"
-      description="Répartition des étudiants par grande discipline et par sexe."
+    <ChartBox
+      title="Grandes disciplines"
+      description={`Rentrée ${year}. Répartition des étudiants inscrits par grande discipline et par sexe.`}
       chartRef={chartRef}
-      source={SISE_SOURCE_SHORT}
+      source="sise"
+      tooltip={
+        <span>
+          Effectifs calculés par somme des inscriptions dans chaque grande discipline, avec ventilation par sexe.
+          {' '}<Link to="/guide/indicateurs/effectifs">En savoir plus</Link> sur le calcul des effectifs.
+        </span>
+      }
     >
       <Chart
         ref={chartRef}
@@ -147,6 +154,6 @@ export function DisciplineSpiderChart({ data, limit = 8 }: DisciplineSpiderChart
           }}
         />
       </Chart>
-    </AnalyticsGraph>
+    </ChartBox>
   );
 }

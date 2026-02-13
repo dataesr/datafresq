@@ -8,7 +8,7 @@ import {
 import cn from 'classnames';
 import { useMemo, useState } from 'react';
 import { useProgramsSearch } from '@/api/programs';
-import { AddToActiveWorkspace } from '@/components/AddToActiveWorkspace';
+import { AddToWorkspace } from '../AddToWorkspace';
 import {
   ColumnVisibilityToggle,
   createDefaultColumnVisibility,
@@ -148,7 +148,7 @@ export default function ProgramsTable({ selectedPrograms, onSelectionChange }: P
     <div>
       <div className="fx-spacer">
         <div>
-          <AddToActiveWorkspace
+          <AddToWorkspace
             programIds={selectedPrograms}
             searchParams={{
               q: params.q || undefined,

@@ -1,0 +1,6 @@
+.chartbox__chart > *,
+.chartbox__chart .blurred-no-data,
+.chartbox__chart .blurred-no-data__content,
+.chartbox__chart .blurred-no-data__content > * {
+  height: 100%;
+}

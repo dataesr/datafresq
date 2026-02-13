@@ -2,10 +2,11 @@ import type { HighchartsReactRefObject } from '@highcharts/react';
 import { Chart, Credits, Legend, Tooltip, XAxis, YAxis } from '@highcharts/react';
 import { Area } from '@highcharts/react/series';
 import { useMemo, useRef } from 'react';
-import { AnalyticsGraph } from '@/components/AnalyticsGraph';
-import { getColorForSeries } from '@/components/highcharts';
-import '@/components/highcharts';
-import { FRESQ_SOURCE, TOP_ROME_LIMIT } from '../constants';
+import { Link } from 'react-router';
+import { ChartBox } from '@/components/charts/ChartBox';
+import { getColorForSeries } from '@/components/charts/highcharts/colors';
+import '@/components/charts/highcharts';
+import { TOP_ROME_LIMIT } from '../constants';
 
 interface RomeData {
   code: string;
@@ -45,11 +46,17 @@ export function RomeSpiderChart({ data, limit = TOP_ROME_LIMIT }: RomeSpiderChar
   const color = getColorForSeries('total');
 
   return (
-    <AnalyticsGraph
-      title="Métiers (codes ROME) (formations)"
-      description="Répartition des formations par métier (codes ROME)."
+    <ChartBox
+      title="Métiers ROME"
+      description="Répartition des formations par métier (codes ROME de France Travail)."
       chartRef={chartRef}
-      source={FRESQ_SOURCE}
+      source={['fresq', 'rome']}
+      tooltip={
+        <span>
+          Nombre de formations associées à chaque code métier ROME.
+          {' '}<Link to="/guide/donnees/fresq">En savoir plus</Link> sur les données Fresq.
+        </span>
+      }
     >
       <Chart
         ref={chartRef}
@@ -111,6 +118,6 @@ export function RomeSpiderChart({ data, limit = TOP_ROME_LIMIT }: RomeSpiderChar
           }}
         />
       </Chart>
-    </AnalyticsGraph>
+    </ChartBox>
   );
 }

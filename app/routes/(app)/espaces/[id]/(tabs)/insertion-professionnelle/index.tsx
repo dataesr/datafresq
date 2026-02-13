@@ -2,7 +2,7 @@ import { Activity, memo, useMemo, useState } from 'react';
 import { useParams } from 'react-router';
 import { useWorkspaceAggregations, useWorkspacePermissions } from '@/api/workspaces';
 import { AutoGrid } from '@/components/Grids/AutoGrid';
-import '@/components/highcharts';
+import '@/components/charts/highcharts';
 import {
   EmploymentRateByGenderChart,
   EmploymentRateChart,
@@ -26,6 +26,8 @@ type YearContentProps = {
   programCount: number;
 };
 
+
+
 const YearContent = memo(function YearContent({ yearData, year, programCount }: YearContentProps) {
   return (
     <>
@@ -37,7 +39,7 @@ const YearContent = memo(function YearContent({ yearData, year, programCount }: 
         />
       ) : (
         <>
-          <AutoGrid min={450}>
+          <AutoGrid min={500}>
             <EmploymentRateChart yearData={yearData} year={year} />
             <EmploymentRateQuantileChart yearData={yearData} year={year} />
             <EmploymentStabilityChart yearData={yearData} year={year} />

@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useId, useMemo, useState } from 'react';
+import { type Career, useCareersSearch } from '@/api/careers';
 import { type Institution, useInstitutionsSearch } from '@/api/institutions';
 import { type FilterState, useProgramsFacets } from '@/api/programs';
 import { Select } from '@/components/ui/Select';
@@ -8,7 +9,7 @@ import './styles.css';
 // TYPES
 // =============================================================================
 
-type FilterType = 'multiselect' | 'async-search' | 'boolean';
+type FilterType = 'multiselect' | 'async-search' | 'async-search-career' | 'boolean';
 type FilterGroup = 'typeDiplome' | 'etablissement' | 'domaine' | 'donneesDispo';
 
 interface FilterConfig {
@@ -91,6 +92,13 @@ const FILTER_CONFIGS: FilterConfig[] = [
     group: 'domaine',
   },
   { key: 'domain', label: 'Domaine', type: 'multiselect', facetKey: 'domains', group: 'domaine' },
+  {
+    key: 'codeRome',
+    label: 'Métier (ROME)',
+    type: 'async-search-career',
+    placeholder: 'Rechercher un métier...',
+    group: 'domaine',
+  },
   { key: 'hasSiseInfos', label: 'Données SISE', type: 'boolean', group: 'donneesDispo' },
   { key: 'hasRncpInfos', label: 'Données RNCP', type: 'boolean', group: 'donneesDispo' },
   { key: 'hasRomeInfos', label: 'Données ROME', type: 'boolean', group: 'donneesDispo' },
@@ -118,7 +126,7 @@ function SelectionBadges({ items, onRemove, maxVisible = 5 }: SelectionBadgesPro
       className="fr-tags-group fr-hidden fr-unhidden-sm fr-mt-1w"
     >
       {visible.map((item) => (
-        <p key={item.key} className="fr-tag fr-tag--sm fr-tag--blue-france">
+        <p key={item.key} className="fr-tag fr-tag--dismiss fr-tag--sm fr-tag--blue-france">
           {item.label.length > 25 ? `${item.label.substring(0, 25)}...` : item.label}
           <button
             type="button"
@@ -319,7 +327,7 @@ function AsyncSearchValuePicker({
 
   return (
     <div>
-      <Select label={getDisplayLabel()} outline multiple>
+      <Select popoverMinWidth="20rem" label={getDisplayLabel()} outline multiple>
         <Select.Search
           placeholder="Saisissez au moins 2 caractères..."
           value={searchQuery}
@@ -350,6 +358,130 @@ function AsyncSearchValuePicker({
                   <div className="fx-flex fx-flex-col" style={{ flex: 1, minWidth: 0 }}>
                     <span className="fx-clamp-1" title={inst.label}>
                       {inst.label}
+                    </span>
+                    {subLabel && (
+                      <span className="fr-text--xs fr-text-mention--grey fr-mb-0 fx-clamp-1">
+                        {subLabel}
+                      </span>
+                    )}
+                  </div>
+                </Select.Checkbox>
+              );
+            })}
+        </Select.Content>
+      </Select>
+      <SelectionBadges items={badgeItems} onRemove={handleRemoveBadge} />
+    </div>
+  );
+}
+
+interface AsyncSearchCareerPickerProps {
+  selectedValues: string[];
+  selectedItems: Career[];
+  onChange: (values: string[], items: Career[]) => void;
+  placeholder?: string;
+}
+
+function AsyncSearchCareerPicker({
+  selectedValues,
+  selectedItems,
+  onChange,
+  placeholder = 'Rechercher un métier...',
+}: AsyncSearchCareerPickerProps) {
+  const [searchQuery, setSearchQuery] = useState('');
+
+  const { careers, isLoading } = useCareersSearch({
+    query: searchQuery,
+    pageSize: 20,
+  });
+
+  const handleToggle = useCallback(
+    (career: Career, checked: boolean) => {
+      if (checked) {
+        onChange([...selectedValues, career.codeRome], [...selectedItems, career]);
+      } else {
+        onChange(
+          selectedValues.filter((v) => v !== career.codeRome),
+          selectedItems.filter((i) => i.codeRome !== career.codeRome),
+        );
+      }
+    },
+    [selectedValues, selectedItems, onChange],
+  );
+
+  const handleRemoveBadge = useCallback(
+    (codeRome: string) => {
+      onChange(
+        selectedValues.filter((v) => v !== codeRome),
+        selectedItems.filter((i) => i.codeRome !== codeRome),
+      );
+    },
+    [selectedValues, selectedItems, onChange],
+  );
+
+  const displayOptions = useMemo(() => {
+    const result = [...selectedItems];
+    for (const career of careers) {
+      if (!result.find((i) => i.codeRome === career.codeRome)) {
+        result.push(career);
+      }
+    }
+    return result.sort((a, b) => {
+      const aSelected = selectedValues.includes(a.codeRome);
+      const bSelected = selectedValues.includes(b.codeRome);
+      if (aSelected && !bSelected) return -1;
+      if (!aSelected && bSelected) return 1;
+      return 0;
+    });
+  }, [careers, selectedItems, selectedValues]);
+
+  const getDisplayLabel = (): string => {
+    if (selectedValues.length === 0) return placeholder;
+    if (selectedValues.length === 1) return '1 sélectionné';
+    return `${selectedValues.length} sélectionnés`;
+  };
+
+  const showInitialMessage = searchQuery.length === 0 && selectedItems.length === 0;
+  const showMinLengthMessage = searchQuery.length > 0 && searchQuery.length < 2;
+
+  const badgeItems = selectedItems.map((item) => ({
+    key: item.codeRome,
+    label: item.label,
+  }));
+
+  return (
+    <div>
+      <Select label={getDisplayLabel()} outline multiple>
+        <Select.Search
+          placeholder="Saisissez au moins 2 caractères..."
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
+        />
+
+        {isLoading && <Select.Loading>Chargement...</Select.Loading>}
+
+        {!isLoading && showInitialMessage && (
+          <Select.Empty>Saisissez au moins 2 caractères</Select.Empty>
+        )}
+
+        {!isLoading && showMinLengthMessage && (
+          <Select.Empty>Saisissez au moins 2 caractères</Select.Empty>
+        )}
+        <Select.Content>
+          {!isLoading &&
+            displayOptions.length > 0 &&
+            displayOptions.map((career) => {
+              const subLabel = [career.level1, career.level2].filter(Boolean).join(' > ');
+              return (
+                <Select.Checkbox
+                  key={career.codeRome}
+                  value={career.codeRome}
+                  checked={selectedValues.includes(career.codeRome)}
+                  onChange={(checked) => handleToggle(career, checked)}
+                >
+                  <div className="fx-flex fx-flex-col" style={{ flex: 1, minWidth: 0 }}>
+                    <span className="fx-clamp-1" title={career.label}>
+                      {career.label}
                     </span>
                     {subLabel && (
                       <span className="fr-text--xs fr-text-mention--grey fr-mb-0 fx-clamp-1">
@@ -413,7 +545,8 @@ interface FilterRowProps {
   facets: Record<string, { key: string; count: number }[]>;
   booleanCounts: Record<string, { true: number; false: number }>;
   selectedInstitutions: Institution[];
-  onValuesChange: (values: string[], institutions?: Institution[]) => void;
+  selectedCareers: Career[];
+  onValuesChange: (values: string[], institutions?: Institution[], careers?: Career[]) => void;
   onRemove: () => void;
 }
 
@@ -423,6 +556,7 @@ function FilterRow({
   facets,
   booleanCounts,
   selectedInstitutions,
+  selectedCareers,
   onValuesChange,
   onRemove,
 }: FilterRowProps) {
@@ -452,6 +586,14 @@ function FilterRow({
             selectedItems={selectedInstitutions}
             onChange={(values, items) => onValuesChange(values, items)}
             placeholder="Rechercher..."
+          />
+        )}
+        {config.type === 'async-search-career' && (
+          <AsyncSearchCareerPicker
+            selectedValues={row.values}
+            selectedItems={selectedCareers}
+            onChange={(values, items) => onValuesChange(values, undefined, items)}
+            placeholder="Rechercher un métier..."
           />
         )}
         {config.type === 'boolean' && (
@@ -512,7 +654,7 @@ function SearchRow({ value, onChange }: SearchRowProps) {
         <input
           id={inputId}
           type="text"
-          placeholder="Exemple : (nucléaire NOT médecine)"
+          placeholder="Exemple : (nucléaire  !médecine)"
           value={localValue}
           onChange={(e) => setLocalValue(e.target.value)}
           onKeyDown={handleKeyDown}
@@ -652,6 +794,7 @@ export function FilterBuilder({
 
   // Track selected institutions for async search display
   const [selectedInstitutions, setSelectedInstitutions] = useState<Institution[]>([]);
+  const [selectedCareers, setSelectedCareers] = useState<Career[]>([]);
 
   // Sync active filter keys when URL filters change
   useEffect(() => {
@@ -740,12 +883,15 @@ export function FilterBuilder({
       if (filterKey === 'paysageId') {
         setSelectedInstitutions([]);
       }
+      if (filterKey === 'codeRome') {
+        setSelectedCareers([]);
+      }
     },
     [filters, onFiltersChange],
   );
 
   const handleValuesChange = useCallback(
-    (filterKey: keyof FilterState, values: string[], institutions?: Institution[]) => {
+    (filterKey: keyof FilterState, values: string[], institutions?: Institution[], careers?: Career[]) => {
       const config = FILTER_CONFIGS.find((c) => c.key === filterKey);
       if (config) {
         if (config.type === 'boolean') {
@@ -758,6 +904,9 @@ export function FilterBuilder({
       if (filterKey === 'paysageId' && institutions) {
         setSelectedInstitutions(institutions);
       }
+      if (filterKey === 'codeRome' && careers) {
+        setSelectedCareers(careers);
+      }
     },
     [filters, onFiltersChange],
   );
@@ -765,6 +914,7 @@ export function FilterBuilder({
   const handleClearAll = useCallback(() => {
     setActiveFilterKeys([]);
     setSelectedInstitutions([]);
+    setSelectedCareers([]);
     onFiltersChange({
       cycle: [],
       diplomaType: [],
@@ -775,6 +925,7 @@ export function FilterBuilder({
       sector: [],
       disciplinarySector: [],
       domain: [],
+      codeRome: [],
       hasSiseInfos: null,
       hasRncpInfos: null,
       hasRomeInfos: null,
@@ -820,8 +971,9 @@ export function FilterBuilder({
             facets={facetsMap}
             booleanCounts={booleanCounts}
             selectedInstitutions={selectedInstitutions}
-            onValuesChange={(values, institutions) =>
-              handleValuesChange(row.filterKey, values, institutions)
+            selectedCareers={selectedCareers}
+            onValuesChange={(values, institutions, careers) =>
+              handleValuesChange(row.filterKey, values, institutions, careers)
             }
             onRemove={() => handleRemoveFilter(row.filterKey)}
           />

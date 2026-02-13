@@ -9,9 +9,10 @@ import {
 } from '@highcharts/react';
 import { Line } from '@highcharts/react/series';
 import { useMemo, useRef, useState } from 'react';
-import { AnalyticsGraph } from '@/components/AnalyticsGraph';
-import { getChartColor } from '@/components/highcharts';
-import { BlurredNoData, COHORT_COLORS, MONTH_KEYS, MONTHS } from '@/components/insersup';
+import { Link } from 'react-router';
+import { ChartBox } from '@/components/charts/ChartBox';
+import { getChartColor } from '@/components/charts/highcharts/colors';
+import { COHORT_COLORS, MONTH_KEYS, MONTHS } from '@/components/insersup';
 import type { InsersupYearStats } from '~/schemas/programs';
 
 interface SalaryEvolutionChartProps {
@@ -89,66 +90,67 @@ export function SalaryEvolutionChart({ sortedByYear }: SalaryEvolutionChartProps
   const metricLabel = METRIC_OPTIONS.find((m) => m.key === selectedMetric)?.label ?? 'Médiane';
 
   return (
-    <AnalyticsGraph
+    <ChartBox
       title="Évolution des salaires"
-      description={`Salaire net mensuel - ${metricLabel}`}
-      chartRef={hasData ? chartRef : undefined}
-      source="InserSup (MESR)"
+      description={`Comparaison du salaire net mensuel (${metricLabel}) par promotion de diplômés, de 6 à 30 mois après l'obtention du diplôme.`}
+      chartRef={chartRef}
+      source="insersup"
+      tooltip={
+        <span>
+          Salaire net mensuel calculé pour chaque promotion, permettant la comparaison inter-cohortes.
+          {' '}<Link to="/guide/indicateurs/salaires">En savoir plus</Link> sur le calcul des salaires.
+        </span>
+      }
+      noData={!hasData ? { message: "Aucune donnée de salaire disponible pour afficher l'évolution.", icon: 'fr-icon-money-euro-circle-line' } : undefined}
     >
-      <BlurredNoData
-        noData={!hasData}
-        icon="fr-icon-money-euro-circle-line"
-        message="Aucune donnée de salaire disponible pour afficher l'évolution."
-      >
-        {/* Internal metric selector */}
-        <div className="fr-mb-2w">
-          <fieldset className="fr-segmented fr-segmented--sm fr-segmented--no-legend">
-            <legend className="fr-sr-only">Choix de la métrique de salaire</legend>
-            <div className="fr-segmented__elements">
-              {METRIC_OPTIONS.map((option) => (
-                <div key={option.key} className="fr-segmented__element">
-                  <input
-                    type="radio"
-                    id={`salary-metric-${option.key}`}
-                    name="salary-metric"
-                    value={option.key}
-                    checked={selectedMetric === option.key}
-                    onChange={() => setSelectedMetric(option.key)}
-                  />
-                  <label className="fr-label" htmlFor={`salary-metric-${option.key}`}>
-                    {option.key === 'median' ? 'Médiane' : option.key.toUpperCase()}
-                  </label>
-                </div>
-              ))}
-            </div>
-          </fieldset>
-        </div>
+      {/* Internal metric selector */}
+      <div className="fr-mb-2w">
+        <fieldset className="fr-segmented fr-segmented--sm fr-segmented--no-legend">
+          <legend className="fr-sr-only">Choix de la métrique de salaire</legend>
+          <div className="fr-segmented__elements">
+            {METRIC_OPTIONS.map((option) => (
+              <div key={option.key} className="fr-segmented__element">
+                <input
+                  type="radio"
+                  id={`salary-metric-${option.key}`}
+                  name="salary-metric"
+                  value={option.key}
+                  checked={selectedMetric === option.key}
+                  onChange={() => setSelectedMetric(option.key)}
+                />
+                <label className="fr-label" htmlFor={`salary-metric-${option.key}`}>
+                  {option.key === 'median' ? 'Médiane' : option.key.toUpperCase()}
+                </label>
+              </div>
+            ))}
+          </div>
+        </fieldset>
+      </div>
 
-        <Chart ref={chartRef}>
-          <Credits enabled={false} />
-          <Legend align="center" />
-          <Tooltip shared valuePrefix="" valueSuffix=" €" />
-          <XAxis categories={MONTHS} title={{ text: 'Temps après diplôme' }} />
-          <YAxis
-            min={0}
-            title={{ text: 'Salaire net mensuel (€)' }}
-            labels={{ format: '{value} €' }}
+      <Chart ref={chartRef}>
+        <Credits enabled={false} />
+        <Legend align="center" />
+        <Tooltip shared valuePrefix="" valueSuffix=" €" />
+        <XAxis categories={MONTHS} title={{ text: 'Temps après diplôme' }} />
+        <YAxis
+          min={0}
+          title={{ text: 'Salaire net mensuel (€)' }}
+          labels={{ format: '{value} €' }}
+        />
+        {promoData.map((promo, index) => (
+          <Line.Series
+            key={promo.promo}
+            data={promo[selectedMetric]}
+            options={{
+              name: `Promo ${promo.promo}`,
+              color: getChartColor(
+                COHORT_COLORS[index % COHORT_COLORS.length] || 'green-archipel',
+              ),
+              marker: { enabled: true },
+            }}
           />
-          {promoData.map((promo, index) => (
-            <Line.Series
-              key={promo.promo}
-              data={promo[selectedMetric]}
-              options={{
-                name: `Promo ${promo.promo}`,
-                color: getChartColor(
-                  COHORT_COLORS[index % COHORT_COLORS.length] || 'green-archipel',
-                ),
-                marker: { enabled: true },
-              }}
-            />
-          ))}
-        </Chart>
-      </BlurredNoData>
-    </AnalyticsGraph>
+        ))}
+      </Chart>
+    </ChartBox>
   );
 }

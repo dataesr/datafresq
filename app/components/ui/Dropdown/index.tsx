@@ -1,4 +1,4 @@
-import '../popover.css';
+import '../shared/popover.css';
 import { Content, type DropdownContentProps } from './Content';
 import { type DropdownProps, Dropdown as DropdownRoot } from './Dropdown';
 import { type DropdownFooterProps, Footer } from './Footer';

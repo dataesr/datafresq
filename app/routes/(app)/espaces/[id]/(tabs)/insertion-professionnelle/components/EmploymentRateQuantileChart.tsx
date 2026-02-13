@@ -10,10 +10,10 @@ import {
 import { Line } from '@highcharts/react/series';
 import BoxPlot from '@highcharts/react/series/BoxPlot';
 import { useMemo, useRef } from 'react';
-import { AnalyticsGraph } from '@/components/AnalyticsGraph';
-import { getChartColor } from '@/components/highcharts';
+import { Link } from 'react-router';
+import { ChartBox } from '@/components/charts/ChartBox';
+import { getChartColor } from '@/components/charts/highcharts/colors';
 import {
-  BlurredNoData,
   countsToPercentages,
   MONTH_KEYS,
   MONTHS,
@@ -113,10 +113,6 @@ function useBoxplotData(quantiles: QuantilesByMonth | null): BoxplotDataPoint[] 
   }, [quantiles]);
 }
 
-/**
- * Employment rate quantile chart showing distribution across programs
- * This chart is unique to workspace view (not available for single programs)
- */
 export function EmploymentRateQuantileChart({ yearData, year }: EmploymentRateQuantileChartProps) {
   const chartRef = useRef<HighchartsReactRefObject | null>(null);
 
@@ -132,47 +128,58 @@ export function EmploymentRateQuantileChart({ yearData, year }: EmploymentRateQu
   const hasData = boxplotData && boxplotData.length > 0;
 
   return (
-    <AnalyticsGraph
-      title={`Distribution du taux d'emploi salarié - ${year}`}
-      description="Quartiles du taux d'emploi salarié par formation (min, Q1, médiane, Q3, max)"
-      chartRef={hasData ? chartRef : undefined}
-      source="InserSup (MESR)"
+    <ChartBox
+      title="Distribution du taux d'emploi"
+      description={`Quartiles du taux d'emploi salarié par formation (min, Q1, médiane, Q3, max) pour la promotion ${year}. Permet de visualiser la dispersion entre les formations de l'espace.`}
+      chartRef={chartRef}
+      source="insersup"
+      tooltip={
+        <span>
+          Distribution statistique du taux d'emploi salarié calculée sur l'ensemble des formations de l'espace.
+          {' '}<Link to="/guide/indicateurs/emploi">En savoir plus</Link> sur le calcul des taux d'emploi.
+        </span>
+      }
+      noData={!hasData ? { message: "Pas assez de formations avec des données suffisantes pour calculer les quartiles (minimum 4 formations avec au moins 20 sortants chacune)." } : undefined}
     >
-      <BlurredNoData
-        noData={!hasData}
-        message="Pas assez de formations avec des données suffisantes pour calculer les quartiles (minimum 4 formations avec au moins 20 sortants chacune)."
-      >
-        <Chart ref={chartRef}>
-          <Credits enabled={false} />
-          <Legend align="center" />
-          <Tooltip />
-          <XAxis categories={MONTHS} title={{ text: 'Temps après diplôme' }} />
-          <YAxis min={0} max={100} title={{ text: "Taux d'emploi salarié (%)" }} />
-          <BoxPlot.Series
-            data={boxplotData ?? []}
+      <Chart ref={chartRef}>
+        <Credits enabled={false} />
+        <Legend align="center" />
+        <Tooltip
+          useHTML
+          pointFormat={
+            '<span style="color:{point.color}">●</span> <b>{series.name}</b><br/>' +
+            'Maximum : <b>{point.high}%</b><br/>' +
+            'Quartile sup. : <b>{point.q3}%</b><br/>' +
+            'Médiane : <b>{point.median}%</b><br/>' +
+            'Quartile inf. : <b>{point.q1}%</b><br/>' +
+            'Minimum : <b>{point.low}%</b>'
+          }
+        />
+        <XAxis categories={MONTHS} title={{ text: 'Temps après diplôme' }} />
+        <YAxis min={0} max={100} title={{ text: "Taux d'emploi salarié (%)" }} />
+        <BoxPlot.Series
+          data={boxplotData ?? []}
+          options={{
+            name: 'Distribution',
+            color: getChartColor('blue-cumulus'),
+            fillColor: getChartColor('blue-cumulus') + '40',
+            medianColor: getChartColor('green-archipel'),
+            medianWidth: 3,
+          }}
+        />
+        {currentYearEmploiLine && (
+          <Line.Series
+            data={ratesToArrayWithTrailingNulls(currentYearEmploiLine)}
             options={{
-              name: 'Distribution',
-              color: getChartColor('blue-cumulus'),
-              fillColor: getChartColor('blue-cumulus') + '40',
-              medianColor: getChartColor('green-archipel'),
-              medianWidth: 3,
+              name: 'Moyenne espace',
+              color: getChartColor('green-archipel'),
+              marker: { enabled: true, symbol: 'circle' },
+              dashStyle: 'Dash',
+              lineWidth: 2,
             }}
           />
-          {/* Overlay: aggregate line */}
-          {currentYearEmploiLine && (
-            <Line.Series
-              data={ratesToArrayWithTrailingNulls(currentYearEmploiLine)}
-              options={{
-                name: 'Moyenne espace',
-                color: getChartColor('green-archipel'),
-                marker: { enabled: true, symbol: 'circle' },
-                dashStyle: 'Dash',
-                lineWidth: 2,
-              }}
-            />
-          )}
-        </Chart>
-      </BlurredNoData>
-    </AnalyticsGraph>
+        )}
+      </Chart>
+    </ChartBox>
   );
 }

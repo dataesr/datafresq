@@ -33,6 +33,10 @@ report.[0-9]_.[0-9]_.[0-9]_.[0-9]_.json
 # Finder (MacOS) folder config
 .DS_Store
 scripts
+!scripts/generate-guide.ts
+
+# generated guide content
+app/routes/guide/guide-content.generated.ts
 
 .rules
 _saved

@@ -1,17 +1,13 @@
 import cn from 'classnames';
-import { useRef, useState } from 'react';
-import { Link } from 'react-router';
-import { useSharedWorkspaces, useWorkspaces } from '@/api/workspaces';
-import { Modal, useModal } from '@/components/Modal';
-import './styles.css';
+import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useEditableWorkspaces } from '@/api/workspaces';
+import SearchModal, { useSearchModal } from '@/components/SearchModal';
 import { useActiveWorkspace } from '@/contexts/ActiveWorkspaceContext';
-import type { ReadWorkspace } from '~/schemas/workspaces';
+import './styles.css';
 
 interface WorkspaceSelectorProps {
   label?: string;
   title?: string;
-  description?: string;
-  showCreateLink?: boolean;
   buttonIcon: string;
   disabled?: boolean;
   outline?: boolean;
@@ -20,39 +16,42 @@ interface WorkspaceSelectorProps {
 export function WorkspaceSelector({
   label,
   title = 'Sélectionner un espace de travail',
-  description,
-  showCreateLink = true,
   buttonIcon = 'fr-icon-refresh-line',
   disabled = false,
   outline = false,
 }: WorkspaceSelectorProps) {
-  const { modalProps, modalId, open, close } = useModal();
-  const { data: workspaces } = useWorkspaces();
-  const { data: sharedWorkspaces } = useSharedWorkspaces();
-  const { setActiveWorkspace } = useActiveWorkspace();
-  const inputRef = useRef<HTMLInputElement>(null);
-  const [focusedIndex, setFocusedIndex] = useState(-1);
+  const { data: allWorkspaces } = useEditableWorkspaces();
+  const { activeWorkspace, setActiveWorkspace } = useActiveWorkspace();
   const [searchValue, setSearchValue] = useState('');
-  const workspaceButtonsRef = useRef<(HTMLButtonElement | null)[]>([]);
 
-  const allWorkspaces = [...workspaces, ...sharedWorkspaces];
-
-  const filteredWorkspaces = allWorkspaces.filter((workspace) =>
-    workspace.name.toLowerCase().includes(searchValue.toLowerCase()),
+  const filteredWorkspaces = useMemo(
+    () =>
+      allWorkspaces.filter((workspace) =>
+        workspace.name.toLowerCase().includes(searchValue.toLowerCase()),
+      ),
+    [allWorkspaces, searchValue],
   );
 
-  const handleSelect = (workspace: ReadWorkspace) => {
-    setActiveWorkspace(workspace);
-    close();
-    setSearchValue('');
-    setFocusedIndex(-1);
-  };
+  const handleSelect = useCallback(
+    (index: number) => {
+      const workspace = filteredWorkspaces[index];
+      if (workspace) setActiveWorkspace(workspace);
+    },
+    [filteredWorkspaces, setActiveWorkspace],
+  );
 
-  const handleClose = () => {
-    close();
-    setSearchValue('');
-    setFocusedIndex(-1);
-  };
+  const search = useSearchModal({
+    itemCount: filteredWorkspaces.length,
+    onSelect: handleSelect,
+    onClose: () => setSearchValue(''),
+  });
+
+  useEffect(() => {
+    search.resetFocus();
+  }, [searchValue, search.resetFocus]);
+
+  const focusedItem = search.focusedIndex >= 0 ? filteredWorkspaces[search.focusedIndex] : undefined;
+  const focusedWorkspace = focusedItem ? `workspace-${focusedItem.id}` : undefined;
 
   return (
     <>
@@ -66,138 +65,71 @@ export function WorkspaceSelector({
         title={label ? undefined : title}
         aria-label={label ? undefined : title}
         disabled={disabled}
-        onClick={open}
+        onClick={search.open}
       >
         {label}
       </button>
-      <Modal {...modalProps}>
-        <div className="fr-col-12 fr-col-md-8 fr-col-lg-6">
-          <div className="fr-modal__body">
-            <div className="fr-modal__header fx-shadow-border-bottom">
-              <div className="fx-flex fx-justify-between fx-items-start fx-gap-4w">
-                <div>
-                  <p className="fr-text--lead fr-text--bold fr-mb-0">{title}</p>
-                  {description && (
-                    <p className="fr-text--sm fr-text-mention--grey fr-mb-0">{description}</p>
-                  )}
-                </div>
-                <div>
-                <button
-                  type="button"
-                  className="fr-btn fr-btn--sm fr-btn--tertiary-no-outline fr-icon-close-line"
-                  aria-label="Fermer"
-                  onClick={handleClose}
-                >
-                  Fermer
-                </button>
-                </div>
-              </div>
-            </div>
 
-            <div className="fr-modal__content fr-px-0 fr-pb-1w">
-              <div className="fr-input-group">
-                <div
-                  className={cn('fr-input-wrap', {
-                    'fr-icon-search-line': !searchValue,
-                    'fr-icon-close-line': searchValue,
-                  })}
-                >
-                  <input
-                    className="fr-input ws-search-input"
-                    type="search"
-                    ref={inputRef}
-                    value={searchValue}
-                    onChange={(e) => setSearchValue(e.target.value)}
-                    placeholder="Rechercher un espace"
-                    aria-autocomplete="list"
-                    aria-controls={`${modalId}-workspace-list`}
-                    aria-activedescendant={
-                      focusedIndex >= 0 && filteredWorkspaces?.[focusedIndex]
-                        ? `workspace-${filteredWorkspaces[focusedIndex].id}`
-                        : undefined
-                    }
-                  />
+      <SearchModal
+        modalProps={search.modalProps}
+        query={searchValue}
+        onQueryChange={setSearchValue}
+        inputRef={search.inputRef}
+        onInputKeyDown={search.handleInputKeyDown}
+        placeholder="Rechercher un espace"
+        listboxId="workspace-selector-listbox"
+        activedescendant={focusedWorkspace}
+        footer={
+          <>
+            <p className="fr-text--xs fr-text-mention--grey fr-mb-0">
+              <SearchModal.Kbd>↑↓</SearchModal.Kbd> naviguer
+              {' · '}
+              <SearchModal.Kbd>↩</SearchModal.Kbd> sélectionner
+              {' · '}
+              <SearchModal.Kbd>esc</SearchModal.Kbd> fermer
+            </p>
+          </>
+        }
+      >
+        {filteredWorkspaces.length === 0 && (
+          <SearchModal.Empty>Aucun espace trouvé</SearchModal.Empty>
+        )}
 
-                  {!!searchValue && (
-                    <button
-                      type="button"
-                      aria-label="Réinitialiser"
-                      onClick={() => {
-                        setSearchValue('');
-                        inputRef.current?.focus();
-                      }}
-                      className="fr-btn--tertiary-no-outline ws-selector-input-clear-btn"
-                    />
-                  )}
-                </div>
-                <div
-                  className="ws-selector-listbox"
-                  role="listbox"
-                  id={`${modalId}-workspace-list`}
-                  style={{ height: '16rem', overflowY: 'auto', overflowX: 'hidden' }}
-                >
-                  {filteredWorkspaces?.length === 0 && (
-                    <div className="fr-p-4w fx-flex fx-items-start fx-flex-col">
-                      <i>Aucun espace trouvé</i>
-                    </div>
-                  )}
-                  {filteredWorkspaces?.map((workspace, index) => (
-                    <button
-                      key={workspace.id}
-                      role="option"
-                      type="button"
-                      id={`workspace-${workspace.id}`}
-                      className="fr-px-2w fr-py-1w ws-selector-workspace-btn"
-                      aria-selected={focusedIndex === index}
-                      ref={(el) => {
-                        workspaceButtonsRef.current[index] = el;
-                      }}
-                      onClick={() => handleSelect(workspace)}
-                    >
-                      <div className="fx-flex fx-items-baseline fx-gap-3w">
-                        <span
-                          className="ws-selector-color"
-                          style={{
-                            backgroundColor: `var(--artwork-minor-${workspace.color})`,
-                          }}
-                          aria-hidden="true"
-                        />
-                        <div className="fx-flex fx-flex-col fx-items-start fx-gap-1w">
-                          <p className="fx-clamp-1 fr-text--sm fr-mb-0">{workspace.name}</p>
-                          <p className="fx-clamp-1 fr-text-mention--grey fr-text--xs fr-mb-0">
-                            {workspace.ownerInfo?.firstName} {workspace.ownerInfo?.lastName}
-                            {' — '}
-                            {workspace.programs?.length || 0} formation
-                            {(workspace.programs?.length || 0) > 1 ? 's' : ''}
-                          </p>
-                        </div>
-                      </div>
-                    </button>
-                  ))}
-                </div>
+        {filteredWorkspaces.map((workspace, index) => (
+          <SearchModal.Item
+            key={workspace.id}
+            id={`workspace-${workspace.id}`}
+            focused={search.focusedIndex === index}
+            ref={(el) => search.setItemRef(index, el)}
+            onClick={() => search.select(index)}
+          >
+            <div className="fx-flex fx-items-center fx-gap-2w fx-width-100">
+              <span
+                className="ws-selector-color fx-flex-shrink-0 fx-self-start fr-pt-1v"
+                style={{
+                  backgroundColor: `var(--artwork-minor-${workspace.color})`,
+                }}
+                aria-hidden="true"
+              />
+              <div className="fx-flex fx-flex-col fx-items-start fx-gap-1w fx-flex-grow">
+                <p className="fx-clamp-1 fr-text--sm fr-mb-0">{workspace.name}</p>
+                <p className="fx-clamp-1 fr-text-mention--grey fr-text--xs fr-mb-0">
+                  {workspace.ownerInfo?.firstName} {workspace.ownerInfo?.lastName}
+                  {' — '}
+                  {workspace.programs?.length || 0} formation
+                  {(workspace.programs?.length || 0) > 1 ? 's' : ''}
+                </p>
               </div>
-            </div>
-            <div className="fr-modal__footer fx-justify-between fx-shadow-border-top fr-px-2w fr-py-3v">
-              <button
-                type="button"
-                className="fr-btn fr-btn--tertiary-no-outline"
-                onClick={handleClose}
-              >
-                Annuler
-              </button>
-              {showCreateLink && (
-                <Link
-                  to="/espaces/nouveau"
-                  className="fr-btn fr-btn--tertiary-no-outline fr-icon-add-line fr-btn--icon-left"
-                  onClick={handleClose}
-                >
-                  Créer un espace
-                </Link>
+              {activeWorkspace?.id === workspace.id && (
+                <span
+                  className="fr-icon-check-line fr-text-label--blue-france fx-flex-shrink-0"
+                  aria-label="Espace actif"
+                />
               )}
             </div>
-          </div>
-        </div>
-      </Modal>
+          </SearchModal.Item>
+        ))}
+      </SearchModal>
     </>
   );
 }

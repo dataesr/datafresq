@@ -31,6 +31,7 @@ type SearchParamsInput = Pick<
   | 'sector'
   | 'disciplinarySector'
   | 'domain'
+  | 'codeRome'
 > & {
   hasSiseInfos?: string | null;
   hasRncpInfos?: string | null;
@@ -52,6 +53,7 @@ async function searchPrograms(params: SearchParamsInput) {
       sector: params.sector?.length ? params.sector : undefined,
       disciplinarySector: params.disciplinarySector?.length ? params.disciplinarySector : undefined,
       domain: params.domain?.length ? params.domain : undefined,
+      codeRome: params.codeRome?.length ? params.codeRome : undefined,
       hasSiseInfos: params.hasSiseInfos || undefined,
       hasRncpInfos: params.hasRncpInfos || undefined,
       hasRomeInfos: params.hasRomeInfos || undefined,
@@ -75,6 +77,7 @@ async function getFacets(params: Omit<SearchParamsInput, 'page' | 'pageSize'>) {
       sector: params.sector?.length ? params.sector : undefined,
       disciplinarySector: params.disciplinarySector?.length ? params.disciplinarySector : undefined,
       domain: params.domain?.length ? params.domain : undefined,
+      codeRome: params.codeRome?.length ? params.codeRome : undefined,
       hasSiseInfos: params.hasSiseInfos || undefined,
       hasRncpInfos: params.hasRncpInfos || undefined,
       hasRomeInfos: params.hasRomeInfos || undefined,
@@ -105,6 +108,7 @@ export interface FilterState {
   sector: string[];
   disciplinarySector: string[];
   domain: string[];
+  codeRome: string[];
   hasSiseInfos: string | null;
   hasRncpInfos: string | null;
   hasRomeInfos: string | null;
@@ -120,6 +124,7 @@ export const EMPTY_FILTERS: FilterState = {
   sector: [],
   disciplinarySector: [],
   domain: [],
+  codeRome: [],
   hasSiseInfos: null,
   hasRncpInfos: null,
   hasRomeInfos: null,

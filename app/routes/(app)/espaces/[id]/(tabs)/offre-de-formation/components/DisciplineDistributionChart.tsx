@@ -9,9 +9,10 @@ import {
 } from '@highcharts/react';
 import { Bar } from '@highcharts/react/series';
 import { useMemo, useRef } from 'react';
-import { AnalyticsGraph } from '@/components/AnalyticsGraph';
-import { getChartColor } from '@/components/highcharts';
-import { FRESQ_SOURCE, TOP_DISCIPLINES_LIMIT } from '../constants';
+import { Link } from 'react-router';
+import { ChartBox } from '@/components/charts/ChartBox';
+import { getChartColor } from '@/components/charts/highcharts/colors';
+import { TOP_DISCIPLINES_LIMIT } from '../constants';
 
 interface DisciplineData {
   discipline: string;
@@ -57,11 +58,17 @@ export function DisciplineDistributionChart({
   }
 
   return (
-    <AnalyticsGraph
-      title={`Top ${limit} secteurs disciplinaires (formations)`}
-      description={`Les ${limit} secteurs disciplinaires avec le plus de formations.`}
+    <ChartBox
+      title="Secteurs disciplinaires"
+      description={`Classement des ${limit} secteurs disciplinaires par nombre de formations proposées.`}
       chartRef={chartRef}
-      source={FRESQ_SOURCE}
+      source="fresq"
+      tooltip={
+        <span>
+          Nombre de formations comptées par secteur disciplinaire.
+          {' '}<Link to="/guide/donnees/fresq">En savoir plus</Link> sur les données Fresq.
+        </span>
+      }
     >
       <Chart ref={chartRef}>
         <Credits enabled={false} />
@@ -81,6 +88,6 @@ export function DisciplineDistributionChart({
           }}
         />
       </Chart>
-    </AnalyticsGraph>
+    </ChartBox>
   );
 }

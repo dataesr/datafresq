@@ -6,13 +6,14 @@ import { BrowserRouter, useLocation } from 'react-router';
 import { queryClient } from '@/api/query-client';
 import { Toaster } from '@/components/ui/Toast';
 import AppRouter from '@/routes';
-import '@/components/highcharts';
+import '@/components/charts/highcharts';
 
 import './styles/index.css';
 
 function DSFRInitializer({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     if (window.dsfr && typeof window.dsfr.start === 'function') {
+      console.info('Starting DSFR...');
       window.dsfr.start();
     }
   }, []);

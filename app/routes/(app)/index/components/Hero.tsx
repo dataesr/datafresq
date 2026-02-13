@@ -23,7 +23,7 @@ export default function Hero() {
               <Link to="/formations" className="fr-btn fr-btn--icon-right fr-icon-arrow-right-line">
                 Explorer les formations
               </Link>
-              <Link to="/faq" className="fr-btn fr-btn--secondary">
+              <Link to="/guide" className="fr-btn fr-btn--secondary">
                 En savoir plus
               </Link>
             </div>

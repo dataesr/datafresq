@@ -1,4 +1,4 @@
-import '../popover.css';
+import '../shared/popover.css';
 import { Checkbox, type SelectCheckboxProps } from './Checkbox';
 import { Content, type SelectContentProps } from './Content';
 import { Empty, type SelectEmptyProps } from './Empty';

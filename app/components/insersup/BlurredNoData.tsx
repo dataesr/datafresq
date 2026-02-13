@@ -1,2 +1,2 @@
 // Re-export BlurredNoData from shared components for backwards compatibility
-export { BlurredNoData } from '@/components/BlurredNoData';
+export { BlurredNoData } from '@/components/charts/BlurredNoData';

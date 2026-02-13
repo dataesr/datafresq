@@ -9,9 +9,9 @@ import {
 } from '@highcharts/react';
 import { Column } from '@highcharts/react/series';
 import { useMemo, useRef } from 'react';
-import { AnalyticsGraph } from '@/components/AnalyticsGraph';
-import { SISE_SOURCE_SHORT } from '@/components/effectifs';
-import { getChartColor } from '@/components/highcharts';
+import { Link } from 'react-router';
+import { ChartBox } from '@/components/charts/ChartBox';
+import { getChartColor } from '@/components/charts/highcharts/colors';
 
 interface StudyYearChartProps {
   categories: string[];
@@ -30,7 +30,7 @@ function useChartData(props: StudyYearChartProps) {
       categories,
       women,
       men,
-      description: `Distribution des étudiants selon leur année dans le cursus (${latestYear})`,
+      description: `Distribution des étudiants inscrits selon leur année dans le cursus (${latestYear}).`,
     };
   }, [props]);
 }
@@ -48,11 +48,17 @@ export function StudyYearChart(props: StudyYearChartProps) {
   }
 
   return (
-    <AnalyticsGraph
+    <ChartBox
       title="Répartition par année d'études"
       description={description}
       chartRef={chartRef}
-      source={SISE_SOURCE_SHORT}
+      source="sise"
+      tooltip={
+        <span>
+          Somme des étudiants inscrits par année dans le cursus de la formation.
+          {' '}<Link to="/guide/indicateurs/effectifs">En savoir plus</Link> sur le calcul des effectifs.
+        </span>
+      }
     >
       <Chart ref={chartRef}>
         <Credits enabled={false} />
@@ -77,6 +83,6 @@ export function StudyYearChart(props: StudyYearChartProps) {
           }}
         />
       </Chart>
-    </AnalyticsGraph>
+    </ChartBox>
   );
 }

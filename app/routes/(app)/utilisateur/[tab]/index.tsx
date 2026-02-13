@@ -4,7 +4,7 @@ import { Breadcrumb } from '@/components/Breadcrumb';
 import ErrorBoundary from '@/components/errors/ErrorBoundary';
 import PageContentLoader from '@/components/loaders/PageContentLoader';
 import { TabActivityPanel } from '@/components/TabActivityPanel';
-import { Tabnav, TabnavItem } from '@/components/Tabnav';
+import { Tabnav, TabnavItem } from '@/components/ui/Tabnav';
 
 import Compte from './compte';
 import Profil from './profil';

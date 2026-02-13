@@ -1,10 +1,10 @@
 import { Chart, Credits, type HighchartsReactRefObject, Legend, Tooltip } from '@highcharts/react';
 import { Pie } from '@highcharts/react/series';
 import { useMemo, useRef } from 'react';
-import { AnalyticsGraph } from '@/components/AnalyticsGraph';
+import { Link } from 'react-router';
+import { ChartBox } from '@/components/charts/ChartBox';
 import { CYCLE_COLORS } from '@/components/effectifs';
-import { getChartColor } from '@/components/highcharts';
-import { FRESQ_SOURCE } from '../constants';
+import { getChartColor } from '@/components/charts/highcharts/colors';
 
 interface CycleData {
   cycle: string;
@@ -42,11 +42,17 @@ export function CycleDistributionChart({ data }: CycleDistributionChartProps) {
   }
 
   return (
-    <AnalyticsGraph
-      title="Répartition par cycle LMD (formations)"
+    <ChartBox
+      title="Répartition par cycle LMD"
       description="Distribution des formations par cycle Licence, Master et Doctorat."
       chartRef={chartRef}
-      source={FRESQ_SOURCE}
+      source="fresq"
+      tooltip={
+        <span>
+          Nombre de formations regroupées par cycle LMD (Licence, Master, Doctorat).
+          {' '}<Link to="/guide/donnees/fresq">En savoir plus</Link> sur les données Fresq.
+        </span>
+      }
     >
       <Chart ref={chartRef}>
         <Credits enabled={false} />
@@ -64,6 +70,6 @@ export function CycleDistributionChart({ data }: CycleDistributionChartProps) {
           }}
         />
       </Chart>
-    </AnalyticsGraph>
+    </ChartBox>
   );
 }

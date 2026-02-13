@@ -41,6 +41,8 @@ export function usePopoverPosition({
   const [maxHeight, setMaxHeight] = useState<number | null>(null);
   const [position, setPosition] = useState<PopoverPosition | null>(null);
   const prevPositionRef = useRef<PopoverPosition | null>(null);
+  const lockedPlacementRef = useRef<PopoverPlacement | null>(null);
+  const lockedAlignRef = useRef<'start' | 'end' | null>(null);
 
   const calculatePosition = useCallback(() => {
     if (!triggerRef.current || !menuRef.current) return;
@@ -68,18 +70,24 @@ export function usePopoverPosition({
     const spaceAbove = triggerRect.top - VIEWPORT_PADDING;
 
     let align: 'start' | 'end';
-    if (alignProp === 'auto') {
+    if (lockedAlignRef.current) {
+      align = lockedAlignRef.current;
+    } else if (alignProp === 'auto') {
       const buttonCenter = triggerRect.left + triggerRect.width / 2;
       align = buttonCenter > window.innerWidth / 2 ? 'end' : 'start';
     } else {
       align = alignProp;
     }
+    lockedAlignRef.current = align;
     setComputedAlign(align);
 
     let placement: PopoverPlacement;
     let availableHeight: number;
 
-    if (placementProp !== 'auto') {
+    if (lockedPlacementRef.current) {
+      placement = lockedPlacementRef.current;
+      availableHeight = placement === 'bottom' ? spaceBelow : spaceAbove;
+    } else if (placementProp !== 'auto') {
       placement = placementProp;
       availableHeight = placement === 'bottom' ? spaceBelow : spaceAbove;
     } else {
@@ -103,6 +111,7 @@ export function usePopoverPosition({
       }
     }
 
+    lockedPlacementRef.current = placement;
     setComputedPlacement(placement);
     setMaxHeight(availableHeight);
 
@@ -199,6 +208,8 @@ export function usePopoverPosition({
   useEffect(() => {
     if (!enabled) {
       prevPositionRef.current = null;
+      lockedPlacementRef.current = null;
+      lockedAlignRef.current = null;
     }
   }, [enabled]);
 

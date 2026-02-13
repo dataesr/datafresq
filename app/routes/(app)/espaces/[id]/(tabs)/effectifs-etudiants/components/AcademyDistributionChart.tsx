@@ -9,9 +9,9 @@ import {
 } from '@highcharts/react';
 import { Bar } from '@highcharts/react/series';
 import { useMemo, useRef } from 'react';
-import { AnalyticsGraph } from '@/components/AnalyticsGraph';
-import { SISE_SOURCE_SHORT } from '@/components/effectifs';
-import { getColorForSeries } from '@/components/highcharts';
+import { Link } from 'react-router';
+import { ChartBox } from '@/components/charts/ChartBox';
+import { getColorForSeries } from '@/components/charts/highcharts/colors';
 
 interface AcademyData {
   academy: string;
@@ -22,6 +22,7 @@ interface AcademyData {
 
 interface AcademyDistributionChartProps {
   data: AcademyData[];
+  year: string;
   limit?: number;
 }
 
@@ -39,11 +40,7 @@ function useChartData(data: AcademyData[], limit: number) {
   }, [data, limit]);
 }
 
-/**
- * Academy distribution chart showing students by academy with gender breakdown
- * Workspace-specific chart
- */
-export function AcademyDistributionChart({ data, limit = 10 }: AcademyDistributionChartProps) {
+export function AcademyDistributionChart({ data, year, limit = 10 }: AcademyDistributionChartProps) {
   const chartRef = useRef<HighchartsReactRefObject | null>(null);
   const { hasData, categories, femaleData, maleData } = useChartData(data, limit);
 
@@ -52,13 +49,19 @@ export function AcademyDistributionChart({ data, limit = 10 }: AcademyDistributi
   }
 
   return (
-    <AnalyticsGraph
-      title={`Top ${limit} académies par genre`}
-      description={`Les ${limit} académies avec le plus d'étudiants, répartis par genre.`}
+    <ChartBox
+      title="Académies par genre"
+      description={`Rentrée ${year}. Les ${limit} académies avec le plus d'étudiants inscrits, avec répartition par sexe.`}
       chartRef={chartRef}
-      source={SISE_SOURCE_SHORT}
+      source="sise"
+      tooltip={
+        <span>
+          Calculé par somme des effectifs des formations pour chaque académie.
+          {' '}<Link to="/guide/indicateurs/effectifs">En savoir plus</Link> sur le calcul des effectifs.
+        </span>
+      }
     >
-      <Chart ref={chartRef} containerProps={{ style: { height: '400px' } }}>
+      <Chart ref={chartRef}>
         <Credits enabled={false} />
         <Legend align="center" />
         <Tooltip valueSuffix=" étudiants" />
@@ -81,6 +84,6 @@ export function AcademyDistributionChart({ data, limit = 10 }: AcademyDistributi
           }}
         />
       </Chart>
-    </AnalyticsGraph>
+    </ChartBox>
   );
 }

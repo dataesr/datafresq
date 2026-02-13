@@ -9,10 +9,10 @@ import {
 } from '@highcharts/react';
 import { Line } from '@highcharts/react/series';
 import { useMemo, useRef } from 'react';
-import { AnalyticsGraph } from '@/components/AnalyticsGraph';
-import { getChartColor } from '@/components/highcharts';
+import { Link } from 'react-router';
+import { ChartBox } from '@/components/charts/ChartBox';
+import { getChartColor } from '@/components/charts/highcharts/colors';
 import type { EmploymentCounts } from '~/schemas/aggregations';
-import { BlurredNoData } from './BlurredNoData';
 import { COHORT_COLORS, MONTH_KEYS, MONTHS, PRIVACY_THRESHOLD } from './constants';
 
 interface YearStatsForEvolution {
@@ -78,37 +78,39 @@ export function EmploymentStabilityEvolutionChart({
   const hasData = promoData.length > 0;
 
   return (
-    <AnalyticsGraph
-      title="Évolution de la part d'emploi stable"
-      description="Part des CDI/fonctionnaires parmi les emplois salariés par promotion"
-      chartRef={hasData ? chartRef : undefined}
-      source="InserSup (MESR)"
+    <ChartBox
+      title="Évolution de l'emploi stable"
+      description="Comparaison de la part d'emploi stable (CDI/fonctionnaire) parmi les emplois salariés par promotion de diplômés, de 6 à 30 mois après l'obtention du diplôme."
+      chartRef={chartRef}
+      source="insersup"
+      tooltip={
+        <span>
+          Part d'emploi stable calculée pour chaque promotion, permettant la comparaison inter-cohortes.
+          {' '}<Link to="/guide/indicateurs/emploi">En savoir plus</Link> sur le calcul des taux d'emploi.
+        </span>
+      }
+      noData={!hasData ? { message: "Aucune donnée disponible pour afficher l'évolution de l'emploi stable." } : undefined}
     >
-      <BlurredNoData
-        noData={!hasData}
-        message="Aucune donnée disponible pour afficher l'évolution de l'emploi stable."
-      >
-        <Chart ref={chartRef}>
-          <Credits enabled={false} />
-          <Legend align="center" />
-          <Tooltip shared valueSuffix="%" />
-          <XAxis categories={MONTHS} title={{ text: 'Temps après diplôme' }} />
-          <YAxis min={0} max={100} title={{ text: "Part d'emploi stable (%)" }} />
-          {promoData.map((promo, index) => (
-            <Line.Series
-              key={promo.promo}
-              data={promo.data}
-              options={{
-                name: `Promo ${promo.promo}`,
-                color: getChartColor(
-                  COHORT_COLORS[index % COHORT_COLORS.length] || 'green-archipel',
-                ),
-                marker: { enabled: true },
-              }}
-            />
-          ))}
-        </Chart>
-      </BlurredNoData>
-    </AnalyticsGraph>
+      <Chart ref={chartRef}>
+        <Credits enabled={false} />
+        <Legend align="center" />
+        <Tooltip shared valueSuffix="%" />
+        <XAxis categories={MONTHS} title={{ text: 'Temps après diplôme' }} />
+        <YAxis min={0} max={100} title={{ text: "Part d'emploi stable (%)" }} />
+        {promoData.map((promo, index) => (
+          <Line.Series
+            key={promo.promo}
+            data={promo.data}
+            options={{
+              name: `Promo ${promo.promo}`,
+              color: getChartColor(
+                COHORT_COLORS[index % COHORT_COLORS.length] || 'green-archipel',
+              ),
+              marker: { enabled: true },
+            }}
+          />
+        ))}
+      </Chart>
+    </ChartBox>
   );
 }

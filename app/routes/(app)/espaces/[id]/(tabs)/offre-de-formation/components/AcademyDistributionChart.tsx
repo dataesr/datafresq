@@ -9,9 +9,10 @@ import {
 } from '@highcharts/react';
 import { Bar } from '@highcharts/react/series';
 import { useMemo, useRef } from 'react';
-import { AnalyticsGraph } from '@/components/AnalyticsGraph';
-import { getChartColor } from '@/components/highcharts';
-import { FRESQ_SOURCE, TOP_ACADEMIES_LIMIT } from '../constants';
+import { Link } from 'react-router';
+import { ChartBox } from '@/components/charts/ChartBox';
+import { getChartColor } from '@/components/charts/highcharts/colors';
+import { TOP_ACADEMIES_LIMIT } from '../constants';
 
 interface AcademyData {
   academy: string;
@@ -57,11 +58,17 @@ export function AcademyDistributionChart({
   }
 
   return (
-    <AnalyticsGraph
-      title={`Top ${limit} académies (formations)`}
-      description={`Les ${limit} académies avec le plus de formations.`}
+    <ChartBox
+      title="Académies"
+      description={`Classement des ${limit} académies par nombre de formations proposées.`}
       chartRef={chartRef}
-      source={FRESQ_SOURCE}
+      source="fresq"
+      tooltip={
+        <span>
+          Nombre de formations comptées par académie d'implantation.
+          {' '}<Link to="/guide/donnees/fresq">En savoir plus</Link> sur les données Fresq.
+        </span>
+      }
     >
       <Chart ref={chartRef}>
         <Credits enabled={false} />
@@ -81,6 +88,6 @@ export function AcademyDistributionChart({
           }}
         />
       </Chart>
-    </AnalyticsGraph>
+    </ChartBox>
   );
 }

@@ -1,9 +1,10 @@
 import { Chart, Credits, type HighchartsReactRefObject, Legend, Tooltip } from '@highcharts/react';
 import { Pie } from '@highcharts/react/series';
 import { useMemo, useRef } from 'react';
-import { AnalyticsGraph } from '@/components/AnalyticsGraph';
-import { CYCLE_COLORS, SISE_SOURCE_SHORT } from '@/components/effectifs';
-import { getChartColor } from '@/components/highcharts';
+import { Link } from 'react-router';
+import { ChartBox } from '@/components/charts/ChartBox';
+import { CYCLE_COLORS } from '@/components/effectifs';
+import { getChartColor } from '@/components/charts/highcharts/colors';
 
 interface CycleData {
   cycle: string;
@@ -14,6 +15,7 @@ interface CycleData {
 
 interface CycleDistributionChartProps {
   data: CycleData[];
+  year: string;
 }
 
 function useChartData(data: CycleData[]) {
@@ -34,11 +36,7 @@ function useChartData(data: CycleData[]) {
   }, [data]);
 }
 
-/**
- * Cycle distribution pie chart showing students by LMD cycle (Licence, Master, Doctorat)
- * Workspace-specific chart
- */
-export function CycleDistributionChart({ data }: CycleDistributionChartProps) {
+export function CycleDistributionChart({ data, year }: CycleDistributionChartProps) {
   const chartRef = useRef<HighchartsReactRefObject | null>(null);
   const { hasData, pieData } = useChartData(data);
 
@@ -47,13 +45,19 @@ export function CycleDistributionChart({ data }: CycleDistributionChartProps) {
   }
 
   return (
-    <AnalyticsGraph
-      title="Répartition par cycle LMD (étudiants)"
-      description="Distribution des étudiants par cycle Licence, Master et Doctorat."
+    <ChartBox
+      title="Répartition par cycle LMD"
+      description={`Rentrée ${year}. Distribution des étudiants inscrits par cycle Licence, Master et Doctorat.`}
       chartRef={chartRef}
-      source={SISE_SOURCE_SHORT}
+      source="sise"
+      tooltip={
+        <span>
+          Somme des étudiants inscrits regroupés par cycle LMD (Licence, Master, Doctorat).
+          {' '}<Link to="/guide/indicateurs/effectifs">En savoir plus</Link> sur le calcul des effectifs.
+        </span>
+      }
     >
-      <Chart ref={chartRef} containerProps={{ style: { height: '400px' } }}>
+      <Chart ref={chartRef}>
         <Credits enabled={false} />
         <Legend align="center" />
         <Tooltip pointFormat="<b>{point.y}</b> étudiants ({point.percentage:.1f}%)" />
@@ -69,6 +73,6 @@ export function CycleDistributionChart({ data }: CycleDistributionChartProps) {
           }}
         />
       </Chart>
-    </AnalyticsGraph>
+    </ChartBox>
   );
 }

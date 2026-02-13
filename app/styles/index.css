@@ -10,6 +10,12 @@ html {
   scroll-padding-top: 2rem;
 }
 
+.fr-logo.fx-footer-logo {
+  margin: -.75rem !important;
+  padding: .75rem !important;
+  font-size: .7875rem !important;
+}
+
 .xfr-simple-card-list {
   list-style: none;
   padding: 0;

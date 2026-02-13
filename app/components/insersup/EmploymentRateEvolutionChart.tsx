@@ -9,10 +9,10 @@ import {
 } from '@highcharts/react';
 import { Line } from '@highcharts/react/series';
 import { useMemo, useRef } from 'react';
-import { AnalyticsGraph } from '@/components/AnalyticsGraph';
-import { getChartColor } from '@/components/highcharts';
+import { Link } from 'react-router';
+import { ChartBox } from '@/components/charts/ChartBox';
+import { getChartColor } from '@/components/charts/highcharts/colors';
 import type { EmploymentCounts } from '~/schemas/aggregations';
-import { BlurredNoData } from './BlurredNoData';
 import { COHORT_COLORS, MONTHS, PRIVACY_THRESHOLD } from './constants';
 import { countsToPercentages, ratesToArrayWithTrailingNulls } from './utils';
 
@@ -46,37 +46,42 @@ export function EmploymentRateEvolutionChart({ sortedByYear }: EmploymentRateEvo
       : 'Une seule cohorte disponible. Le graphique de comparaison nécessite au moins 2 cohortes.';
 
   return (
-    <AnalyticsGraph
+    <ChartBox
       title="Comparaison des cohortes"
-      description="Taux d'emploi salarié en France par promotion"
-      chartRef={hasData ? chartRef : undefined}
-      source="InserSup (MESR)"
+      description="Évolution comparée du taux d'emploi salarié en France pour chaque promotion de diplômés, de 6 à 30 mois après l'obtention du diplôme."
+      chartRef={chartRef}
+      source="insersup"
+      tooltip={
+        <span>
+          Taux d'emploi salarié calculé pour chaque promotion de diplômés, permettant la comparaison inter-cohortes.
+          {' '}<Link to="/guide/indicateurs/emploi">En savoir plus</Link> sur le calcul des taux d'emploi.
+        </span>
+      }
+      noData={!hasData ? { message: noDataMessage } : undefined}
     >
-      <BlurredNoData noData={!hasData} message={noDataMessage}>
-        <Chart ref={chartRef}>
-          <Credits enabled={false} />
-          <Legend align="center" />
-          <Tooltip shared valueSuffix="%" />
-          <XAxis categories={MONTHS} title={{ text: 'Temps après diplôme' }} />
-          <YAxis min={0} max={100} title={{ text: "Taux d'emploi salarié (%)" }} />
-          {cohortsWithData.map((cohort, index) => {
-            const cohortPercentages = countsToPercentages(cohort.emploiSalFr, cohort.nbSortants);
-            return (
-              <Line.Series
-                key={cohort.promo}
-                data={ratesToArrayWithTrailingNulls(cohortPercentages)}
-                options={{
-                  name: `Promo ${cohort.promo}`,
-                  color: getChartColor(
-                    COHORT_COLORS[index % COHORT_COLORS.length] || 'green-archipel',
-                  ),
-                  marker: { enabled: true },
-                }}
-              />
-            );
-          })}
-        </Chart>
-      </BlurredNoData>
-    </AnalyticsGraph>
+      <Chart ref={chartRef}>
+        <Credits enabled={false} />
+        <Legend align="center" />
+        <Tooltip shared valueSuffix="%" />
+        <XAxis categories={MONTHS} title={{ text: 'Temps après diplôme' }} />
+        <YAxis min={0} max={100} title={{ text: "Taux d'emploi salarié (%)" }} />
+        {cohortsWithData.map((cohort, index) => {
+          const cohortPercentages = countsToPercentages(cohort.emploiSalFr, cohort.nbSortants);
+          return (
+            <Line.Series
+              key={cohort.promo}
+              data={ratesToArrayWithTrailingNulls(cohortPercentages)}
+              options={{
+                name: `Promo ${cohort.promo}`,
+                color: getChartColor(
+                  COHORT_COLORS[index % COHORT_COLORS.length] || 'green-archipel',
+                ),
+                marker: { enabled: true },
+              }}
+            />
+          );
+        })}
+      </Chart>
+    </ChartBox>
   );
 }

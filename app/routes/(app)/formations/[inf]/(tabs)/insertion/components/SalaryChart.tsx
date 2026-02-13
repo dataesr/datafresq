@@ -9,9 +9,10 @@ import {
 } from '@highcharts/react';
 import { Line } from '@highcharts/react/series';
 import { useMemo, useRef } from 'react';
-import { AnalyticsGraph } from '@/components/AnalyticsGraph';
-import { getChartColor } from '@/components/highcharts';
-import { BlurredNoData, MONTH_KEYS, MONTHS } from '@/components/insersup';
+import { Link } from 'react-router';
+import { ChartBox } from '@/components/charts/ChartBox';
+import { getChartColor } from '@/components/charts/highcharts/colors';
+import { MONTH_KEYS, MONTHS } from '@/components/insersup';
 import type { InsersupYearStats } from '~/schemas/programs';
 
 interface SalaryChartProps {
@@ -62,58 +63,59 @@ export function SalaryChart({ yearData, year }: SalaryChartProps) {
   const hasData = salaryData !== null;
 
   return (
-    <AnalyticsGraph
-      title={`Distribution des salaires - ${year}`}
-      description="Quartiles de salaire net mensuel (Q1, médiane, Q3)"
-      chartRef={hasData ? chartRef : undefined}
-      source="InserSup (MESR)"
+    <ChartBox
+      title="Distribution des salaires"
+      description={`Quartiles du salaire net mensuel (Q1, médiane, Q3) pour la promotion ${year}, de 6 à 30 mois après l'obtention du diplôme.`}
+      chartRef={chartRef}
+      source="insersup"
+      tooltip={
+        <span>
+          Quartiles du salaire net mensuel calculés sur les diplômés en emploi salarié à chaque échéance.
+          {' '}<Link to="/guide/indicateurs/salaires">En savoir plus</Link> sur le calcul des salaires.
+        </span>
+      }
+      noData={!hasData ? { message: 'Données de salaire insuffisantes pour cette promotion.', icon: 'fr-icon-money-euro-circle-line' } : undefined}
     >
-      <BlurredNoData
-        noData={!hasData}
-        icon="fr-icon-money-euro-circle-line"
-        message="Données de salaire insuffisantes pour cette promotion."
-      >
-        <Chart ref={chartRef}>
-          <Credits enabled={false} />
-          <Legend align="center" />
-          <Tooltip shared valuePrefix="" valueSuffix=" €" />
-          <XAxis categories={MONTHS} title={{ text: 'Temps après diplôme' }} />
-          <YAxis
-            min={0}
-            title={{ text: 'Salaire net mensuel (€)' }}
-            labels={{ format: '{value} €' }}
-          />
-          <Line.Series
-            data={salaryData?.q1Data ?? [null, null, null, null, null]}
-            options={{
-              name: 'Q1 (25e percentile)',
-              color: getChartColor('blue-cumulus'),
-              dashStyle: 'Dash',
-              lineWidth: 1,
-              marker: { enabled: true, symbol: 'circle', radius: 3 },
-            }}
-          />
-          <Line.Series
-            data={salaryData?.medianData ?? [null, null, null, null, null]}
-            options={{
-              name: 'Médiane',
-              color: getChartColor('green-archipel'),
-              lineWidth: 3,
-              marker: { enabled: true, symbol: 'circle', radius: 4 },
-            }}
-          />
-          <Line.Series
-            data={salaryData?.q3Data ?? [null, null, null, null, null]}
-            options={{
-              name: 'Q3 (75e percentile)',
-              color: getChartColor('purple-glycine'),
-              dashStyle: 'Dash',
-              lineWidth: 1,
-              marker: { enabled: true, symbol: 'circle', radius: 3 },
-            }}
-          />
-        </Chart>
-      </BlurredNoData>
-    </AnalyticsGraph>
+      <Chart ref={chartRef}>
+        <Credits enabled={false} />
+        <Legend align="center" />
+        <Tooltip shared valuePrefix="" valueSuffix=" €" />
+        <XAxis categories={MONTHS} title={{ text: 'Temps après diplôme' }} />
+        <YAxis
+          min={0}
+          title={{ text: 'Salaire net mensuel (€)' }}
+          labels={{ format: '{value} €' }}
+        />
+        <Line.Series
+          data={salaryData?.q1Data ?? [null, null, null, null, null]}
+          options={{
+            name: 'Q1 (25e percentile)',
+            color: getChartColor('blue-cumulus'),
+            dashStyle: 'Dash',
+            lineWidth: 1,
+            marker: { enabled: true, symbol: 'circle', radius: 3 },
+          }}
+        />
+        <Line.Series
+          data={salaryData?.medianData ?? [null, null, null, null, null]}
+          options={{
+            name: 'Médiane',
+            color: getChartColor('green-archipel'),
+            lineWidth: 3,
+            marker: { enabled: true, symbol: 'circle', radius: 4 },
+          }}
+        />
+        <Line.Series
+          data={salaryData?.q3Data ?? [null, null, null, null, null]}
+          options={{
+            name: 'Q3 (75e percentile)',
+            color: getChartColor('purple-glycine'),
+            dashStyle: 'Dash',
+            lineWidth: 1,
+            marker: { enabled: true, symbol: 'circle', radius: 3 },
+          }}
+        />
+      </Chart>
+    </ChartBox>
   );
 }

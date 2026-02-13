@@ -9,9 +9,9 @@ import {
 } from '@highcharts/react';
 import { Column } from '@highcharts/react/series';
 import { useMemo, useRef } from 'react';
-import { AnalyticsGraph } from '@/components/AnalyticsGraph';
-import { SISE_SOURCE_SHORT } from '@/components/effectifs';
-import { getChartColor } from '@/components/highcharts';
+import { Link } from 'react-router';
+import { ChartBox } from '@/components/charts/ChartBox';
+import { getChartColor } from '@/components/charts/highcharts/colors';
 
 interface DiplomaData {
   diploma: string;
@@ -23,6 +23,7 @@ interface DiplomaData {
 
 interface DiplomaDistributionChartProps {
   data: DiplomaData[];
+  year: string;
   limit?: number;
 }
 
@@ -46,11 +47,7 @@ function useChartData(data: DiplomaData[], limit: number) {
   }, [data, limit]);
 }
 
-/**
- * Diploma distribution bar chart showing students by diploma type
- * Workspace-specific chart
- */
-export function DiplomaDistributionChart({ data, limit = 8 }: DiplomaDistributionChartProps) {
+export function DiplomaDistributionChart({ data, year, limit = 8 }: DiplomaDistributionChartProps) {
   const chartRef = useRef<HighchartsReactRefObject | null>(null);
   const { hasData, categories, values } = useChartData(data, limit);
 
@@ -59,13 +56,19 @@ export function DiplomaDistributionChart({ data, limit = 8 }: DiplomaDistributio
   }
 
   return (
-    <AnalyticsGraph
-      title="Effectifs par type de diplôme"
-      description="Répartition des étudiants par type de diplôme préparé."
+    <ChartBox
+      title="Effectifs par diplôme"
+      description={`Rentrée ${year}. Répartition des étudiants inscrits par type de diplôme préparé.`}
       chartRef={chartRef}
-      source={SISE_SOURCE_SHORT}
+      source="sise"
+      tooltip={
+        <span>
+          Somme des étudiants inscrits regroupés par type de diplôme préparé.
+          {' '}<Link to="/guide/indicateurs/effectifs">En savoir plus</Link> sur le calcul des effectifs.
+        </span>
+      }
     >
-      <Chart ref={chartRef} containerProps={{ style: { height: '400px' } }}>
+      <Chart ref={chartRef}>
         <Credits enabled={false} />
         <Legend enabled={false} />
         <Tooltip valueSuffix=" étudiants" />
@@ -83,6 +86,6 @@ export function DiplomaDistributionChart({ data, limit = 8 }: DiplomaDistributio
           }}
         />
       </Chart>
-    </AnalyticsGraph>
+    </ChartBox>
   );
 }

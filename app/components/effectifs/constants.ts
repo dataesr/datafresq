@@ -2,7 +2,7 @@
  * Shared constants for Effectifs (Student enrollment) views
  */
 
-import type { colorFamily } from '@/components/highcharts/colors';
+import type { colorFamily } from '@/components/charts/highcharts/colors';
 
 export type ColorName = (typeof colorFamily)[number];
 
@@ -14,7 +14,3 @@ export const CYCLE_COLORS: ColorName[] = [
   'yellow-tournesol',
   'pink-macaron',
 ];
-
-// Data source label
-export const SISE_SOURCE = "SISE (Système d'Information sur le Suivi de l'Étudiant)";
-export const SISE_SOURCE_SHORT = 'SISE (MESR)';

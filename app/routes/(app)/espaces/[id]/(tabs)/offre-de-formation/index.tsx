@@ -1,7 +1,7 @@
 import { useParams } from 'react-router';
 import { useWorkspaceAggregations, useWorkspacePermissions } from '@/api/workspaces';
 import { AutoGrid } from '@/components/Grids/AutoGrid';
-import '@/components/highcharts';
+import '@/components/charts/highcharts';
 import { EmptyWorkspace } from '../components/EmptyWorkspace';
 import { AcademyDistributionChart } from './components/AcademyDistributionChart';
 import { CycleDistributionChart } from './components/CycleDistributionChart';

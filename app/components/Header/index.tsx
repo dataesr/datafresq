@@ -7,9 +7,10 @@ import './styles.css';
 interface HeaderProps {
   showSidemenu?: boolean;
   sidemenuContent?: React.ReactNode;
+  searchContent?: React.ReactNode;
 }
 
-export function Header({ showSidemenu = false, sidemenuContent }: HeaderProps) {
+export function Header({ showSidemenu = false, sidemenuContent, searchContent }: HeaderProps) {
   const { user, isAuthenticated } = useAuth();
   const signOutMutation = useSignOut();
   const handleLogout = () => signOutMutation.mutate();
@@ -131,6 +132,11 @@ export function Header({ showSidemenu = false, sidemenuContent }: HeaderProps) {
                     </Dropdown.Footer>
                   </Dropdown>
                 </div>
+                {searchContent && (
+                  <div className="fr-header__search fr-hidden fr-unhidden-lg">
+                    {searchContent}
+                  </div>
+                )}
               </div>
             )}
             {showSidemenu && sidemenuContent && (

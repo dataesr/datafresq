@@ -17,13 +17,23 @@ export function useScrollLock({
     let touchStartY = 0;
 
     const getScrollableContent = (): HTMLElement | null => {
+      const isScrollContainer = (el: HTMLElement): boolean => {
+        const style = getComputedStyle(el);
+        const overflowY = style.overflowY;
+        return (
+          (overflowY === 'auto' || overflowY === 'scroll') && el.scrollHeight > el.clientHeight
+        );
+      };
+
       for (const ref of containerRefs) {
         if (!ref.current) continue;
 
-        const contentEl = ref.current.querySelector(scrollableSelector) as HTMLElement | null;
-        if (contentEl) return contentEl;
+        const candidates = ref.current.querySelectorAll<HTMLElement>(scrollableSelector);
+        for (const candidate of candidates) {
+          if (isScrollContainer(candidate)) return candidate;
+        }
 
-        if (ref.current.scrollHeight > ref.current.clientHeight) {
+        if (isScrollContainer(ref.current)) {
           return ref.current;
         }
       }

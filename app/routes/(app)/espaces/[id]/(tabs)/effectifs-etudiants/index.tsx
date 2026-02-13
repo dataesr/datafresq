@@ -3,8 +3,7 @@ import { useParams } from 'react-router';
 import { useWorkspaceAggregations, useWorkspacePermissions } from '@/api/workspaces';
 import { EffectifsEvolutionChart, EmptyState } from '@/components/effectifs';
 import { AutoGrid } from '@/components/Grids/AutoGrid';
-import '@/components/highcharts';
-
+import '@/components/charts/highcharts';
 import { YearSelector } from '@/components/YearSelector';
 import type { SiseYearStats } from '~/schemas/aggregations';
 import { EmptyWorkspace } from '../components/EmptyWorkspace';
@@ -35,27 +34,27 @@ const YearContent = memo(function YearContent({ yearData, totalPrograms }: YearC
 
       <AutoGrid min={500}>
         {yearData.byCycle && yearData.byCycle.length > 0 && (
-          <CycleDistributionChart data={yearData.byCycle} />
+          <CycleDistributionChart data={yearData.byCycle} year={yearData.year} />
         )}
 
         {yearData.byDiploma && yearData.byDiploma.length > 0 && (
-          <DiplomaDistributionChart data={yearData.byDiploma} />
+          <DiplomaDistributionChart data={yearData.byDiploma} year={yearData.year} />
         )}
 
         {yearData.byAcademy && yearData.byAcademy.length > 0 && (
-          <AcademyDistributionChart data={yearData.byAcademy} />
+          <AcademyDistributionChart data={yearData.byAcademy} year={yearData.year} />
         )}
 
         {yearData.byRegion && yearData.byRegion.length > 0 && (
-          <RegionChoroplethMap data={yearData.byRegion} />
+          <RegionChoroplethMap data={yearData.byRegion} year={yearData.year} />
         )}
 
         {yearData.byLargeDiscipline && yearData.byLargeDiscipline.length > 2 && (
-          <DisciplineSpiderChart data={yearData.byLargeDiscipline} />
+          <DisciplineSpiderChart data={yearData.byLargeDiscipline} year={yearData.year} />
         )}
 
         {yearData.byDiscipline && yearData.byDiscipline.length > 0 && (
-          <DisciplineDistributionChart data={yearData.byDiscipline} />
+          <DisciplineDistributionChart data={yearData.byDiscipline} year={yearData.year} />
         )}
       </AutoGrid>
 

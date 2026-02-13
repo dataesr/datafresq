@@ -4,6 +4,7 @@ import { Elysia } from 'elysia';
 import { errorHandler } from '~/plugins/error-handler';
 import { adminRoutes } from '~/routes/admin';
 import { authRoutes } from '~/routes/auth';
+import { careersRoutes } from '~/routes/careers';
 import { institutionsRoutes } from '~/routes/institutions';
 import { programsRoutes } from '~/routes/programs';
 import workspacesRoutes from '~/routes/workspaces';
@@ -53,6 +54,7 @@ export const app = new Elysia({ prefix: '/api' })
   }))
   .use(adminRoutes)
   .use(authRoutes)
+  .use(careersRoutes)
   .use(institutionsRoutes)
   .use(invitationRoutes)
   .use(meRoutes)

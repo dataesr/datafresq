@@ -1,25 +1,26 @@
+import cn from 'classnames';
 const siesLogo = '/public/sies_logo_signature.svg';
 
-export default function Footer() {
+export default function Footer({ sm = false }: { sm?: boolean }) {
   return (
     <footer className="fr-footer" id="footer-7361">
       <div className="">
         <div className="fr-footer__body">
           <div className="fr-footer__brand fr-enlarge-link">
-            <p className="fr-logo">
-              Ministère
-              <br />
-              de l'enseignement
-              <br />
-              supérieur,
-              <br />
-              de la recherche
-              <br />
-              et de l'espace
-            </p>
 
             <a title="Retour à l'accueil du site" href="/" className="fr-footer__brand-link">
-              <svg role="img" aria-label="Logo SIES" viewBox="0 0 1167.77 752.85" width="100%">
+              <p className={cn("fr-logo", { "fx-footer-logo": sm})}>
+                Ministère
+                <br />
+                de l'enseignement
+                <br />
+                supérieur,
+                <br />
+                de la recherche
+                <br />
+                et de l'espace
+              </p>
+              <svg role="img" aria-label="Logo SIES" viewBox="0 0 1167.77 752.85" width={sm ? "200px" : "300px"}>
                 <use className="fr-text-black-white--grey" href={`${siesLogo}#sies-logo-text`} />
                 <use href={`${siesLogo}#sies-logo-artwork`} />
               </svg>
@@ -27,8 +28,7 @@ export default function Footer() {
           </div>
           <div className="fr-footer__content">
             <p className="fr-footer__content-desc">
-              Lorem ipsum dolor sit amet, consectetur adipiscing, incididunt, ut labore et dolore
-              magna aliqua. Vitae sapien pellentesque habitant morbi tristique senectus et. Ut aliqu
+              Cette application est gérée par la Sous-direction des systèmes d'information et des études statistiques (SIES)
             </p>
             <ul className="fr-footer__content-list">
               <li className="fr-footer__content-item">

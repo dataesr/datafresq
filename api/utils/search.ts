@@ -1,201 +1,167 @@
 export interface SearchFieldConfig {
   field: string;
   boost?: number;
-  highlight: boolean;
   displayName: string;
   displayGroup?: string;
 }
 
 export const PROGRAM_SEARCH_FIELDS: SearchFieldConfig[] = [
   {
-    field: 'label',
-    boost: 3,
-    highlight: true,
+    field: 'search.label',
+    boost: 8,
     displayName: 'Intitulé',
   },
   {
-    field: 'mentionNormalized',
+    field: 'search.inf',
+    displayName: 'INF',
+  },
+  {
+    field: 'search.disciplinarySector',
     boost: 2,
-    highlight: true,
-    displayName: 'Mention',
-  },
-  {
-    field: 'cycle',
-    highlight: true,
-    displayName: 'Cycle',
-  },
-  {
-    field: 'domains',
-    boost: 2,
-    highlight: true,
-    displayName: 'Domaines',
-  },
-  {
-    field: 'keywords',
-    boost: 2,
-    highlight: true,
-    displayName: 'Mots-clés',
-  },
-  {
-    field: 'disciplinarySector',
-    highlight: true,
     displayName: 'Secteur disciplinaire',
   },
   {
-    field: 'diploma.type',
-    boost: 2,
-    highlight: true,
-    displayName: 'Type de diplôme',
-  },
-  {
-    field: 'diploma.code',
-    highlight: true,
-    displayName: 'Code diplôme',
-  },
-  {
-    field: 'diploma.category',
-    highlight: true,
-    displayName: 'Catégorie diplôme',
-  },
-  {
-    field: 'etablissements.name',
-    boost: 2,
-    highlight: true,
+    field: 'search.etablissements.name',
+    boost: 4,
     displayName: 'Nom',
     displayGroup: 'Établissements',
   },
   {
-    field: 'etablissements.shortName',
-    highlight: true,
+    field: 'search.etablissements.paysageName',
+    boost: 3,
+    displayName: 'Nom Paysage',
+    displayGroup: 'Établissements',
+  },
+  {
+    field: 'search.etablissements.shortName',
+    boost: 2,
     displayName: 'Nom court',
     displayGroup: 'Établissements',
   },
   {
-    field: 'etablissements.sigle',
-    highlight: true,
+    field: 'search.etablissements.sigle',
+    boost: 2,
     displayName: 'Sigle',
     displayGroup: 'Établissements',
   },
   {
-    field: 'etablissements.academy',
-    highlight: true,
-    displayName: 'Académie',
-    displayGroup: 'Établissements',
-  },
-  {
-    field: 'etablissements.region',
-    highlight: true,
-    displayName: 'Région',
-    displayGroup: 'Établissements',
-  },
-  {
-    field: 'etablissements.address.city',
-    highlight: true,
+    field: 'search.etablissements.city',
+    boost: 2,
     displayName: 'Ville',
     displayGroup: 'Établissements',
   },
   {
-    field: 'etapes.pedagogicalInfo.keywords',
+    field: 'search.etablissements.uai',
+    displayName: 'UAI',
+    displayGroup: 'Établissements',
+  },
+  {
+    field: 'search.etapes.label',
+    boost: 3,
+    displayName: 'Intitulé',
+    displayGroup: 'Étapes',
+  },
+  {
+    field: 'search.etapes.infe',
+    displayName: 'INFE',
+    displayGroup: 'Étapes',
+  },
+  {
+    field: 'search.etapes.pedagogicalInfoKeywords',
     boost: 2,
-    highlight: true,
     displayName: 'Mots-clés',
     displayGroup: 'Infos pédagogiques',
   },
   {
-    field: 'etapes.pedagogicalInfo.disciplines',
+    field: 'search.etapes.pedagogicalInfoKeywordsdisciplines',
     boost: 2,
-    highlight: true,
     displayName: 'Disciplines',
     displayGroup: 'Infos pédagogiques',
   },
   {
-    field: 'etapes.pedagogicalInfo.languages',
-    highlight: true,
-    displayName: 'Langues',
+    field: 'search.etapes.pedagogicalInfoKeywordsjobs',
+    boost: 2,
+    displayName: 'Métiers',
     displayGroup: 'Infos pédagogiques',
   },
   {
-    field: 'etapes.pedagogicalInfo.teachingLanguages',
-    highlight: true,
-    displayName: "Langues d'enseignement",
+    field: 'search.etapes.pedagogicalInfoKeywordssectors',
+    boost: 2,
+    displayName: 'Secteurs',
     displayGroup: 'Infos pédagogiques',
   },
   {
-    field: 'etapes.recruitmentInfo.expectations',
-    highlight: true,
+    field: 'search.etapes.recruitmentInfoExpectations',
     displayName: 'Attendus',
     displayGroup: 'Recrutement',
   },
   {
-    field: 'etapes.recruitmentInfo.recommendedDiplomas',
-    highlight: true,
-    displayName: 'Diplômes recommandés',
-    displayGroup: 'Recrutement',
+    field: 'search.parcours.label',
+    boost: 3,
+    displayName: 'Intitulé',
+    displayGroup: 'Parcours',
   },
   {
-    field: 'parcours.label',
-    highlight: true,
-    displayName: 'Parcours',
+    field: 'search.parcours.infp',
+    displayName: 'INFP',
+    displayGroup: 'Parcours',
   },
   {
-    field: 'parcours.sigle',
-    highlight: true,
-    displayName: 'Sigle parcours',
-  },
-  {
-    field: 'etapes.label',
-    highlight: true,
-    displayName: 'Étapes',
-  },
-  {
-    field: 'rncp.keyword',
-    highlight: true,
+    field: 'search.rncpInfos.rncp',
     displayName: 'Code RNCP',
+    displayGroup: 'RNCP',
   },
   {
-    field: 'codeSise.keyword',
-    highlight: true,
-    displayName: 'Code SISE',
-  },
-  {
-    field: 'parcours.rncp.keyword',
-    highlight: false,
-    displayName: 'RNCP parcours',
-  },
-  {
-    field: 'parcours.codeSise.keyword',
-    highlight: false,
-    displayName: 'SISE parcours',
-  },
-  {
-    field: 'rncpInfos.typeEmploiAccessibles',
-    highlight: true,
+    field: 'search.rncpInfos.typeEmploiAccessibles',
+    boost: 2,
     displayName: "Types d'emploi accessibles",
+    displayGroup: 'RNCP',
   },
   {
-    field: 'romeInfos.label',
-    highlight: true,
-    displayName: 'Métiers ROME',
+    field: 'search.romeInfos.label',
+    boost: 2,
+    displayName: 'Intitulé',
+    displayGroup: 'ROME',
   },
   {
-    field: 'romeInfos.level1',
-    highlight: false,
-    displayName: 'Domaine ROME',
+    field: 'search.romeInfos.codeRome',
+    displayName: 'Code ROME',
+    displayGroup: 'ROME',
   },
   {
-    field: 'romeInfos.level2',
-    highlight: false,
-    displayName: 'Sous-domaine ROME',
+    field: 'search.romeInfos.level1',
+    displayName: 'Domaine',
+    displayGroup: 'ROME',
   },
   {
-    field: 'engineeringSpecialties',
-    highlight: true,
-    displayName: 'Spécialités ingénieur',
+    field: 'search.romeInfos.level2',
+    displayName: 'Sous-domaine',
+    displayGroup: 'ROME',
   },
   {
-    field: 'healthSpecialty',
-    highlight: true,
-    displayName: 'Spécialité santé',
+    field: 'search.romeInfos.level3',
+    displayName: 'Famille',
+    displayGroup: 'ROME',
+  },
+  {
+    field: 'search.romeInfos.idLevel1',
+    displayName: 'ID domaine',
+    displayGroup: 'ROME',
+  },
+  {
+    field: 'search.romeInfos.idLevel2',
+    displayName: 'ID sous-domaine',
+    displayGroup: 'ROME',
+  },
+  {
+    field: 'search.romeInfos.ogr',
+    displayName: 'OGR',
+    displayGroup: 'ROME',
+  },
+  {
+    field: 'search.romeInfos.rncp',
+    displayName: 'RNCP',
+    displayGroup: 'ROME',
   },
 ];
 
@@ -206,7 +172,7 @@ export function buildSearchFields(): string[] {
 }
 
 export function buildHighlightFields(): Record<string, object> {
-  return PROGRAM_SEARCH_FIELDS.filter((config) => config.highlight).reduce(
+  return PROGRAM_SEARCH_FIELDS.reduce(
     (acc, config) => {
       acc[config.field] = {};
       return acc;

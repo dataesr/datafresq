@@ -6,7 +6,7 @@ import { Breadcrumb } from '@/components/Breadcrumb';
 import ErrorBoundary from '@/components/errors/ErrorBoundary';
 import PageContentLoader from '@/components/loaders/PageContentLoader';
 import { TabActivityPanel } from '@/components/TabActivityPanel';
-import { Tabnav, TabnavItem } from '@/components/Tabnav';
+import { Tabnav, TabnavItem } from '@/components/ui/Tabnav';
 import { toast } from '@/components/ui/Toast';
 import { getErrorMessage } from '@/utils/getErrorMessage';
 import EffectifsEtudiants from './effectifs-etudiants';

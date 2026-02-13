@@ -2,28 +2,6 @@
  * Shared utility functions for Effectifs (Student enrollment) views
  */
 
-// Mapping from region names to Highcharts map keys
-export const regionToHcKey: Record<string, string> = {
-  Corse: 'fr-cor',
-  Bretagne: 'fr-bre',
-  'Pays de la Loire': 'fr-pdl',
-  "Provence-Alpes-Côte d'Azur": 'fr-pac',
-  Occitanie: 'fr-occ',
-  'Nouvelle-Aquitaine': 'fr-naq',
-  'Bourgogne-Franche-Comté': 'fr-bfc',
-  'Centre-Val de Loire': 'fr-cvl',
-  'Île-de-France': 'fr-idf',
-  'Hauts-de-France': 'fr-hdf',
-  Normandie: 'fr-nor',
-  'Grand Est': 'fr-ges',
-  'Auvergne-Rhône-Alpes': 'fr-ara',
-  Guadeloupe: 'fr-gua',
-  Martinique: 'fr-mq',
-  Guyane: 'fr-gf',
-  'La Réunion': 'fr-lre',
-  Mayotte: 'fr-may',
-};
-
 /**
  * Extract numeric value from a string (e.g., "1ère année" -> 1)
  * Used for sorting study years

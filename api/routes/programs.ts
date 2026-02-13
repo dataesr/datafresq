@@ -148,8 +148,6 @@ import {
 } from '~/schemas/programs';
 import { buildHighlightFields, buildSearchFields } from '~/utils/search';
 
-const fields = Object.keys(programSearchSchema.properties);
-
 // Filter field mappings for Elasticsearch
 const FILTER_FIELD_MAP = {
   cycle: 'cycle.keyword',
@@ -168,6 +166,7 @@ const FILTER_FIELD_MAP = {
   hasSiseInfos: 'hasSiseInfos',
   hasRncpInfos: 'hasRncpInfos',
   hasRomeInfos: 'hasRomeInfos',
+  codeRome: 'romeInfos.codeRome.keyword',
 } as const;
 
 // Aggregation definitions for facets
@@ -210,6 +209,7 @@ function buildFilters(query: {
   hasSiseInfos?: string;
   hasRncpInfos?: string;
   hasRomeInfos?: string;
+  codeRome?: string | string[];
 }) {
   return setFilters([
     { key: FILTER_FIELD_MAP.cycle, value: query.cycle },
@@ -227,6 +227,7 @@ function buildFilters(query: {
     { key: FILTER_FIELD_MAP.hasSiseInfos, value: query.hasSiseInfos },
     { key: FILTER_FIELD_MAP.hasRncpInfos, value: query.hasRncpInfos },
     { key: FILTER_FIELD_MAP.hasRomeInfos, value: query.hasRomeInfos },
+    { key: FILTER_FIELD_MAP.codeRome, value: query.codeRome },
   ]);
 }
 
@@ -318,11 +319,12 @@ export const programsRoutes = new Elysia({ prefix: '/programs' })
         hasSiseInfos,
         hasRncpInfos,
         hasRomeInfos,
+        codeRome,
       } = query;
 
       // Build the main query with configured search fields
       const textQuery = q
-        ? { query_string: { query: q, fields: buildSearchFields() } }
+        ? { query_string: { query: q } }
         : { match_all: {} };
       const from = (page - 1) * pageSize;
 
@@ -343,13 +345,14 @@ export const programsRoutes = new Elysia({ prefix: '/programs' })
         hasSiseInfos,
         hasRncpInfos,
         hasRomeInfos,
+        codeRome,
       });
 
       const searchResponse = await elastic.programs
         .search<ProgramSearch>({
           from,
           size: pageSize,
-          fields,
+          fields: buildSearchFields(),
           query: {
             bool: {
               must: [textQuery],
@@ -415,6 +418,7 @@ export const programsRoutes = new Elysia({ prefix: '/programs' })
         hasSiseInfos,
         hasRncpInfos,
         hasRomeInfos,
+        codeRome,
       } = query;
 
       // Limit max results to prevent abuse
@@ -440,6 +444,7 @@ export const programsRoutes = new Elysia({ prefix: '/programs' })
         hasSiseInfos,
         hasRncpInfos,
         hasRomeInfos,
+        codeRome,
       });
 
       const esQuery = {
@@ -626,6 +631,7 @@ export const programsRoutes = new Elysia({ prefix: '/programs' })
         hasSiseInfos,
         hasRncpInfos,
         hasRomeInfos,
+        codeRome,
       } = query;
 
       const textQuery = q
@@ -648,6 +654,7 @@ export const programsRoutes = new Elysia({ prefix: '/programs' })
         hasSiseInfos,
         hasRncpInfos,
         hasRomeInfos,
+        codeRome,
       });
 
       const searchResponse = await elastic.programs
@@ -716,7 +723,7 @@ export const programsRoutes = new Elysia({ prefix: '/programs' })
             $project: {
               _id: 0,
               academicYear: '$annee_universitaire',
-              enrollment: '$effectif_sans_cpge',
+              enrollment: '$effectif',
               women: '$femmes',
               men: '$hommes',
               studyYear: '$degetu_lib',

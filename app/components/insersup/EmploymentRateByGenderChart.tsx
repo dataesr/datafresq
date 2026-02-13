@@ -9,25 +9,18 @@ import {
 } from '@highcharts/react';
 import { Line } from '@highcharts/react/series';
 import { useMemo, useRef } from 'react';
-import { AnalyticsGraph } from '@/components/AnalyticsGraph';
-import { getColorForSeries } from '@/components/highcharts';
+import { Link } from 'react-router';
+import { ChartBox } from '@/components/charts/ChartBox';
+import { getColorForSeries } from '@/components/charts/highcharts/colors';
 import type { EmploymentCounts } from '~/schemas/aggregations';
-import { BlurredNoData } from './BlurredNoData';
 import { MONTHS, PRIVACY_THRESHOLD } from './constants';
 import { countsToPercentages, ratesToArrayWithTrailingNulls } from './utils';
 
-/**
- * Minimal interface for gender data that works with both program and workspace data
- */
 interface GenderData {
   nbSortants: number;
   emploiSalFr: EmploymentCounts | null;
 }
 
-/**
- * Minimal interface for year stats that works with both program and workspace data
- * Only includes the fields actually needed for this chart
- */
 interface YearStatsForGender {
   byGender: {
     femme: GenderData | null;
@@ -70,10 +63,6 @@ function useGenderData(yearData: YearStatsForGender) {
   }, [yearData]);
 }
 
-/**
- * Gender comparison chart showing employment rates for women vs men
- * Works with both program and workspace data
- */
 export function EmploymentRateByGenderChart({ yearData, year }: EmploymentRateByGenderChartProps) {
   const chartRef = useRef<HighchartsReactRefObject | null>(null);
   const { femmePercentages, hommePercentages, femmeSortants, hommeSortants, canShow } =
@@ -82,37 +71,42 @@ export function EmploymentRateByGenderChart({ yearData, year }: EmploymentRateBy
   const noDataMessage = `Effectifs insuffisants (femmes: ${femmeSortants}, hommes: ${hommeSortants}).`;
 
   return (
-    <AnalyticsGraph
-      title={`Comparaison Femmes/Hommes - ${year}`}
-      description="Taux d'emploi salarié par genre"
-      chartRef={canShow ? chartRef : undefined}
-      source="InserSup (MESR)"
+    <ChartBox
+      title="Emploi salarié par genre"
+      description={`Comparaison des taux d'emploi salarié en France entre femmes et hommes pour la promotion ${year}, après l'obtention du diplôme.`}
+      chartRef={chartRef}
+      source="insersup"
+      tooltip={
+        <span>
+          Taux d'emploi salarié calculé séparément pour les femmes et les hommes de la promotion.
+          {' '}<Link to="/guide/indicateurs/emploi">En savoir plus</Link> sur le calcul des taux d'emploi.
+        </span>
+      }
+      noData={!canShow ? { message: noDataMessage, icon: 'fr-icon-lock-line' } : undefined}
     >
-      <BlurredNoData noData={!canShow} icon="fr-icon-lock-line" message={noDataMessage}>
-        <Chart ref={chartRef}>
-          <Credits enabled={false} />
-          <Legend align="center" />
-          <Tooltip shared valueSuffix="%" />
-          <XAxis categories={MONTHS} title={{ text: 'Temps après diplôme' }} />
-          <YAxis min={0} max={100} title={{ text: "Taux d'emploi salarié (%)" }} />
-          <Line.Series
-            data={ratesToArrayWithTrailingNulls(femmePercentages)}
-            options={{
-              name: `Femmes (${femmeSortants} sortantes)`,
-              color: getColorForSeries('femmes'),
-              marker: { enabled: true },
-            }}
-          />
-          <Line.Series
-            data={ratesToArrayWithTrailingNulls(hommePercentages)}
-            options={{
-              name: `Hommes (${hommeSortants} sortants)`,
-              color: getColorForSeries('hommes'),
-              marker: { enabled: true },
-            }}
-          />
-        </Chart>
-      </BlurredNoData>
-    </AnalyticsGraph>
+      <Chart ref={chartRef}>
+        <Credits enabled={false} />
+        <Legend align="center" />
+        <Tooltip shared valueSuffix="%" />
+        <XAxis categories={MONTHS} title={{ text: 'Temps après diplôme' }} />
+        <YAxis min={0} max={100} title={{ text: "Taux d'emploi salarié (%)" }} />
+        <Line.Series
+          data={ratesToArrayWithTrailingNulls(femmePercentages)}
+          options={{
+            name: `Femmes (${femmeSortants} sortantes)`,
+            color: getColorForSeries('femmes'),
+            marker: { enabled: true },
+          }}
+        />
+        <Line.Series
+          data={ratesToArrayWithTrailingNulls(hommePercentages)}
+          options={{
+            name: `Hommes (${hommeSortants} sortants)`,
+            color: getColorForSeries('hommes'),
+            marker: { enabled: true },
+          }}
+        />
+      </Chart>
+    </ChartBox>
   );
 }

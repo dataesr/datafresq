@@ -5,6 +5,7 @@ import FullPageLoader from '@/components/loaders/FullPageLoader';
 import { appRoutes } from './(app)/routes';
 import { adminRoutes } from './admin/routes';
 import { authRoutes } from './auth/routes';
+import { guideRoutes } from './guide/routes';
 import { Suspense } from 'react';
 
 /**
@@ -40,6 +41,7 @@ export default function AppRouter() {
       <Routes>
         {authRoutes}
         {adminRoutes}
+        {guideRoutes}
         {appRoutes}
       </Routes>
     </Suspense>

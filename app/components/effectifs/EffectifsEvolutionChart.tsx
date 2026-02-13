@@ -9,13 +9,10 @@ import {
 } from '@highcharts/react';
 import { Line } from '@highcharts/react/series';
 import { useMemo, useRef } from 'react';
-import { AnalyticsGraph } from '@/components/AnalyticsGraph';
-import { getColorForSeries } from '@/components/highcharts';
-import { SISE_SOURCE } from './constants';
+import { Link } from 'react-router';
+import { ChartBox } from '@/components/charts/ChartBox';
+import { getColorForSeries } from '@/components/charts/highcharts/colors';
 
-/**
- * Props for the evolution chart - accepts pre-computed trend data
- */
 interface EffectifsEvolutionChartProps {
   years: string[];
   totalTrend: number[];
@@ -23,9 +20,6 @@ interface EffectifsEvolutionChartProps {
   menTrend: number[];
 }
 
-/**
- * Hook to compute chart configuration from props
- */
 function useChartData(props: EffectifsEvolutionChartProps) {
   return useMemo(() => {
     const { years, totalTrend, womenTrend, menTrend } = props;
@@ -40,15 +34,11 @@ function useChartData(props: EffectifsEvolutionChartProps) {
       totalTrend,
       womenTrend,
       menTrend,
-      description: `Données disponibles sur ${years.length} années universitaires (${firstYear} - ${lastYear})`,
+      description: `Évolution du nombre d'étudiants inscrits sur ${years.length} années universitaires (${firstYear} à ${lastYear}), avec répartition par sexe.`,
     };
   }, [props]);
 }
 
-/**
- * Shared evolution chart showing enrollment trends over academic years
- * Works with both program-level and workspace-level data
- */
 export function EffectifsEvolutionChart(props: EffectifsEvolutionChartProps) {
   const chartRef = useRef<HighchartsReactRefObject | null>(null);
   const { hasData, years, totalTrend, womenTrend, menTrend, description } = useChartData(props);
@@ -58,11 +48,17 @@ export function EffectifsEvolutionChart(props: EffectifsEvolutionChartProps) {
   }
 
   return (
-    <AnalyticsGraph
+    <ChartBox
       title="Évolution des effectifs"
       description={description}
       chartRef={chartRef}
-      source={SISE_SOURCE}
+      source="sise"
+      tooltip={
+        <span>
+          Somme des étudiants inscrits pour chaque rentrée universitaire, avec ventilation par sexe.
+          {' '}<Link to="/guide/indicateurs/effectifs">En savoir plus</Link> sur le calcul des effectifs.
+        </span>
+      }
     >
       <Chart ref={chartRef}>
         <Credits enabled={false} />
@@ -92,6 +88,6 @@ export function EffectifsEvolutionChart(props: EffectifsEvolutionChartProps) {
           }}
         />
       </Chart>
-    </AnalyticsGraph>
+    </ChartBox>
   );
 }

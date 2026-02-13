@@ -9,9 +9,9 @@ import {
 } from '@highcharts/react';
 import { Bar } from '@highcharts/react/series';
 import { useMemo, useRef } from 'react';
-import { AnalyticsGraph } from '@/components/AnalyticsGraph';
-import { SISE_SOURCE_SHORT } from '@/components/effectifs';
-import { getChartColor } from '@/components/highcharts';
+import { Link } from 'react-router';
+import { ChartBox } from '@/components/charts/ChartBox';
+import { getChartColor } from '@/components/charts/highcharts/colors';
 
 interface DisciplineData {
   id: string;
@@ -23,6 +23,7 @@ interface DisciplineData {
 
 interface DisciplineDistributionChartProps {
   data: DisciplineData[];
+  year: string;
   limit?: number;
 }
 
@@ -39,12 +40,9 @@ function useChartData(data: DisciplineData[], limit: number) {
   }, [data, limit]);
 }
 
-/**
- * Discipline distribution bar chart showing students by discipline sector
- * Workspace-specific chart
- */
 export function DisciplineDistributionChart({
   data,
+  year,
   limit = 10,
 }: DisciplineDistributionChartProps) {
   const chartRef = useRef<HighchartsReactRefObject | null>(null);
@@ -55,13 +53,19 @@ export function DisciplineDistributionChart({
   }
 
   return (
-    <AnalyticsGraph
-      title={`Top ${limit} secteurs disciplinaires (étudiants)`}
-      description={`Les ${limit} secteurs disciplinaires avec le plus d'étudiants.`}
+    <ChartBox
+      title="Secteurs disciplinaires"
+      description={`Rentrée ${year}. Classement des ${limit} secteurs disciplinaires avec le plus d'étudiants inscrits.`}
       chartRef={chartRef}
-      source={SISE_SOURCE_SHORT}
+      source="sise"
+      tooltip={
+        <span>
+          Calculé par somme des effectifs des formations pour chaque secteur disciplinaire.
+          {' '}<Link to="/guide/indicateurs/effectifs">En savoir plus</Link> sur le calcul des effectifs.
+        </span>
+      }
     >
-      <Chart ref={chartRef} containerProps={{ style: { height: '400px' } }}>
+      <Chart ref={chartRef}>
         <Credits enabled={false} />
         <Legend enabled={false} />
         <Tooltip valueSuffix=" étudiants" />
@@ -79,6 +83,6 @@ export function DisciplineDistributionChart({
           }}
         />
       </Chart>
-    </AnalyticsGraph>
+    </ChartBox>
   );
 }

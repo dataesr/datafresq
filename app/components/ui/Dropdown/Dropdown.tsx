@@ -20,6 +20,7 @@ export interface DropdownProps {
   closeOnAction?: boolean;
   fullWidth?: boolean;
   portal?: boolean;
+  popoverMinWidth?: string;
 }
 
 export function Dropdown({
@@ -38,6 +39,7 @@ export function Dropdown({
   closeOnAction = true,
   fullWidth = false,
   portal = true,
+  popoverMinWidth,
 }: DropdownProps) {
   const {
     isOpen,
@@ -116,7 +118,11 @@ export function Dropdown({
         position: 'absolute',
         top: position.top,
         left: position.left,
-        minWidth: position.minWidth,
+        minWidth: popoverMinWidth ?? position.minWidth,
+      }),
+    ...(!portal &&
+      popoverMinWidth && {
+        minWidth: popoverMinWidth,
       }),
   } as CSSProperties;
 

@@ -8,6 +8,11 @@
 .fx-width-100 {
   width: 100%;
 }
+
+.fx-height-100 {
+  height: 100%;
+}
+
 .fx-width-fit-content {
   width: fit-content;
 }

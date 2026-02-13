@@ -5,8 +5,6 @@
  * data across both workspace and program-level views.
  */
 
-// Components
-export { BlurredNoData } from './BlurredNoData';
 // Constants
 export type { MonthKey } from './constants';
 export {
