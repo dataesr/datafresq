@@ -1,6 +1,7 @@
-import { elastic, setFilters } from '~/external/elastic';
+import type { estypes } from '@elastic/elasticsearch';
+import { elastic, extractTotal, setFilters } from '~/external/elastic';
 import { type ProgramSearch, programSearchSchema } from '~/schemas/programs';
-import { buildSearchFields } from '~/utils/search';
+import { buildSearchFields, PROGRAM_SEARCH_FIELDS } from '~/utils/search';
 
 export const FILTER_FIELD_MAP = {
   cycle: 'cycle.keyword',
@@ -19,6 +20,7 @@ export const FILTER_FIELD_MAP = {
   hasSiseInfos: 'hasSiseInfos',
   hasRncpInfos: 'hasRncpInfos',
   hasRomeInfos: 'hasRomeInfos',
+  codeRome: 'romeInfos.codeRome.keyword',
 } as const;
 
 export interface ProgramFilterParams {
@@ -37,6 +39,7 @@ export interface ProgramFilterParams {
   hasSiseInfos?: string;
   hasRncpInfos?: string;
   hasRomeInfos?: string;
+  codeRome?: string | string[];
 }
 
 export function buildProgramFilters(query: ProgramFilterParams) {
@@ -56,6 +59,7 @@ export function buildProgramFilters(query: ProgramFilterParams) {
     { key: FILTER_FIELD_MAP.hasSiseInfos, value: query.hasSiseInfos },
     { key: FILTER_FIELD_MAP.hasRncpInfos, value: query.hasRncpInfos },
     { key: FILTER_FIELD_MAP.hasRomeInfos, value: query.hasRomeInfos },
+    { key: FILTER_FIELD_MAP.codeRome, value: query.codeRome },
   ]);
 }
 
@@ -78,6 +82,57 @@ export function buildElasticsearchQuery(params: ProgramFilterParams & { q?: stri
   };
 }
 
+export function buildHighlightFields(): Record<string, object> {
+  return PROGRAM_SEARCH_FIELDS.reduce(
+    (acc, config) => {
+      acc[config.field] = {};
+      return acc;
+    },
+    {} as Record<string, object>,
+  );
+}
+
+export function buildHighlightConfig(q?: string) {
+  if (!q) return undefined;
+  return {
+    fields: buildHighlightFields(),
+    pre_tags: ['<strong>'],
+    post_tags: ['</strong>'],
+    number_of_fragments: 3,
+    fragment_size: 150,
+  };
+}
+
+export async function previewSearchOverlap(
+  params: ProgramFilterParams & { q?: string },
+  existingProgramIds: string[],
+): Promise<{ toAdd: number; alreadyPresent: number; total: number }> {
+  const esQuery = buildElasticsearchQuery(params);
+
+  const response = await elastic.programs.search({
+    size: 0,
+    query: esQuery,
+    track_total_hits: true,
+    aggs: {
+      already_present: {
+        filter: {
+          terms: { 'inf.keyword': existingProgramIds },
+        },
+      },
+    },
+  });
+
+  const total = extractTotal(response);
+  const alreadyPresent =
+    (response.aggregations?.already_present as { doc_count: number })?.doc_count ?? 0;
+
+  return {
+    toAdd: total - alreadyPresent,
+    alreadyPresent,
+    total,
+  };
+}
+
 export const SEARCH_CONFIG = {
   maxWorkspacePrograms: 5000,
   warningThreshold: 1000,
@@ -87,16 +142,30 @@ export const SEARCH_CONFIG = {
 
 export const PROGRAM_FIELDS = Object.keys(programSearchSchema.properties);
 
-export async function fetchAllProgramIds(
-  params: ProgramFilterParams & { q?: string },
-  maxResults: number = SEARCH_CONFIG.maxWorkspacePrograms
-): Promise<{ programIds: string[]; totalCount: number }> {
-  const esQuery = buildElasticsearchQuery(params);
-  const programIds: string[] = [];
+interface ScrollOptions<T, R> {
+  query: estypes.QueryDslQueryContainer;
+  maxResults: number;
+  source: estypes.SearchSourceConfig;
+  mapper: (source: T) => R;
+  batchSize?: number;
+  pitKeepAlive?: string;
+}
+
+export async function scrollAll<T, R>(options: ScrollOptions<T, R>): Promise<{ results: R[]; totalCount: number }> {
+  const {
+    query,
+    maxResults,
+    source,
+    mapper,
+    batchSize = SEARCH_CONFIG.batchSize,
+    pitKeepAlive = SEARCH_CONFIG.pitKeepAlive,
+  } = options;
+
+  const results: R[] = [];
 
   // @ts-expect-error - proxy injects index at runtime
   const pitResponse = await elastic.programs.openPointInTime({
-    keep_alive: SEARCH_CONFIG.pitKeepAlive,
+    keep_alive: pitKeepAlive,
   });
   let pitId = pitResponse.id;
 
@@ -105,21 +174,21 @@ export async function fetchAllProgramIds(
     let hasMore = true;
     let totalCount = 0;
 
-    while (hasMore && programIds.length < maxResults) {
-      const searchResponse = await elastic.client.search<ProgramSearch>({
-        size: Math.min(SEARCH_CONFIG.batchSize, maxResults - programIds.length),
-        query: esQuery,
+    while (hasMore && results.length < maxResults) {
+      const searchResponse = await elastic.client.search<T>({
+        size: Math.min(batchSize, maxResults - results.length),
+        query,
         pit: {
           id: pitId,
-          keep_alive: SEARCH_CONFIG.pitKeepAlive,
+          keep_alive: pitKeepAlive,
         },
         sort: [{ _shard_doc: 'asc' }],
         ...(searchAfter && { search_after: searchAfter }),
-        track_total_hits: programIds.length === 0,
-        _source: ['inf'],
+        track_total_hits: results.length === 0,
+        _source: source,
       });
 
-      if (programIds.length === 0 && searchResponse.hits.total) {
+      if (results.length === 0 && searchResponse.hits.total) {
         totalCount =
           typeof searchResponse.hits.total === 'number'
             ? searchResponse.hits.total
@@ -134,8 +203,8 @@ export async function fetchAllProgramIds(
       }
 
       for (const hit of hits) {
-        if (hit._source && programIds.length < maxResults) {
-          programIds.push(hit._source.inf);
+        if (hit._source && results.length < maxResults) {
+          results.push(mapper(hit._source));
         }
       }
 
@@ -149,8 +218,22 @@ export async function fetchAllProgramIds(
       }
     }
 
-    return { programIds, totalCount: totalCount || programIds.length };
+    return { results, totalCount: totalCount || results.length };
   } finally {
     await elastic.programs.closePointInTime({ id: pitId }).catch(() => {});
   }
+}
+
+export async function fetchAllProgramIds(
+  params: ProgramFilterParams & { q?: string },
+  maxResults: number = SEARCH_CONFIG.maxWorkspacePrograms
+): Promise<{ programIds: string[]; totalCount: number }> {
+  const { results, totalCount } = await scrollAll<ProgramSearch, string>({
+    query: buildElasticsearchQuery(params),
+    maxResults,
+    source: ['inf'],
+    mapper: (source) => source.inf,
+  });
+
+  return { programIds: results, totalCount };
 }

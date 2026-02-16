@@ -8,7 +8,7 @@ import { t } from 'elysia';
 export const careerSearchParamsSchema = t.Object({
   q: t.Optional(t.String({ description: 'Search query' })),
   page: t.Optional(t.Numeric({ default: 1, description: 'Page number' })),
-  pageSize: t.Optional(t.Numeric({ default: 20, description: 'Number of results per page' })),
+  pageSize: t.Optional(t.Numeric({ default: 20, description: 'Number of results per page', maximum: 100 })),
 });
 
 export const careerSearchResponseSchema = t.Object({

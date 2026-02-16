@@ -133,7 +133,6 @@ import {
   extractHits,
   extractTermBuckets,
   extractTotal,
-  setFilters,
 } from '~/external/elastic';
 import { authMacro } from '~/macros/authMacro';
 import { errorResponseSchema } from '~/schemas/common';
@@ -146,28 +145,7 @@ import {
   programsSearchResponseSchema,
   type SiseRecord,
 } from '~/schemas/programs';
-import { buildHighlightFields, buildSearchFields } from '~/utils/search';
-
-// Filter field mappings for Elasticsearch
-const FILTER_FIELD_MAP = {
-  cycle: 'cycle.keyword',
-  diplomaType: 'diploma.type.keyword',
-  diplomaCode: 'diploma.code.keyword',
-  diplomaCategory: 'diploma.category.keyword',
-  academy: 'etablissements.academy.keyword',
-  region: 'etablissements.region.keyword',
-  institution: 'etablissements.uai.keyword',
-  institutionName: 'etablissements.name.keyword',
-  paysageId: 'etablissements.paysageElt.id.keyword',
-  sector: 'etablissements.sector.keyword',
-  disciplinarySector: 'disciplinarySector.keyword',
-  domain: 'domains.keyword',
-  keyword: 'keywords.keyword',
-  hasSiseInfos: 'hasSiseInfos',
-  hasRncpInfos: 'hasRncpInfos',
-  hasRomeInfos: 'hasRomeInfos',
-  codeRome: 'romeInfos.codeRome.keyword',
-} as const;
+import { buildElasticsearchQuery, buildHighlightConfig, scrollAll } from '~/utils/programs-search';
 
 // Aggregation definitions for facets
 const AGGREGATIONS = {
@@ -191,45 +169,6 @@ const EXPORT_CONFIG = {
   pitKeepAlive: '5m', // Point in time keep alive duration
   batchSize: 2000, // Number of results per batch
 } as const;
-
-// Build filters from query parameters (shared logic)
-function buildFilters(query: {
-  cycle?: string | string[];
-  diplomaType?: string | string[];
-  diplomaCode?: string | string[];
-  diplomaCategory?: string | string[];
-  academy?: string | string[];
-  region?: string | string[];
-  institution?: string | string[];
-  paysageId?: string | string[];
-  sector?: string | string[];
-  disciplinarySector?: string | string[];
-  domain?: string | string[];
-  keyword?: string | string[];
-  hasSiseInfos?: string;
-  hasRncpInfos?: string;
-  hasRomeInfos?: string;
-  codeRome?: string | string[];
-}) {
-  return setFilters([
-    { key: FILTER_FIELD_MAP.cycle, value: query.cycle },
-    { key: FILTER_FIELD_MAP.diplomaType, value: query.diplomaType },
-    { key: FILTER_FIELD_MAP.diplomaCode, value: query.diplomaCode },
-    { key: FILTER_FIELD_MAP.diplomaCategory, value: query.diplomaCategory },
-    { key: FILTER_FIELD_MAP.academy, value: query.academy },
-    { key: FILTER_FIELD_MAP.region, value: query.region },
-    { key: FILTER_FIELD_MAP.institution, value: query.institution },
-    { key: FILTER_FIELD_MAP.paysageId, value: query.paysageId },
-    { key: FILTER_FIELD_MAP.sector, value: query.sector },
-    { key: FILTER_FIELD_MAP.disciplinarySector, value: query.disciplinarySector },
-    { key: FILTER_FIELD_MAP.domain, value: query.domain },
-    { key: FILTER_FIELD_MAP.keyword, value: query.keyword },
-    { key: FILTER_FIELD_MAP.hasSiseInfos, value: query.hasSiseInfos },
-    { key: FILTER_FIELD_MAP.hasRncpInfos, value: query.hasRncpInfos },
-    { key: FILTER_FIELD_MAP.hasRomeInfos, value: query.hasRomeInfos },
-    { key: FILTER_FIELD_MAP.codeRome, value: query.codeRome },
-  ]);
-}
 
 // Transform program data for export (flatten nested structures)
 function transformProgramForExport(program: ProgramSearch) {
@@ -300,76 +239,18 @@ export const programsRoutes = new Elysia({ prefix: '/programs' })
   .get(
     '/',
     async ({ query }) => {
-      const {
-        q,
-        page = 1,
-        pageSize = 10,
-        cycle,
-        diplomaType,
-        diplomaCode,
-        diplomaCategory,
-        academy,
-        region,
-        institution,
-        paysageId,
-        sector,
-        disciplinarySector,
-        domain,
-        keyword,
-        hasSiseInfos,
-        hasRncpInfos,
-        hasRomeInfos,
-        codeRome,
-      } = query;
-
-      // Build the main query with configured search fields
-      const textQuery = q
-        ? { query_string: { query: q } }
-        : { match_all: {} };
+      const { q, page = 1, pageSize = 10, ...rest } = query;
+      const esQuery = buildElasticsearchQuery({ q, ...rest });
       const from = (page - 1) * pageSize;
-
-      // Build filters array
-      const filters = buildFilters({
-        cycle,
-        diplomaType,
-        diplomaCode,
-        diplomaCategory,
-        academy,
-        region,
-        institution,
-        paysageId,
-        sector,
-        disciplinarySector,
-        domain,
-        keyword,
-        hasSiseInfos,
-        hasRncpInfos,
-        hasRomeInfos,
-        codeRome,
-      });
 
       const searchResponse = await elastic.programs
         .search<ProgramSearch>({
           from,
           size: pageSize,
-          fields: buildSearchFields(),
-          query: {
-            bool: {
-              must: [textQuery],
-              filter: filters,
-            },
-          },
+          query: esQuery,
           track_total_hits: true,
           track_scores: true,
-          highlight: q
-            ? {
-                fields: buildHighlightFields(),
-                pre_tags: ['<strong>'],
-                post_tags: ['</strong>'],
-                number_of_fragments: 3,
-                fragment_size: 150,
-              }
-            : undefined,
+          highlight: buildHighlightConfig(q),
         })
         .catch((err) => {
           console.error(err);
@@ -399,125 +280,19 @@ export const programsRoutes = new Elysia({ prefix: '/programs' })
   .get(
     '/export',
     async ({ query, set }) => {
-      const {
-        q,
-        format,
-        maxResults = EXPORT_CONFIG.maxResults,
-        cycle,
-        diplomaType,
-        diplomaCode,
-        diplomaCategory,
-        academy,
-        region,
-        institution,
-        paysageId,
-        sector,
-        disciplinarySector,
-        domain,
-        keyword,
-        hasSiseInfos,
-        hasRncpInfos,
-        hasRomeInfos,
-        codeRome,
-      } = query;
-
-      // Limit max results to prevent abuse
+      const { q, format, maxResults = EXPORT_CONFIG.maxResults, ...rest } = query;
       const effectiveMaxResults = Math.min(Number(maxResults), EXPORT_CONFIG.maxResults);
-
-      // Build the query with configured search fields
-      const textQuery = q
-        ? { query_string: { query: q, fields: buildSearchFields() } }
-        : { match_all: {} };
-      const filters = buildFilters({
-        cycle,
-        diplomaType,
-        diplomaCode,
-        diplomaCategory,
-        academy,
-        region,
-        institution,
-        paysageId,
-        sector,
-        disciplinarySector,
-        domain,
-        keyword,
-        hasSiseInfos,
-        hasRncpInfos,
-        hasRomeInfos,
-        codeRome,
-      });
-
-      const esQuery = {
-        bool: {
-          must: [textQuery],
-          filter: filters,
-        },
-      };
-
+      const esQuery = buildElasticsearchQuery({ q, ...rest });
       const timestamp = new Date().toISOString().split('T')[0];
 
-      // Collect all results using search_after with PIT (Point In Time)
-      const allPrograms: ReturnType<typeof transformProgramForExport>[] = [];
-
-      // Create a Point In Time to ensure consistent results
-      // @ts-expect-error - proxy injects index at runtime
-      const pitResponse = await elastic.programs.openPointInTime({
-        keep_alive: EXPORT_CONFIG.pitKeepAlive,
+      const { results: allPrograms } = await scrollAll<ProgramSearch, ReturnType<typeof transformProgramForExport>>({
+        query: esQuery,
+        maxResults: effectiveMaxResults,
+        source: true,
+        mapper: transformProgramForExport,
+        batchSize: EXPORT_CONFIG.batchSize,
+        pitKeepAlive: EXPORT_CONFIG.pitKeepAlive,
       });
-      let pitId = pitResponse.id;
-
-      try {
-        let searchAfter: (string | number)[] | undefined;
-        let hasMore = true;
-
-        while (hasMore && allPrograms.length < effectiveMaxResults) {
-          const searchResponse = await elastic.client.search<ProgramSearch>({
-            size: Math.min(EXPORT_CONFIG.batchSize, effectiveMaxResults - allPrograms.length),
-            query: esQuery,
-            pit: {
-              id: pitId,
-              keep_alive: EXPORT_CONFIG.pitKeepAlive,
-            },
-            sort: [{ _shard_doc: 'asc' }], // Most efficient sort for iteration
-            ...(searchAfter && { search_after: searchAfter }),
-            track_total_hits: false, // Faster pagination
-            _source: true,
-          });
-
-          const hits = searchResponse.hits.hits;
-
-          if (hits.length === 0) {
-            hasMore = false;
-            break;
-          }
-
-          // Process batch
-          for (const hit of hits) {
-            if (hit._source && allPrograms.length < effectiveMaxResults) {
-              allPrograms.push(transformProgramForExport(hit._source as ProgramSearch));
-            }
-          }
-
-          // Get sort values from last hit for next page
-          const lastHit = hits.at(-1);
-          if (lastHit?.sort) {
-            searchAfter = lastHit.sort as (string | number)[];
-          }
-
-          // Update PIT ID if it changed
-          if (searchResponse.pit_id) {
-            pitId = searchResponse.pit_id;
-          }
-        }
-      } catch (err) {
-        console.error('Export error:', err);
-        throw new DatabaseError(err instanceof Error ? err.message : 'Error during export');
-      } finally {
-        // Always clean up the PIT
-        await elastic.programs.closePointInTime({ id: pitId }).catch(() => {
-          // Ignore errors when closing PIT
-        });
-      }
 
       const totalCount = allPrograms.length;
 
@@ -614,58 +389,13 @@ export const programsRoutes = new Elysia({ prefix: '/programs' })
   .get(
     '/facets',
     async ({ query }) => {
-      const {
-        q,
-        cycle,
-        diplomaType,
-        diplomaCode,
-        diplomaCategory,
-        academy,
-        region,
-        institution,
-        paysageId,
-        sector,
-        disciplinarySector,
-        domain,
-        keyword,
-        hasSiseInfos,
-        hasRncpInfos,
-        hasRomeInfos,
-        codeRome,
-      } = query;
-
-      const textQuery = q
-        ? { query_string: { query: q, fields: buildSearchFields() } }
-        : { match_all: {} };
-
-      const filters = buildFilters({
-        cycle,
-        diplomaType,
-        diplomaCode,
-        diplomaCategory,
-        academy,
-        region,
-        institution,
-        paysageId,
-        sector,
-        disciplinarySector,
-        domain,
-        keyword,
-        hasSiseInfos,
-        hasRncpInfos,
-        hasRomeInfos,
-        codeRome,
-      });
+      const { q, ...rest } = query;
+      const esQuery = buildElasticsearchQuery({ q, ...rest });
 
       const searchResponse = await elastic.programs
         .search({
           size: 0,
-          query: {
-            bool: {
-              must: [textQuery],
-              filter: filters,
-            },
-          },
+          query: esQuery,
           track_total_hits: true,
           aggs: AGGREGATIONS,
         })

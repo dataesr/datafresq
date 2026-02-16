@@ -1,11 +1,12 @@
 import { file, serve } from 'bun';
 import client from '@/index.html';
-import { config } from '~/config';
+import { config, validateConfig } from '~/config';
 import { close as closeDb, connect } from '~/database/mongo';
 import { app } from '~/index';
 
 async function bootstrap() {
   try {
+    validateConfig();
     await connect();
 
     const server = serve({
@@ -24,7 +25,8 @@ async function bootstrap() {
       },
       development: config.isDevelopment,
       port: 3000,
-      idleTimeout: 60, // 1 minutes - allows longer requests for exports
+      idleTimeout: 60, // 1 minute - allows longer requests for exports
+      maxRequestBodySize: 1024 * 1024, // 1MB - no file uploads, JSON only
     });
 
     console.log(`

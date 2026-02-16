@@ -103,7 +103,7 @@ function formatTiming(ms: number): string {
  * ```
  */
 export const logger = (options: LoggerOptions = {}) => {
-  const { enabled = process.env.NODE_ENV !== 'production' } = options;
+  const { enabled = true } = options;
 
   return new Elysia({ name: 'logger' })
     .state('startTime', 0)

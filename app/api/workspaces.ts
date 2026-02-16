@@ -3,7 +3,6 @@ import { useMemo } from 'react';
 import { useAuth } from '@/api/auth';
 import { APIError, api } from '@/api/eden-treaty';
 import type {
-  CreateWorkspaceFromSearchResponse,
   PreviewAddProgramsResponse,
   ReadWorkspace,
   WorkspaceSearchParams,
@@ -54,41 +53,9 @@ async function createWorkspace(input: {
   isPublic?: boolean;
   users?: { userId: string; role: 'viewer' | 'editor' }[];
   programs?: string[];
+  searchParams?: WorkspaceSearchParams;
 }) {
   const { data, error } = await api.workspaces.post(input);
-  if (error) throw new APIError(error);
-  return data;
-}
-
-interface CreateWorkspaceFromSearchInput {
-  name: string;
-  description?: string;
-  color?: string;
-  isPublic?: boolean;
-  searchParams: {
-    q?: string;
-    cycle?: string | string[];
-    diplomaType?: string | string[];
-    diplomaCode?: string | string[];
-    diplomaCategory?: string | string[];
-    academy?: string | string[];
-    region?: string | string[];
-    institution?: string | string[];
-    paysageId?: string | string[];
-    sector?: string | string[];
-    disciplinarySector?: string | string[];
-    domain?: string | string[];
-    keyword?: string | string[];
-    hasSiseInfos?: string;
-    hasRncpInfos?: string;
-    hasRomeInfos?: string;
-  };
-}
-
-async function createWorkspaceFromSearch(
-  input: CreateWorkspaceFromSearchInput
-): Promise<CreateWorkspaceFromSearchResponse> {
-  const { data, error } = await (api.workspaces as any)['from-search'].post(input);
   if (error) throw new APIError(error);
   return data;
 }
@@ -365,17 +332,6 @@ export function useCreateWorkspace() {
         if (!old) return [newWorkspace];
         return [...old, newWorkspace];
       });
-      queryClient.invalidateQueries({ queryKey: workspaceQueryKeys.user });
-    },
-  });
-}
-
-export function useCreateWorkspaceFromSearch() {
-  const queryClient = useQueryClient();
-
-  return useMutation({
-    mutationFn: createWorkspaceFromSearch,
-    onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: workspaceQueryKeys.user });
     },
   });

@@ -30,6 +30,7 @@ export const changePasswordSchema = t.Object({
   }),
   newPassword: t.String({
     minLength: 8,
+    maxLength: 128,
     pattern: '^(?=.*[A-Z])(?=.*[a-z])(?=.*[0-9]).+$',
     error:
       'Le nouveau mot de passe doit contenir au moins 8 caractères, une majuscule, une minuscule et un chiffre',

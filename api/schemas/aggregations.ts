@@ -96,7 +96,7 @@ export const siseAggregationsSchema = t.Object({
 // Insersup (Professional Insertion) Aggregation Schemas
 // ============================================================================
 
-const employmentCountsSchema = t.Object({
+export const employmentCountsSchema = t.Object({
   m6: t.Union([t.Number(), t.Null()]),
   m12: t.Union([t.Number(), t.Null()]),
   m18: t.Union([t.Number(), t.Null()]),
@@ -104,14 +104,14 @@ const employmentCountsSchema = t.Object({
   m30: t.Union([t.Number(), t.Null()]),
 });
 
-const salaryMonthSchema = t.Object({
+export const salaryMonthSchema = t.Object({
   count: t.Union([t.Number(), t.Null()]),
   q1: t.Union([t.Number(), t.Null()]),
   median: t.Union([t.Number(), t.Null()]),
   q3: t.Union([t.Number(), t.Null()]),
 });
 
-const salaryQuartilesSchema = t.Object({
+export const salaryQuartilesSchema = t.Object({
   m6: salaryMonthSchema,
   m12: salaryMonthSchema,
   m18: salaryMonthSchema,
@@ -119,7 +119,7 @@ const salaryQuartilesSchema = t.Object({
   m30: salaryMonthSchema,
 });
 
-const insersupGenderStatsSchema = t.Object({
+export const insersupGenderStatsSchema = t.Object({
   nbSortants: t.Number(),
   emploiSalFr: t.Union([employmentCountsSchema, t.Null()]),
   emploiNonSal: t.Union([employmentCountsSchema, t.Null()]),

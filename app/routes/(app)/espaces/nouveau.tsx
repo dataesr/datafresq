@@ -1,7 +1,7 @@
 import { useRef, useState } from 'react';
 import { Link, useNavigate, useSearchParams } from 'react-router';
 import { useAuth } from '@/api/auth';
-import { useCreateWorkspace, useCreateWorkspaceFromSearch } from '@/api/workspaces';
+import { useCreateWorkspace } from '@/api/workspaces';
 import { Breadcrumb } from '@/components/Breadcrumb';
 import ColorPicker from '@/components/ColorPicker';
 import { Input } from '@/components/Input';
@@ -23,7 +23,6 @@ export default function NouveauEspacePage() {
   const navigate = useNavigate();
   const { user } = useAuth();
   const createMutation = useCreateWorkspace();
-  const createFromSearchMutation = useCreateWorkspaceFromSearch();
   const [urlSearchParams] = useSearchParams();
 
   const formationIdsParam = urlSearchParams.get('formationIds');
@@ -43,7 +42,7 @@ export default function NouveauEspacePage() {
 
   const excludeUserIds = user ? [user.id] : [];
 
-  const isPending = createMutation.isPending || createFromSearchMutation.isPending;
+  const isPending = createMutation.isPending;
   const postActionRef = useRef<'view' | 'return'>('view');
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -64,56 +63,33 @@ export default function NouveauEspacePage() {
       }
     };
 
-    if (searchQuery) {
-      toast.promise(
-        createFromSearchMutation.mutateAsync({
-          name: name.trim(),
-          description: description.trim() || undefined,
-          color,
-          isPublic,
-          searchParams: searchQuery,
-        }),
-        {
-          loading: { title: "Création de l'espace..." },
-          success: (data) => {
-            navigateAfter(data.id);
-            return {
-              title: `L'espace "${data.name}" a été créé avec ${data.programCount} formation${data.programCount > 1 ? 's' : ''}`,
-            };
-          },
-          error: (err) => ({
-            title: 'Erreur lors de la création',
-            description: getErrorMessage(err),
-          }),
+    toast.promise(
+      createMutation.mutateAsync({
+        name: name.trim(),
+        description: description.trim() || undefined,
+        color,
+        isPublic,
+        users: pendingUsers.map((u) => ({ userId: u.userId, role: u.role })),
+        programs: formationIds.length > 0 ? formationIds : undefined,
+        searchParams: searchQuery ?? undefined,
+      }),
+      {
+        loading: { title: "Création de l'espace..." },
+        success: (data) => {
+          const count = data.programs.length;
+          const successMessage =
+            count > 0
+              ? `L'espace "${data.name}" a été créé avec ${count} formation${count > 1 ? 's' : ''}`
+              : `L'espace "${data.name}" a été créé`;
+          navigateAfter(data.id);
+          return { title: successMessage };
         },
-      );
-    } else {
-      toast.promise(
-        createMutation.mutateAsync({
-          name: name.trim(),
-          description: description.trim() || undefined,
-          color,
-          isPublic,
-          users: pendingUsers.map((u) => ({ userId: u.userId, role: u.role })),
-          programs: formationIds.length > 0 ? formationIds : undefined,
+        error: (err) => ({
+          title: 'Erreur lors de la création',
+          description: getErrorMessage(err),
         }),
-        {
-          loading: { title: "Création de l'espace..." },
-          success: (data) => {
-            const successMessage =
-              formationIds.length > 0
-                ? `L'espace "${data.name}" a été créé avec ${formationIds.length} formation${formationIds.length > 1 ? 's' : ''}`
-                : `L'espace "${data.name}" a été créé`;
-            navigateAfter(data.id);
-            return { title: successMessage };
-          },
-          error: (err) => ({
-            title: 'Erreur lors de la création',
-            description: getErrorMessage(err),
-          }),
-        },
-      );
-    }
+      },
+    );
   };
 
   return (

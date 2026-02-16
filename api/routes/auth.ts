@@ -23,6 +23,7 @@ import {
 } from '~/schemas/auth';
 import { errorResponseSchema, successResponseSchema } from '~/schemas/common';
 import { generateId } from '~/utils/id';
+import { hashPassword, verifyPassword } from '~/utils/password';
 import { generateSessionInfo, generateTokenWithHash, hashToken } from '~/utils/token';
 
 export const authRoutes = new Elysia({ prefix: '/auth' })
@@ -36,8 +37,9 @@ export const authRoutes = new Elysia({ prefix: '/auth' })
       const user = await collections.users.findOne({ email: body.email.toLowerCase() });
       if (!user) throw new InvalidCredentialsError();
       if (!user.isActive) throw new AccountInactiveError();
+      if (!user.passwordHash) throw new InvalidCredentialsError();
 
-      const isPasswordValid = await Bun.password.verify(body.password, user.passwordHash || '');
+      const isPasswordValid = await verifyPassword(body.password, user.passwordHash);
       if (!isPasswordValid) throw new InvalidCredentialsError();
 
       const payload = { sub: user.id, email: user.email, role: user.role };
@@ -154,6 +156,12 @@ export const authRoutes = new Elysia({ prefix: '/auth' })
           "Obtenir un nouveau token d'accès en utilisant le token de session (avec rotation)",
         tags: ['Authentification'],
       },
+      rateLimit: {
+        maxRequests: 10,
+        windowSeconds: 60,
+        key: 'session-refresh',
+        message: "Trop de tentatives de renouvellement de session. Veuillez réessayer dans quelques minutes.",
+      },
     },
   )
   .post(
@@ -268,7 +276,7 @@ export const authRoutes = new Elysia({ prefix: '/auth' })
         throw new InvalidTokenError('Token expiré');
       }
 
-      const passwordHash = await Bun.password.hash(body.password);
+      const passwordHash = await hashPassword(body.password);
 
       await collections.users.updateOne(
         { id: tokenDoc.userId },

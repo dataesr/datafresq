@@ -2,7 +2,7 @@ import { Elysia } from 'elysia';
 
 import { config } from '~/config';
 import { collections } from '~/database/mongo';
-import { InvalidTokenError, MailerFailedError } from '~/errors';
+import { BadRequestError, InvalidTokenError, MailerFailedError } from '~/errors';
 import { DatabaseError } from '~/errors/database.error';
 import { sendInvitationEmail } from '~/external/email';
 import { authMacro } from '~/macros/authMacro';
@@ -10,6 +10,7 @@ import { rateLimitMacro } from '~/macros/rateLimitMacro';
 import { inviteUserSchema, registerSchema } from '~/schemas/auth';
 import { errorResponseSchema, successResponseSchema } from '~/schemas/common';
 import { generateId } from '~/utils/id';
+import { hashPassword } from '~/utils/password';
 import { generateTokenWithHash, hashToken } from '~/utils/token';
 
 export const invitationRoutes = new Elysia({ prefix: '/invitations' })
@@ -22,6 +23,7 @@ export const invitationRoutes = new Elysia({ prefix: '/invitations' })
       const email = body.email.toLowerCase();
 
       const existingUser = await collections.users.findOne({ email });
+      if (existingUser?.isActive) throw new BadRequestError('User already active');
 
       const userId = existingUser?.id ?? generateId();
       const userInput = {
@@ -93,7 +95,12 @@ export const invitationRoutes = new Elysia({ prefix: '/invitations' })
     '/register',
     async ({ body }) => {
       const tokenHash = hashToken(body.token);
-      const payload = await collections.tokens.findOne({ tokenHash });
+      const payload = await collections.tokens.findOne({
+        tokenHash,
+        type: 'invitation',
+        used: false,
+        expiresAt: { $gt: new Date() },
+      });
 
       if (!payload || !payload.userId) {
         throw new InvalidTokenError("Token d'invitation invalide");
@@ -106,7 +113,7 @@ export const invitationRoutes = new Elysia({ prefix: '/invitations' })
 
       if (!user) throw new InvalidTokenError("Token d'invitation invalide ou expiré");
 
-      const passwordHash = await Bun.password.hash(body.password);
+      const passwordHash = await hashPassword(body.password);
 
       const { acknowledged } = await collections.users.updateOne(
         { id: user.id },

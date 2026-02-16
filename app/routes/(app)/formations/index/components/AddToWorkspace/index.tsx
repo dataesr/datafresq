@@ -51,7 +51,7 @@ function useAddToWorkspace({ programIds, searchParams, onSuccess }: UseAddToWork
   );
 
   const canAdd =
-    (hasSelection) && !isPending && !isError && preview && preview.toAdd > 0;
+    (hasSelection || preview && preview.toAdd > 0) && !isPending && !isError;
 
   const handleAdd = useCallback(() => {
     if (!activeWorkspace || !preview) return;

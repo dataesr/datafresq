@@ -4,6 +4,7 @@ import { collections } from '~/database/mongo';
 import { authMacro } from '~/macros/authMacro';
 import { errorResponseSchema } from '~/schemas/common';
 import { USER_SEARCH_PROJECTION, userSearchSchema } from '~/schemas/users';
+import { escapeRegex } from '~/utils/strings';
 
 /**
  * Users routes
@@ -20,15 +21,16 @@ export const usersRoutes = new Elysia({ prefix: '/users' })
       }
 
       const searchLimit = Math.min(Number.parseInt(limit, 10) || 10, 50);
+      const safeQuery = escapeRegex(q);
 
       const users = await collections.users
         .find(
           {
             isActive: true,
             $or: [
-              { email: { $regex: q, $options: 'i' } },
-              { firstName: { $regex: q, $options: 'i' } },
-              { lastName: { $regex: q, $options: 'i' } },
+              { email: { $regex: safeQuery, $options: 'i' } },
+              { firstName: { $regex: safeQuery, $options: 'i' } },
+              { lastName: { $regex: safeQuery, $options: 'i' } },
             ],
           },
           {

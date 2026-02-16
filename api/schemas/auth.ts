@@ -4,28 +4,6 @@ import { config } from '~/config';
 // ============================================================================
 // Schemas
 // ============================================================================
-
-export const signupSchema = t.Object({
-  email: t.String({
-    format: 'email',
-    error: "Format d'email invalide",
-  }),
-  password: t.String({
-    minLength: 8,
-    pattern: '^(?=.*[A-Z])(?=.*[a-z])(?=.*[0-9]).+$',
-    error:
-      'Le mot de passe doit contenir au moins 8 caractères, une majuscule, une minuscule et un chiffre',
-  }),
-  name: t.Optional(
-    t.Nullable(
-      t.String({
-        minLength: 2,
-        error: 'Le nom doit contenir au moins 2 caractères',
-      }),
-    ),
-  ),
-});
-
 export const signinSchema = t.Object({
   email: t.String({
     format: 'email',
@@ -51,6 +29,7 @@ export const resetPasswordSchema = t.Object({
   }),
   password: t.String({
     minLength: 8,
+    maxLength: 128,
     pattern: '^(?=.*[A-Z])(?=.*[a-z])(?=.*[0-9]).+$',
     error:
       'Le mot de passe doit contenir au moins 8 caractères, une majuscule, une minuscule et un chiffre',
@@ -75,6 +54,7 @@ export const registerSchema = t.Object({
   }),
   password: t.String({
     minLength: 8,
+    maxLength: 128,
     pattern: '^(?=.*[A-Z])(?=.*[a-z])(?=.*[0-9]).+$',
     error:
       'Le mot de passe doit contenir au moins 8 caractères, une majuscule, une minuscule et un chiffre',
@@ -109,14 +89,11 @@ export const forgotPasswordResponseSchema = t.Object({
 export const authCookieSchema = t.Cookie({
   [config.cookies.access.name]: t.String(),
   [config.cookies.session.name]: t.String(),
-  [config.cookies.auth.name]: t.String(),
 });
 
 // ============================================================================
 // Types
 // ============================================================================
-
-export type Signup = typeof signupSchema.static;
 export type Signin = typeof signinSchema.static;
 export type ForgotPassword = typeof forgotPasswordSchema.static;
 export type ResetPassword = typeof resetPasswordSchema.static;

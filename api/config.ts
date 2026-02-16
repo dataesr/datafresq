@@ -37,6 +37,7 @@ export const config = {
         secure: isProduction,
         sameSite: (isProduction ? 'strict' : 'lax') as 'strict' | 'lax',
         maxAge: Number(process.env.ACCESS_EXP_SECONDS || '900'), // 15 minutes
+        path: '/',
       },
     },
     session: {
@@ -47,16 +48,7 @@ export const config = {
         secure: isProduction,
         sameSite: (isProduction ? 'strict' : 'lax') as 'strict' | 'lax',
         maxAge: Number(process.env.SESSION_EXP_SECONDS || '604800'), // 7 days
-      },
-    },
-    auth: {
-      name: 'fqv_auth',
-      config: {
-        domain: process.env.COOKIE_DOMAIN || '',
-        httpOnly: false,
-        secure: isProduction,
-        sameSite: (isProduction ? 'strict' : 'lax') as 'strict' | 'lax',
-        maxAge: Number(process.env.SESSION_EXP_SECONDS || '604800'), // 7 days
+        path: '/',
       },
     },
   },
@@ -70,6 +62,12 @@ export const config = {
       username: process.env.ELASTIC_USERNAME || '',
       password: process.env.ELASTIC_PASSWORD || '',
     },
+    indexes: {
+        programs: process.env.ES_PROGRAMS_INDEX,
+        institutions: process.env.ES_INSTITUTIONS_INDEX,
+        specializations: process.env.ES_SPECIALIZATIONS_INDEX,
+        careers: process.env.ES_CAREERS_INDEX,
+    }
   },
 } as const;
 
@@ -86,8 +84,8 @@ export function validateConfig() {
 
   // Production-specific validation
   if (isProduction) {
-    if (!process.env.MONGODB_URI) {
-      errors.push('MONGODB_URI must be explicitly set in production');
+    if (!process.env.MONGO_URI) {
+      errors.push('MONGO_URI must be explicitly set in production');
     }
 
     if (config.mongodb.uri.includes('localhost')) {
@@ -112,6 +110,22 @@ export function validateConfig() {
 
     if (!config.brevo.url) {
       errors.push('BREVO_URL must be explicitly set in production');
+    }
+
+    if (!config.elastic.indexes.programs) {
+      errors.push('ES_PROGRAMS_INDEX must be explicitly set in production');
+    }
+
+    if (!config.elastic.indexes.institutions) {
+      errors.push('ES_INSTITUTIONS_INDEX must be explicitly set in production');
+    }
+
+    if (!config.elastic.indexes.specializations) {
+      errors.push('ES_SPECIALIZATIONS_INDEX must be explicitly set in production');
+    }
+
+    if (!config.elastic.indexes.careers) {
+      errors.push('ES_CAREERS_INDEX must be explicitly set in production');
     }
   }
 

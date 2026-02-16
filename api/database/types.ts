@@ -46,7 +46,7 @@ export interface WorkspaceEventDoc {
   };
 }
 
-export type UserRole = 'admin' | 'user';
+export type UserRole = 'admin' | 'user' | 'root';
 
 export type UserDoc = {
   id: string;

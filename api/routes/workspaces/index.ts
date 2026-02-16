@@ -12,8 +12,6 @@ import { USER_LIGHT_PROJECTION } from '~/schemas/users';
 import {
   addProgramsSchema,
   addUsersSchema,
-  createWorkspaceFromSearchResponseSchema,
-  createWorkspaceFromSearchSchema,
   createWorkspaceSchema,
   previewAddProgramsResponseSchema,
   previewAddProgramsSchema,
@@ -27,7 +25,7 @@ import {
   workspaceHistoryResponseSchema,
 } from '~/schemas/workspaces';
 import { generateId } from '~/utils/id';
-import { fetchAllProgramIds, SEARCH_CONFIG } from '~/utils/programs-search';
+import { fetchAllProgramIds, previewSearchOverlap, SEARCH_CONFIG } from '~/utils/programs-search';
 import { getOrComputeWorkspaceCache, refreshWorkspaceCache } from './utils/cache';
 import {
   logProgramsAdded,
@@ -38,6 +36,8 @@ import {
   logWorkspaceCreated,
   logWorkspaceUpdated,
 } from './utils/events';
+import { escapeRegex } from '~/utils/strings';
+import { ALLOWED_SORT_FIELDS } from './utils/constants';
 
 const workspacePipeline = [
   // Lookup owner info by ID
@@ -113,16 +113,56 @@ function canView(workspace: WorkspaceDoc, userId: string): boolean {
 
 const workspaces = new Elysia()
   .use(authMacro)
-  // Create a new workspace
   .post(
     '/workspaces',
     async ({
-      body: { description, isPublic = false, name, color, programs = [], users = [] },
+      body: {
+        description,
+        isPublic = false,
+        name,
+        color,
+        programs: directPrograms = [],
+        users = [],
+        searchParams,
+      },
       user,
     }) => {
+      let allProgramIds = [...directPrograms];
+
+      if (searchParams) {
+        const { q, ...filterParams } = searchParams;
+
+        const hasQuery = q && q.trim().length > 0;
+        const hasFilters = Object.values(filterParams).some(
+          (v) => v !== undefined && v !== null && (Array.isArray(v) ? v.length > 0 : true),
+        );
+
+        if (!hasQuery && !hasFilters) {
+          throw new BadRequestError(
+            'Au moins une requête de recherche ou un filtre est requis pour créer un espace depuis une recherche.',
+          );
+        }
+
+        const { programIds, totalCount } = await fetchAllProgramIds(
+          { q, ...filterParams },
+          SEARCH_CONFIG.maxWorkspacePrograms,
+        );
+
+        if (programIds.length === 0) {
+          throw new BadRequestError('Aucune formation ne correspond à cette recherche.');
+        }
+
+        if (totalCount > SEARCH_CONFIG.maxWorkspacePrograms) {
+          throw new BadRequestError(
+            `Cette recherche contient ${totalCount.toLocaleString('fr-FR')} formations, ce qui dépasse la limite de ${SEARCH_CONFIG.maxWorkspacePrograms.toLocaleString('fr-FR')}. Veuillez affiner votre recherche.`,
+          );
+        }
+
+        allProgramIds = [...new Set([...allProgramIds, ...programIds])];
+      }
+
       const workspaceId = generateId();
 
-      // Transform users to include metadata
       const usersWithMeta: WorkspaceUserDoc[] = users.map((u) => ({
         userId: u.userId,
         role: u.role,
@@ -138,24 +178,21 @@ const workspaces = new Elysia()
         isPublic,
         name,
         owner: user.id,
-        programs: programs ?? [],
+        programs: allProgramIds,
         updatedAt: new Date(),
         users: usersWithMeta,
       });
 
       if (!insertedId) throw new DatabaseError();
 
-      // Log creation event
       await logWorkspaceCreated(workspaceId, name, user.id);
 
-      // Log user additions
       for (const u of usersWithMeta) {
         await logUserAdded(workspaceId, user.id, u.userId, u.role);
       }
 
-      // If programs were added, refresh cache
-      if (programs.length > 0) {
-        await logProgramsAdded(workspaceId, user.id, programs);
+      if (allProgramIds.length > 0) {
+        await logProgramsAdded(workspaceId, user.id, allProgramIds);
         await refreshWorkspaceCache(workspaceId);
       }
 
@@ -179,92 +216,7 @@ const workspaces = new Elysia()
       detail: {
         summary: 'Créer un espace de travail',
         description:
-          "**Permet à l'utilisateur connecté de créer un espace de travail avec les informations fournies.**",
-        tags: ['Espaces de travail'],
-      },
-    },
-  )
-  // Create a workspace from search results
-  .post(
-    '/workspaces/from-search',
-    async ({ body: { name, description, isPublic = false, color, searchParams }, user }) => {
-      const { q, ...filterParams } = searchParams;
-
-      // Require at least a query or one filter
-      const hasQuery = q && q.trim().length > 0;
-      const hasFilters = Object.values(filterParams).some(
-        (v) => v !== undefined && v !== null && (Array.isArray(v) ? v.length > 0 : true),
-      );
-
-      if (!hasQuery && !hasFilters) {
-        throw new BadRequestError(
-          'Au moins une requête de recherche ou un filtre est requis pour créer un espace depuis une recherche.',
-        );
-      }
-
-      // Fetch all matching program IDs from Elasticsearch
-      const { programIds, totalCount } = await fetchAllProgramIds(
-        { q, ...filterParams },
-        SEARCH_CONFIG.maxWorkspacePrograms,
-      );
-
-      if (programIds.length === 0) {
-        throw new BadRequestError('Aucune formation ne correspond à cette recherche.');
-      }
-
-      if (totalCount > SEARCH_CONFIG.maxWorkspacePrograms) {
-        throw new BadRequestError(
-          `Cette recherche contient ${totalCount.toLocaleString('fr-FR')} formations, ce qui dépasse la limite de ${SEARCH_CONFIG.maxWorkspacePrograms.toLocaleString('fr-FR')}. Veuillez affiner votre recherche.`,
-        );
-      }
-
-      // Create the workspace with the program IDs
-      const workspaceId = generateId();
-
-      const { insertedId } = await collections.workspaces.insertOne({
-        id: workspaceId,
-        createdAt: new Date(),
-        color: color ?? 'yellow-tournesol',
-        description,
-        isPublic,
-        name,
-        owner: user.id,
-        programs: programIds,
-        updatedAt: new Date(),
-        users: [],
-      });
-
-      if (!insertedId) throw new DatabaseError();
-
-      // Log creation event
-      await logWorkspaceCreated(workspaceId, name, user.id);
-
-      // Log programs added and refresh cache
-      if (programIds.length > 0) {
-        await logProgramsAdded(workspaceId, user.id, programIds);
-        await refreshWorkspaceCache(workspaceId);
-      }
-
-      return {
-        id: workspaceId,
-        name,
-        programCount: programIds.length,
-      };
-    },
-    {
-      isAuth: true,
-      body: createWorkspaceFromSearchSchema,
-      response: {
-        200: createWorkspaceFromSearchResponseSchema,
-        400: errorResponseSchema,
-        401: errorResponseSchema,
-        422: errorResponseSchema,
-        500: errorResponseSchema,
-      },
-      detail: {
-        summary: 'Créer un espace de travail depuis une recherche',
-        description:
-          '**Crée un espace de travail contenant toutes les formations correspondant aux critères de recherche.** Limité à 5000 formations maximum.',
+          "**Crée un espace de travail. Accepte des formations directement via `programs` et/ou des critères de recherche via `searchParams`.** Limité à 5000 formations depuis une recherche.",
         tags: ['Espaces de travail'],
       },
     },
@@ -278,15 +230,16 @@ const workspaces = new Elysia()
             {
               $match: {
                 $or: [
-                  { description: { $regex: query, $options: 'i' } },
-                  { name: { $regex: query, $options: 'i' } },
+                  { description: { $regex: escapeRegex(query), $options: 'i' } },
+                  { name: { $regex: escapeRegex(query), $options: 'i' } },
                 ],
               },
             },
           ]
         : [];
       const limit = size ? [{ $limit: Number(size) }] : [];
-      const sort = sortBy ? [{ $sort: { [sortBy]: Number(sortOrder) } }] : [];
+      const sort = sortBy && ALLOWED_SORT_FIELDS.has(sortBy)
+        ? [{ $sort: { [sortBy]: Number(sortOrder) } }] : [];
 
       const workspacesList = await collections.workspaces
         .aggregate<ReadWorkspace>([
@@ -338,8 +291,8 @@ const workspaces = new Elysia()
               baseMatch,
               {
                 $or: [
-                  { description: { $regex: query, $options: 'i' } },
-                  { name: { $regex: query, $options: 'i' } },
+                  { description: { $regex: escapeRegex(query), $options: 'i' } },
+                  { name: { $regex: escapeRegex(query), $options: 'i' } },
                 ],
               },
             ],
@@ -791,30 +744,23 @@ const workspacePrograms = new Elysia()
   .post(
     '/workspaces/:id/programs/preview',
     async ({ workspace, body: { programIds, searchParams } }) => {
-      const currentPrograms = new Set(workspace.programs || []);
-
-      let requestedIds: string[];
-
-      if (programIds && programIds.length > 0) {
-        requestedIds = programIds;
-      } else if (searchParams) {
-        const { programIds: fetchedIds } = await fetchAllProgramIds(
-          searchParams,
-          SEARCH_CONFIG.maxWorkspacePrograms,
-        );
-        requestedIds = fetchedIds;
-      } else {
-        throw new BadRequestError('Either programIds or searchParams must be provided');
+      if (searchParams) {
+        return previewSearchOverlap(searchParams, workspace.programs || []);
       }
 
-      const alreadyPresent = requestedIds.filter((id) => currentPrograms.has(id)).length;
-      const toAdd = requestedIds.length - alreadyPresent;
+      if (programIds && programIds.length > 0) {
+        const currentPrograms = new Set(workspace.programs || []);
+        const alreadyPresent = programIds.filter((id) => currentPrograms.has(id)).length;
+        const toAdd = programIds.length - alreadyPresent;
 
-      return {
-        toAdd,
-        alreadyPresent,
-        total: requestedIds.length,
-      };
+        return {
+          toAdd,
+          alreadyPresent,
+          total: programIds.length,
+        };
+      }
+
+      throw new BadRequestError('Either programIds or searchParams must be provided');
     },
     {
       isAuth: true,

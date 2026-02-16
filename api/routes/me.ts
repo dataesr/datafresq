@@ -10,6 +10,7 @@ import {
   updateUserSchema,
   userMeSchema,
 } from '~/schemas/users';
+import { hashPassword, verifyPassword } from '~/utils/password';
 
 export const meRoutes = new Elysia({ prefix: '/me' })
   .use(authMacro)
@@ -81,15 +82,16 @@ export const meRoutes = new Elysia({ prefix: '/me' })
       const userDoc = await collections.users.findOne({ email: user.email });
       if (!userDoc) throw new NotFoundError('Utilisateur introuvable');
 
-      const isPasswordValid = await Bun.password.verify(
+      if (!userDoc.passwordHash) throw new InvalidCredentialsError('Mot de passe actuel incorrect');
+      const isPasswordValid = await verifyPassword(
         body.currentPassword,
-        userDoc.passwordHash || '',
+        userDoc.passwordHash,
       );
       if (!isPasswordValid) {
         throw new InvalidCredentialsError('Mot de passe actuel incorrect');
       }
 
-      const newPasswordHash = await Bun.password.hash(body.newPassword);
+      const newPasswordHash = await hashPassword(body.newPassword);
 
       await collections.users.updateOne(
         { id: userDoc.id },

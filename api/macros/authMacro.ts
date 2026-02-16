@@ -16,7 +16,7 @@ export const authMacro = new Elysia({ name: 'auth-macro' })
     isAdmin: {
       resolve: ({ user }) => {
         if (!user) {
-          throw new ForbiddenError('Authentication required');
+          throw new UnauthorizedError('Authentication required');
         }
         if (user.role !== 'admin' && user.role !== 'root') {
           throw new ForbiddenError('Admin privileges required');
@@ -28,7 +28,7 @@ export const authMacro = new Elysia({ name: 'auth-macro' })
       return {
         resolve({ user }) {
           if (!user) {
-            throw new ForbiddenError('Authentication required');
+            throw new UnauthorizedError('Authentication required');
           }
           if (user.role !== role) {
             throw new ForbiddenError('Privilege required');

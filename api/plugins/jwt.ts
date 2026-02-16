@@ -5,7 +5,7 @@ import { config } from '~/config';
 export const jwtSchema = t.Object({
   sub: t.String(), // User ID
   email: t.String(),
-  role: t.String(),
+  role: t.Union([t.Literal('user'), t.Literal('admin'), t.Literal('root')]),
   iat: t.Optional(t.Number()),
   exp: t.Optional(t.Number()),
 });

@@ -1,3 +1,5 @@
+import { config } from '~/config';
+
 type ErrorMetadata = {
   code: string;
   message: string;
@@ -21,16 +23,13 @@ export abstract class AppError extends Error {
    * Convert error to HTTP response
    */
   toResponse(): Response {
-    const body: { error: ErrorMetadata } = {
-      error: {
-        code: this.code,
-        message: this.message,
-      },
+    const body: ErrorMetadata = {
+      code: this.code,
+      message: this.message,
     };
 
-    // Include details only in development
-    if (process.env.NODE_ENV !== 'production' && this.details) {
-      body.error.details = this.details;
+    if (!config.isProduction && this.details) {
+      body.details = this.details;
     }
 
     return Response.json(body, { status: this.status });

@@ -4,18 +4,14 @@ import { config } from '~/config';
 
 const esConfig: ClientOptions = {
   Connection: HttpConnection,
-  ...config.elastic,
+  auth: config.elastic.auth,
+  node: config.elastic.node,
 };
 
 const client = new Client(esConfig);
 
 // Index mapping
-const indexMap = {
-  programs: 'fresq-20260213',
-  institutions: 'fresq-etablissements-2025-staging',
-  specializations: 'fresq-mentions-2025-staging',
-  careers: 'fresq-metiers-2025-staging',
-} as const;
+const indexMap = config.elastic.indexes;
 
 /**
  * Create a proxy that automatically injects the index into any ES operation
@@ -40,7 +36,7 @@ const createIndexProxy = (index: string) => {
 // Create proxies for all indices, plus raw client for PIT searches
 export const elastic = {
   ...Object.fromEntries(
-    Object.entries(indexMap).map(([name, index]) => [name, createIndexProxy(index)]),
+    Object.entries(indexMap).map(([name, index]) => [name, createIndexProxy(index!)]),
   ),
   // Raw client for operations that must not include index (e.g., search with PIT)
   client,

@@ -1,4 +1,10 @@
 import { t } from 'elysia';
+import {
+  employmentCountsSchema,
+  insersupGenderStatsSchema,
+  salaryMonthSchema,
+  salaryQuartilesSchema,
+} from '~/schemas/aggregations';
 
 // ============================================================================
 // Base Schemas (Sub-components)
@@ -216,7 +222,7 @@ export const programSearchSchema = t.Composite([
 export const programsParamsSchema = t.Object({
   q: t.Optional(t.String({ description: 'Search query text' })),
   page: t.Optional(t.Numeric({ description: 'Page number (1-based)', default: 1 })),
-  pageSize: t.Optional(t.Numeric({ description: 'Number of results per page', default: 10 })),
+  pageSize: t.Optional(t.Numeric({ description: 'Number of results per page', default: 10, maximum: 100 })),
   sort: t.Optional(t.String({ description: 'Sort field and direction (e.g., "label:asc")' })),
   cycle: t.Optional(
     t.Union([t.String(), t.Array(t.String())], { description: 'Cycle filter (L, M, D, etc.)' }),
@@ -309,40 +315,6 @@ export const siseRecordSchema = t.Object({
   city: t.String(),
 });
 
-// Employment counts (raw counts, not percentages)
-const employmentCountsSchema = t.Object({
-  m6: t.Union([t.Number(), t.Null()]),
-  m12: t.Union([t.Number(), t.Null()]),
-  m18: t.Union([t.Number(), t.Null()]),
-  m24: t.Union([t.Number(), t.Null()]),
-  m30: t.Union([t.Number(), t.Null()]),
-});
-
-// Salary quartile data for a single month
-const salaryMonthSchema = t.Object({
-  count: t.Union([t.Number(), t.Null()]),
-  q1: t.Union([t.Number(), t.Null()]),
-  median: t.Union([t.Number(), t.Null()]),
-  q3: t.Union([t.Number(), t.Null()]),
-});
-
-// Salary quartiles across all months
-const salaryQuartilesSchema = t.Object({
-  m6: salaryMonthSchema,
-  m12: salaryMonthSchema,
-  m18: salaryMonthSchema,
-  m24: salaryMonthSchema,
-  m30: salaryMonthSchema,
-});
-
-const insersupGenderStatsSchema = t.Object({
-  nbSortants: t.Number(),
-  emploiSalFr: t.Union([employmentCountsSchema, t.Null()]),
-  emploiNonSal: t.Union([employmentCountsSchema, t.Null()]),
-  emploiStable: t.Union([employmentCountsSchema, t.Null()]),
-  salaires: t.Union([salaryQuartilesSchema, t.Null()]),
-});
-
 const insersupYearStatsSchema = t.Object({
   promo: t.String(),
   nbEtudiants: t.Number(),
@@ -403,7 +375,4 @@ export type SiseRecord = typeof siseRecordSchema.static;
 export type ProgramDetailResponse = typeof programDetailResponseSchema.static;
 export type InsersupStats = typeof insersupStatsSchema.static;
 export type InsersupYearStats = typeof insersupYearStatsSchema.static;
-export type InsersupGenderStats = typeof insersupGenderStatsSchema.static;
-export type EmploymentCounts = typeof employmentCountsSchema.static;
-export type SalaryQuartiles = typeof salaryQuartilesSchema.static;
-export type SalaryMonth = typeof salaryMonthSchema.static;
+export type { EmploymentCounts, InsersupGenderStats, SalaryMonth, SalaryQuartiles } from '~/schemas/aggregations';

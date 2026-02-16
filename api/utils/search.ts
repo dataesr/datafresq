@@ -171,16 +171,6 @@ export function buildSearchFields(): string[] {
   );
 }
 
-export function buildHighlightFields(): Record<string, object> {
-  return PROGRAM_SEARCH_FIELDS.reduce(
-    (acc, config) => {
-      acc[config.field] = {};
-      return acc;
-    },
-    {} as Record<string, object>,
-  );
-}
-
 export function getFieldDisplayName(field: string): string {
   const config = PROGRAM_SEARCH_FIELDS.find((c) => c.field === field);
   if (!config) return field;
