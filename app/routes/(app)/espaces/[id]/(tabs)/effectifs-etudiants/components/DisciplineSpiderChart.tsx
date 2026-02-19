@@ -61,8 +61,9 @@ export function DisciplineSpiderChart({ data, year, limit = 8 }: DisciplineSpide
       source="sise"
       tooltip={
         <span>
-          Effectifs calculés par somme des inscriptions dans chaque grande discipline, avec ventilation par sexe.
-          {' '}<Link to="/guide/indicateurs/effectifs">En savoir plus</Link> sur le calcul des effectifs.
+          Effectifs calculés par somme des inscriptions dans chaque grande discipline, avec
+          ventilation par sexe. <Link to="/guide/indicateurs/effectifs">En savoir plus</Link> sur le
+          calcul des effectifs.
         </span>
       }
     >

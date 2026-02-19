@@ -1,6 +1,10 @@
 import { Elysia } from 'elysia';
-import { ForbiddenError, UnauthorizedError } from '~/errors/auth.errors';
+import { ForbiddenError, UnauthorizedError } from '~/errors';
 import { authPlugin } from '~/plugins/auth';
+import type { JWTPayload } from '~/plugins/jwt';
+
+export type Role = JWTPayload['role'];
+export type Allow = 'visitor' | Role | Role[];
 
 export const authMacro = new Elysia({ name: 'auth-macro' })
   .use(authPlugin)
@@ -13,27 +17,19 @@ export const authMacro = new Elysia({ name: 'auth-macro' })
         return { user };
       },
     },
-    isAdmin: {
-      resolve: ({ user }) => {
-        if (!user) {
-          throw new UnauthorizedError('Authentication required');
-        }
-        if (user.role !== 'admin' && user.role !== 'root') {
-          throw new ForbiddenError('Admin privileges required');
-        }
-        return { user };
-      },
-    },
-    requireRole(role: string) {
+    allow(value: Allow) {
+      if (value === 'visitor') return;
+
+      const roles = Array.isArray(value) ? value : [value];
+
       return {
-        resolve({ user }) {
+        beforeHandle({ user }) {
           if (!user) {
             throw new UnauthorizedError('Authentication required');
           }
-          if (user.role !== role) {
-            throw new ForbiddenError('Privilege required');
+          if (!roles.includes(user.role as Role)) {
+            throw new ForbiddenError('Insufficient privileges');
           }
-          return { user };
         },
       };
     },

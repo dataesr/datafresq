@@ -1,12 +1,12 @@
-import { Credits } from '@highcharts/react';
 import type { HighchartsReactRefObject } from '@highcharts/react';
+import { Credits } from '@highcharts/react';
 import { MapsChart, MapsSeries } from '@highcharts/react/Maps';
 import { useMemo, useRef } from 'react';
 import { Link } from 'react-router';
 import { ChartBox } from '@/components/charts/ChartBox';
+import { getSequentialColors } from '@/components/charts/highcharts/colors';
 import { regionToHcKey } from '@/components/charts/regions';
 import mapDataFR from '@/components/charts/topo.json';
-import { getSequentialColors } from '@/components/charts/highcharts/colors';
 
 const GREEN_ARCHIPEL = getSequentialColors('green-archipel');
 
@@ -55,8 +55,8 @@ export function RegionChoroplethMap({ data, year }: RegionChoroplethMapProps) {
       chartRef={chartRef}
       tooltip={
         <span>
-          Calculé par somme des effectifs des formations pour chaque région d'implantation.
-          {' '}<Link to="/guide/indicateurs/effectifs">En savoir plus</Link> sur le calcul des effectifs.
+          Calculé par somme des effectifs des formations pour chaque région d'implantation.{' '}
+          <Link to="/guide/indicateurs/effectifs">En savoir plus</Link> sur le calcul des effectifs.
         </span>
       }
     >

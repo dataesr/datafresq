@@ -93,7 +93,7 @@ async function addUsers({
 }
 
 async function removeUsers({ workspaceId, userIds }: { workspaceId: string; userIds: string[] }) {
-  const { data, error } = await api.workspaces({ id: workspaceId }).users.delete({ userIds });
+  const { data, error } = await api.workspaces({ id: workspaceId }).users.remove.post({ userIds });
   if (error) throw new APIError(error);
   return data;
 }
@@ -158,7 +158,7 @@ async function removePrograms({
   workspaceId: string;
   programIds: string[];
 }) {
-  const { data, error } = await api.workspaces({ id: workspaceId }).programs.delete({
+  const { data, error } = await api.workspaces({ id: workspaceId }).programs.remove.post({
     programs: programIds,
   });
   if (error) throw new APIError(error);

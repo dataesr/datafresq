@@ -107,7 +107,11 @@
 }
 
 .tabnav__tab:hover:not([aria-current="page"]) {
-  background-image: linear-gradient(0deg, var(--border-contrast-grey), var(--border-contrast-grey)) !important;
+  background-image: linear-gradient(
+    0deg,
+    var(--border-contrast-grey),
+    var(--border-contrast-grey)
+  ) !important;
   background-size: 100% 2px !important;
   background-color: var(--background-default-grey-hover);
 }
@@ -183,8 +187,6 @@
     margin-right: 0;
   }
 }
-
-
 
 /* ============================================================================
    Responsive behavior - Shared styles for all breakpoints

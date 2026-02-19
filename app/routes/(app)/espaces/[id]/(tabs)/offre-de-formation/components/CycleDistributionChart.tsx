@@ -3,8 +3,8 @@ import { Pie } from '@highcharts/react/series';
 import { useMemo, useRef } from 'react';
 import { Link } from 'react-router';
 import { ChartBox } from '@/components/charts/ChartBox';
-import { CYCLE_COLORS } from '@/components/effectifs';
 import { getChartColor } from '@/components/charts/highcharts/colors';
+import { CYCLE_COLORS } from '@/components/effectifs';
 
 interface CycleData {
   cycle: string;
@@ -49,8 +49,8 @@ export function CycleDistributionChart({ data }: CycleDistributionChartProps) {
       source="fresq"
       tooltip={
         <span>
-          Nombre de formations regroupées par cycle LMD (Licence, Master, Doctorat).
-          {' '}<Link to="/guide/donnees/fresq">En savoir plus</Link> sur les données Fresq.
+          Nombre de formations regroupées par cycle LMD (Licence, Master, Doctorat).{' '}
+          <Link to="/guide/donnees/fresq">En savoir plus</Link> sur les données Fresq.
         </span>
       }
     >

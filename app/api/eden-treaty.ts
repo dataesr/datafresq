@@ -117,7 +117,11 @@ export class APIError extends Error {
   }
 
   isValidationError(): boolean {
-    return this.status === 422 || this.value?.type === 'validation';
+    return (
+      this.status === 422 ||
+      this.value?.code === 'VALIDATION_ERROR' ||
+      this.value?.type === 'validation'
+    );
   }
 
   getCode(): string | undefined {

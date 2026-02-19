@@ -3,7 +3,7 @@ import cn from 'classnames';
 import { useId } from 'react';
 import { Link } from 'react-router';
 import type { ProgramSearch } from '~/schemas/programs';
-import { getFieldDisplayName } from '~/utils/search';
+import { getHighlightedFieldDisplayName as getFieldDisplayName } from '~/schemas/search-fields';
 import { IndeterminateCheckbox } from '../IndeterminateCheckbox';
 
 /**

@@ -1,7 +1,9 @@
+import { lazy } from 'react';
 import { Route } from 'react-router';
-import AdminSection from './(tabs)';
 import RedirectToUsers from '.';
-import AdminLayout from './layout';
+
+const AdminLayout = lazy(() => import('./layout'));
+const AdminSection = lazy(() => import('./(tabs)'));
 
 export const adminRoutes = (
   <Route path="admin" element={<AdminLayout />}>

@@ -1,10 +1,5 @@
 import { t } from 'elysia';
-import {
-  employmentCountsSchema,
-  insersupGenderStatsSchema,
-  salaryMonthSchema,
-  salaryQuartilesSchema,
-} from '~/schemas/aggregations';
+import { employmentCountsSchema, salaryQuartilesSchema } from '~/schemas/aggregations';
 
 // ============================================================================
 // Base Schemas (Sub-components)
@@ -222,7 +217,9 @@ export const programSearchSchema = t.Composite([
 export const programsParamsSchema = t.Object({
   q: t.Optional(t.String({ description: 'Search query text' })),
   page: t.Optional(t.Numeric({ description: 'Page number (1-based)', default: 1 })),
-  pageSize: t.Optional(t.Numeric({ description: 'Number of results per page', default: 10, maximum: 100 })),
+  pageSize: t.Optional(
+    t.Numeric({ description: 'Number of results per page', default: 10, maximum: 100 }),
+  ),
   sort: t.Optional(t.String({ description: 'Sort field and direction (e.g., "label:asc")' })),
   cycle: t.Optional(
     t.Union([t.String(), t.Array(t.String())], { description: 'Cycle filter (L, M, D, etc.)' }),
@@ -275,6 +272,17 @@ export const facetItemSchema = t.Object({
   count: t.Number(),
 });
 
+export const programsFacetsQuerySchema = t.Partial(programsParamsSchema);
+
+export const exportParamsSchema = t.Composite([
+  t.Omit(programsParamsSchema, ['page', 'pageSize']),
+  t.Object({
+    format: t.Union([t.Literal('json'), t.Literal('xlsx')], {
+      description: 'Export format (json or xlsx)',
+    }),
+  }),
+]);
+
 // ============================================================================
 // Response Schemas
 // ============================================================================
@@ -306,13 +314,32 @@ export const programsSearchResponseSchema = t.Object({
 // SISE Schemas (Student enrollment data)
 // ============================================================================
 
-export const siseRecordSchema = t.Object({
-  academicYear: t.String(),
-  enrollment: t.Number(),
+const siseBreakdownItemSchema = t.Object({
+  key: t.String(),
+  total: t.Number(),
   women: t.Number(),
   men: t.Number(),
-  studyYear: t.String(),
-  city: t.String(),
+});
+
+const programSiseYearStatsSchema = t.Object({
+  year: t.String(),
+  total: t.Number(),
+  women: t.Number(),
+  men: t.Number(),
+  byStudyYear: t.Array(siseBreakdownItemSchema),
+  byCity: t.Array(siseBreakdownItemSchema),
+});
+
+const programSiseStatsSchema = t.Object({
+  byYear: t.Array(programSiseYearStatsSchema),
+});
+
+const programInsersupGenderStatsSchema = t.Object({
+  nbSortants: t.Number(),
+  emploiSalFr: t.Union([employmentCountsSchema, t.Null()]),
+  emploiNonSal: t.Union([employmentCountsSchema, t.Null()]),
+  emploiStable: t.Union([employmentCountsSchema, t.Null()]),
+  salaires: t.Union([salaryQuartilesSchema, t.Null()]),
 });
 
 const insersupYearStatsSchema = t.Object({
@@ -325,8 +352,8 @@ const insersupYearStatsSchema = t.Object({
   emploiStable: t.Union([employmentCountsSchema, t.Null()]),
   salaires: t.Union([salaryQuartilesSchema, t.Null()]),
   byGender: t.Object({
-    femme: t.Union([insersupGenderStatsSchema, t.Null()]),
-    homme: t.Union([insersupGenderStatsSchema, t.Null()]),
+    femme: t.Union([programInsersupGenderStatsSchema, t.Null()]),
+    homme: t.Union([programInsersupGenderStatsSchema, t.Null()]),
   }),
 });
 
@@ -341,7 +368,7 @@ const insersupStatsSchema = t.Object({
 
 export const programDetailResponseSchema = t.Object({
   program: programSchema,
-  sise: t.Array(siseRecordSchema),
+  sise: programSiseStatsSchema,
   insersup: insersupStatsSchema,
 });
 
@@ -368,11 +395,19 @@ export type Program = typeof programSchema.static;
 export type ProgramLight = typeof programLightSchema.static;
 export type ProgramSearch = typeof programSearchSchema.static;
 export type ProgramsParams = typeof programsParamsSchema.static;
+export type ProgramsFacetsQuery = typeof programsFacetsQuerySchema.static;
 export type FacetItem = typeof facetItemSchema.static;
 export type ProgramsFacetsResponse = typeof programsFacetsResponseSchema.static;
 export type ProgramsSearchResponse = typeof programsSearchResponseSchema.static;
-export type SiseRecord = typeof siseRecordSchema.static;
+export type ProgramSiseBreakdownItem = typeof siseBreakdownItemSchema.static;
+export type ProgramSiseYearStats = typeof programSiseYearStatsSchema.static;
+export type ProgramSiseStats = typeof programSiseStatsSchema.static;
 export type ProgramDetailResponse = typeof programDetailResponseSchema.static;
 export type InsersupStats = typeof insersupStatsSchema.static;
 export type InsersupYearStats = typeof insersupYearStatsSchema.static;
-export type { EmploymentCounts, InsersupGenderStats, SalaryMonth, SalaryQuartiles } from '~/schemas/aggregations';
+export type {
+  EmploymentCounts,
+  InsersupGenderStats,
+  SalaryMonth,
+  SalaryQuartiles,
+} from '~/schemas/aggregations';

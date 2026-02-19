@@ -3,8 +3,8 @@ import { Pie } from '@highcharts/react/series';
 import { useMemo, useRef } from 'react';
 import { Link } from 'react-router';
 import { ChartBox } from '@/components/charts/ChartBox';
-import { CYCLE_COLORS } from '@/components/effectifs';
 import { getChartColor } from '@/components/charts/highcharts/colors';
+import { CYCLE_COLORS } from '@/components/effectifs';
 
 interface CycleData {
   cycle: string;
@@ -52,8 +52,8 @@ export function CycleDistributionChart({ data, year }: CycleDistributionChartPro
       source="sise"
       tooltip={
         <span>
-          Somme des étudiants inscrits regroupés par cycle LMD (Licence, Master, Doctorat).
-          {' '}<Link to="/guide/indicateurs/effectifs">En savoir plus</Link> sur le calcul des effectifs.
+          Somme des étudiants inscrits regroupés par cycle LMD (Licence, Master, Doctorat).{' '}
+          <Link to="/guide/indicateurs/effectifs">En savoir plus</Link> sur le calcul des effectifs.
         </span>
       }
     >

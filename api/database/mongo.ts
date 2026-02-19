@@ -2,6 +2,7 @@
 import { type Collection, type Db, MongoClient } from 'mongodb';
 import { config } from '~/config';
 import type {
+  GuideReviewDoc,
   InsersupDoc,
   ProgramDoc,
   RateLimitDoc,
@@ -26,6 +27,7 @@ export type Collections = {
   workspaceCache: Collection<WorkspaceCacheDoc>;
   programs: Collection<ProgramDoc>;
   rateLimits: Collection<RateLimitDoc>;
+  guideReviews: Collection<GuideReviewDoc>;
 };
 
 let client: MongoClient | null = null;
@@ -62,6 +64,7 @@ export async function connect(): Promise<Collections> {
     workspaceCache: db.collection<WorkspaceCacheDoc>('workspace_cache'),
     programs: db.collection<ProgramDoc>('programs'),
     rateLimits: db.collection<RateLimitDoc>('rate_limits'),
+    guideReviews: db.collection<GuideReviewDoc>('guide_reviews'),
   };
 
   // Ensure indexes
@@ -97,7 +100,6 @@ async function ensureIndexes(cols: Collections): Promise<void> {
   await cols.sessions.createIndex({ userId: 1 });
   await cols.sessions.createIndex({ sessionTokenHash: 1 }, { unique: true });
   await cols.sessions.createIndex({ expiresAt: 1 }, { expireAfterSeconds: 0 });
-  await cols.sessions.createIndex({ isRevoked: 1, expiresAt: 1 });
 
   // === WORKSPACES ===
   await cols.workspaces.createIndex({ id: 1 }, { unique: true });
@@ -134,4 +136,10 @@ async function ensureIndexes(cols: Collections): Promise<void> {
     nationalite: 1,
     regime_inscription: 1,
   });
+
+  // === GUIDE REVIEWS ===
+  await cols.guideReviews.createIndex({ id: 1 }, { unique: true });
+  await cols.guideReviews.createIndex({ userId: 1 });
+  await cols.guideReviews.createIndex({ pageId: 1, createdAt: -1 });
+  await cols.guideReviews.createIndex({ createdAt: -1 });
 }

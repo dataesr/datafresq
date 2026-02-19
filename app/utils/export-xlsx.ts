@@ -64,9 +64,7 @@ export function exportToXlsx<T>({
 }: ExportOptions<T>): void {
   const worksheetData = [
     columns.map((c) => c.header),
-    ...data.map((row) =>
-      columns.map((column) => formatCellForExport(getCellValue(row, column)))
-    ),
+    ...data.map((row) => columns.map((column) => formatCellForExport(getCellValue(row, column)))),
   ];
 
   const worksheet = XLSX.utils.aoa_to_sheet(worksheetData);

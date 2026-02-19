@@ -35,7 +35,7 @@ export function ExportButton({
         'fr-btn--tertiary-no-outline',
         'fr-btn--icon-left',
         isExporting ? 'fr-icon-refresh-line' : 'fr-icon-download-line',
-        { 'fr-icon--spin': isExporting }
+        { 'fr-icon--spin': isExporting },
       )}
       onClick={handleClick}
       disabled={disabled || isExporting}

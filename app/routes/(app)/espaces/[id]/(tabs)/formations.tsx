@@ -8,7 +8,12 @@ import {
 } from '@tanstack/react-table';
 import { Activity, useCallback, useMemo, useState } from 'react';
 import { Link, useParams } from 'react-router';
-import { useRemovePrograms, useWorkspace, useWorkspacePermissions, useWorkspacePrograms } from '@/api/workspaces';
+import {
+  useRemovePrograms,
+  useWorkspace,
+  useWorkspacePermissions,
+  useWorkspacePrograms,
+} from '@/api/workspaces';
 import {
   ColumnVisibilityToggle,
   createDefaultColumnVisibility,
@@ -89,7 +94,7 @@ const EXPORT_COLUMNS: ExportColumn<ExportRow>[] = [
 function programToExportRow(
   program: ProgramLight,
   workspaceName: string,
-  exportDate: string
+  exportDate: string,
 ): ExportRow {
   const firstEtab = program.etablissements?.[0];
   return {
@@ -155,26 +160,23 @@ export default function Formations() {
         ? 'Formation retirée avec succès'
         : `${selectedPrograms.length} formations retirées avec succès`;
 
-    toast.promise(
-      removePrograms.mutateAsync({ workspaceId, programIds: selectedPrograms }),
-      {
-        loading: { title: 'Suppression en cours...' },
-        success: {
-          title: message,
-        },
-        error: (err) => ({
-          title: 'Erreur',
-          description: getErrorMessage(err),
-        }),
+    toast.promise(removePrograms.mutateAsync({ workspaceId, programIds: selectedPrograms }), {
+      loading: { title: 'Suppression en cours...' },
+      success: {
+        title: message,
       },
-    );
+      error: (err) => ({
+        title: 'Erreur',
+        description: getErrorMessage(err),
+      }),
+    });
     setRowSelection({});
   };
 
   const handleExport = useCallback(() => {
     const exportDate = new Date().toISOString().slice(0, 10);
     const exportData = programs.map((program) =>
-      programToExportRow(program, workspace.name, exportDate)
+      programToExportRow(program, workspace.name, exportDate),
     );
 
     const filename = `${toSnakeCase(workspace.name)}_formations.xlsx`;

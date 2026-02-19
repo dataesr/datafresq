@@ -1,4 +1,4 @@
-import { createContext, useCallback, useContext, useEffect, useState, type ReactNode } from 'react';
+import { createContext, type ReactNode, useCallback, useContext, useEffect, useState } from 'react';
 import type { ReadWorkspace } from '~/schemas/workspaces';
 
 const STORAGE_KEY = 'datafresq:activeWorkspaceId';
@@ -26,7 +26,7 @@ export function ActiveWorkspaceProvider({ children, workspaces }: ActiveWorkspac
   const [isLoading, setIsLoading] = useState(true);
 
   const activeWorkspace = activeWorkspaceId
-    ? workspaces.find((ws) => ws.id === activeWorkspaceId) ?? null
+    ? (workspaces.find((ws) => ws.id === activeWorkspaceId) ?? null)
     : null;
 
   useEffect(() => {

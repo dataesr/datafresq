@@ -132,9 +132,7 @@ export default function Faq() {
         </FaqItem>
 
         <FaqItem id="recherche-operateurs" question="Quels opérateurs puis-je utiliser ?">
-          <p>
-            Vous pouvez combiner des opérateurs pour affiner vos résultats :
-          </p>
+          <p>Vous pouvez combiner des opérateurs pour affiner vos résultats :</p>
           <div className="fr-table fr-mt-2w">
             <table>
               <thead>
@@ -146,39 +144,67 @@ export default function Faq() {
               </thead>
               <tbody>
                 <tr>
-                  <td><code>&&</code></td>
+                  <td>
+                    <code>&&</code>
+                  </td>
                   <td>Les deux termes doivent être présents</td>
-                  <td><code>nucléaire && énergie</code></td>
+                  <td>
+                    <code>nucléaire && énergie</code>
+                  </td>
                 </tr>
                 <tr>
-                  <td><code>||</code></td>
+                  <td>
+                    <code>||</code>
+                  </td>
                   <td>Au moins un des termes (comportement par défaut)</td>
-                  <td><code>physique || chimie</code></td>
+                  <td>
+                    <code>physique || chimie</code>
+                  </td>
                 </tr>
                 <tr>
-                  <td><code>!</code> ou <code>-</code></td>
+                  <td>
+                    <code>!</code> ou <code>-</code>
+                  </td>
                   <td>Exclure un terme</td>
-                  <td><code>nucléaire !médecine</code></td>
+                  <td>
+                    <code>nucléaire !médecine</code>
+                  </td>
                 </tr>
                 <tr>
-                  <td><code>"..."</code></td>
+                  <td>
+                    <code>"..."</code>
+                  </td>
                   <td>Expression exacte</td>
-                  <td><code>"intelligence artificielle"</code></td>
+                  <td>
+                    <code>"intelligence artificielle"</code>
+                  </td>
                 </tr>
                 <tr>
-                  <td><code>*</code></td>
+                  <td>
+                    <code>*</code>
+                  </td>
                   <td>Joker (remplace plusieurs caractères)</td>
-                  <td><code>inform*</code></td>
+                  <td>
+                    <code>inform*</code>
+                  </td>
                 </tr>
                 <tr>
-                  <td><code>?</code></td>
+                  <td>
+                    <code>?</code>
+                  </td>
                   <td>Joker (remplace un seul caractère)</td>
-                  <td><code>chimi?</code></td>
+                  <td>
+                    <code>chimi?</code>
+                  </td>
                 </tr>
                 <tr>
-                  <td><code>( )</code></td>
+                  <td>
+                    <code>( )</code>
+                  </td>
                   <td>Grouper des conditions</td>
-                  <td><code>(physique || chimie) && !médecine</code></td>
+                  <td>
+                    <code>(physique || chimie) && !médecine</code>
+                  </td>
                 </tr>
               </tbody>
             </table>
@@ -188,25 +214,29 @@ export default function Faq() {
         <FaqItem id="recherche-exemples" question="Quelques exemples de recherches">
           <ul className="fr-mt-1w">
             <li>
-              <code>nucléaire && énergie</code> — formations contenant à la fois "nucléaire" et "énergie"
+              <code>nucléaire && énergie</code> — formations contenant à la fois "nucléaire" et
+              "énergie"
             </li>
             <li>
               <code>"sciences politiques"</code> — l'expression exacte "sciences politiques"
             </li>
             <li>
-              <code>informatique !réseau</code> — formations en informatique, en excluant celles liées aux réseaux
+              <code>informatique !réseau</code> — formations en informatique, en excluant celles
+              liées aux réseaux
             </li>
             <li>
-              <code>(droit || juridique) && européen</code> — formations en droit ou juridique, avec une dimension européenne
+              <code>(droit || juridique) && européen</code> — formations en droit ou juridique, avec
+              une dimension européenne
             </li>
             <li>
-              <code>bio*</code> — formations dont un terme commence par "bio" (biologie, biotechnologie, bioéthique…)
+              <code>bio*</code> — formations dont un terme commence par "bio" (biologie,
+              biotechnologie, bioéthique…)
             </li>
           </ul>
           <div className="fr-callout fr-callout--brown-caramel fr-mt-2w">
             <p className="fr-callout__text">
-              <strong>Astuce :</strong> les guillemets sont très utiles pour rechercher un intitulé précis. Sans guillemets,
-              chaque mot est recherché indépendamment.
+              <strong>Astuce :</strong> les guillemets sont très utiles pour rechercher un intitulé
+              précis. Sans guillemets, chaque mot est recherché indépendamment.
             </p>
           </div>
         </FaqItem>
@@ -572,16 +602,16 @@ export default function Faq() {
           <p>Deux méthodes sont disponibles :</p>
           <ul className="fr-mt-1w">
             <li>
-              <strong>Depuis le menu latéral</strong> : cliquez sur le bouton{' '}
-              <strong>+</strong> à côté de « Mes espaces », ou rendez-vous sur la page{' '}
-              <Link to="/espaces">Espaces</Link> et cliquez sur « Créer un espace ».
+              <strong>Depuis le menu latéral</strong> : cliquez sur le bouton <strong>+</strong> à
+              côté de « Mes espaces », ou rendez-vous sur la page <Link to="/espaces">Espaces</Link>{' '}
+              et cliquez sur « Créer un espace ».
             </li>
             <li>
-              <strong>Depuis les résultats de recherche</strong> : lorsque vous n'avez pas
-              d'espace actif, le bouton <strong>« Nouvel espace »</strong> apparaît au-dessus du
-              tableau de résultats. En cliquant dessus, vous voyez un récapitulatif du nombre de
-              formations concernées, puis le lien <strong>« Créer un espace »</strong> vous
-              redirige vers le formulaire de création pré-rempli avec votre recherche.
+              <strong>Depuis les résultats de recherche</strong> : lorsque vous n'avez pas d'espace
+              actif, le bouton <strong>« Nouvel espace »</strong> apparaît au-dessus du tableau de
+              résultats. En cliquant dessus, vous voyez un récapitulatif du nombre de formations
+              concernées, puis le lien <strong>« Créer un espace »</strong> vous redirige vers le
+              formulaire de création pré-rempli avec votre recherche.
             </li>
           </ul>
           <p className="fr-mt-2w">
@@ -609,8 +639,8 @@ export default function Faq() {
           <ul className="fr-mt-1w">
             <li>
               Cliquez sur le bouton de sélection{' '}
-              <span className="fr-icon-arrow-left-right-fill fr-icon--sm" aria-hidden="true" />{' '}
-              dans la section « Espace actif » du menu latéral
+              <span className="fr-icon-arrow-left-right-fill fr-icon--sm" aria-hidden="true" /> dans
+              la section « Espace actif » du menu latéral
             </li>
             <li>
               Ou cliquez sur <strong>« Espace existant »</strong> dans le menu{' '}
@@ -643,9 +673,9 @@ export default function Faq() {
             </li>
           </ul>
           <p className="fr-mt-2w">
-            Avant l'ajout, un récapitulatif vous indique le nombre total de formations, combien
-            sont déjà présentes dans l'espace (elles seront ignorées) et combien seront
-            effectivement ajoutées.
+            Avant l'ajout, un récapitulatif vous indique le nombre total de formations, combien sont
+            déjà présentes dans l'espace (elles seront ignorées) et combien seront effectivement
+            ajoutées.
           </p>
           <div className="fr-callout fr-callout--brown-caramel fr-mt-2w">
             <p className="fr-callout__text">

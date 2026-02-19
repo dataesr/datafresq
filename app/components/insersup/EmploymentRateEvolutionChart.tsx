@@ -53,8 +53,9 @@ export function EmploymentRateEvolutionChart({ sortedByYear }: EmploymentRateEvo
       source="insersup"
       tooltip={
         <span>
-          Taux d'emploi salarié calculé pour chaque promotion de diplômés, permettant la comparaison inter-cohortes.
-          {' '}<Link to="/guide/indicateurs/emploi">En savoir plus</Link> sur le calcul des taux d'emploi.
+          Taux d'emploi salarié calculé pour chaque promotion de diplômés, permettant la comparaison
+          inter-cohortes. <Link to="/guide/indicateurs/emploi">En savoir plus</Link> sur le calcul
+          des taux d'emploi.
         </span>
       }
       noData={!hasData ? { message: noDataMessage } : undefined}

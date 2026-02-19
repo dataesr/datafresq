@@ -58,11 +58,19 @@ export function SalaryByGenderChart({ yearData, year }: SalaryByGenderChartProps
       source="insersup"
       tooltip={
         <span>
-          Salaire net mensuel médian calculé séparément pour les femmes et les hommes de la promotion.
-          {' '}<Link to="/guide/indicateurs/salaires">En savoir plus</Link> sur le calcul des salaires.
+          Salaire net mensuel médian calculé séparément pour les femmes et les hommes de la
+          promotion. <Link to="/guide/indicateurs/salaires">En savoir plus</Link> sur le calcul des
+          salaires.
         </span>
       }
-      noData={!hasData ? { message: 'Données insuffisantes pour comparer les salaires par genre.', icon: 'fr-icon-money-euro-circle-line' } : undefined}
+      noData={
+        !hasData
+          ? {
+              message: 'Données insuffisantes pour comparer les salaires par genre.',
+              icon: 'fr-icon-money-euro-circle-line',
+            }
+          : undefined
+      }
     >
       <Chart ref={chartRef}>
         <Credits enabled={false} />

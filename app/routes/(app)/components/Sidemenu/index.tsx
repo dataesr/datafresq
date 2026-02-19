@@ -189,8 +189,16 @@ export default function Sidemenu() {
                   'fr-icon-arrow-down-s-line': sharedWorkspacesOpen,
                   'fr-icon-arrow-right-s-line': !sharedWorkspacesOpen,
                 })}
-                title={sharedWorkspacesOpen ? 'Masquer les espaces partagés' : 'Afficher les espaces partagés'}
-                aria-label={sharedWorkspacesOpen ? 'Masquer les espaces partagés' : 'Afficher les espaces partagés'}
+                title={
+                  sharedWorkspacesOpen
+                    ? 'Masquer les espaces partagés'
+                    : 'Afficher les espaces partagés'
+                }
+                aria-label={
+                  sharedWorkspacesOpen
+                    ? 'Masquer les espaces partagés'
+                    : 'Afficher les espaces partagés'
+                }
                 aria-expanded={sharedWorkspacesOpen}
                 onClick={() => setSharedWorkspacesOpen(!sharedWorkspacesOpen)}
               />

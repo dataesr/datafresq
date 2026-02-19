@@ -29,7 +29,9 @@ export const institutionSearchSchema = t.Object({
 export const institutionSearchParamsSchema = t.Object({
   q: t.Optional(t.String({ description: 'Search query (searches on autocompleted field)' })),
   page: t.Optional(t.Numeric({ default: 1, description: 'Page number' })),
-  pageSize: t.Optional(t.Numeric({ default: 20, description: 'Number of results per page', maximum: 100 })),
+  pageSize: t.Optional(
+    t.Numeric({ default: 20, description: 'Number of results per page', maximum: 100 }),
+  ),
 });
 
 export const institutionSearchResponseSchema = t.Object({

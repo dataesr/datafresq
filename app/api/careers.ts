@@ -1,6 +1,7 @@
 import { useQuery } from '@tanstack/react-query';
 import { useMemo } from 'react';
 import { APIError, api } from '@/api/eden-treaty';
+import type { CareerSearchParams } from '~/schemas/careers';
 
 // =============================================================================
 // QUERY KEYS
@@ -9,23 +10,6 @@ import { APIError, api } from '@/api/eden-treaty';
 const queryKeys = {
   search: (queryParams: CareerSearchParams) => ['careers', 'search', queryParams] as const,
 };
-
-// =============================================================================
-// TYPES
-// =============================================================================
-
-export interface CareerSearchParams {
-  q?: string;
-  page?: number;
-  pageSize?: number;
-}
-
-export interface Career {
-  codeRome: string;
-  label: string;
-  level1?: string;
-  level2?: string;
-}
 
 // =============================================================================
 // API FUNCTIONS
@@ -63,7 +47,7 @@ export function useCareersSearch(
     staleTime: 30 * 1000,
   });
 
-  const careers: Career[] = data?.careers ?? [];
+  const careers = data?.careers ?? [];
   const totalCount = data?.totalCount ?? 0;
 
   const careerOptions = useMemo(() => {

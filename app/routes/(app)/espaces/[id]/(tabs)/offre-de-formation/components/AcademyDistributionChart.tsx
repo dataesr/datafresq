@@ -65,8 +65,8 @@ export function AcademyDistributionChart({
       source="fresq"
       tooltip={
         <span>
-          Nombre de formations comptées par académie d'implantation.
-          {' '}<Link to="/guide/donnees/fresq">En savoir plus</Link> sur les données Fresq.
+          Nombre de formations comptées par académie d'implantation.{' '}
+          <Link to="/guide/donnees/fresq">En savoir plus</Link> sur les données Fresq.
         </span>
       }
     >

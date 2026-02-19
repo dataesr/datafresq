@@ -1,7 +1,6 @@
 // Components
 
 export { ColumnVisibilityToggle } from './ColumnVisibilityToggle';
-export { ExportButton, type ExportButtonProps } from './ExportButton';
 // Column definitions - Programs
 export {
   createDefaultColumnVisibility,
@@ -22,6 +21,7 @@ export {
   USER_COLUMN_LABELS,
   type UserColumnId,
 } from './columns/userColumns';
+export { ExportButton, type ExportButtonProps } from './ExportButton';
 // Hooks
 export { useCollapseMenu } from './hooks/useCollapseMenu';
 export { useMenuKeyboardNavigation } from './hooks/useMenuKeyboardNavigation';

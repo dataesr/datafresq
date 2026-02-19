@@ -488,7 +488,7 @@ function buildExportColumns(): ExportColumn<ExportRow>[] {
         header: `Emploi stable ${monthLabel} (%)`,
         accessor: (row) =>
           row.emploiStable[month].rate !== null ? `${row.emploiStable[month].rate}%` : '',
-      }
+      },
     );
   }
 
@@ -552,10 +552,7 @@ export function ProgramsTable({ yearData }: ProgramsTableProps) {
             }}
           />
           <MonthVisibilityToggle visibleMonths={visibleMonths} onToggleMonth={handleToggleMonth} />
-          <ExportButton
-            onExport={handleExport}
-            disabled={programTableData.length === 0}
-          />
+          <ExportButton onExport={handleExport} disabled={programTableData.length === 0} />
         </div>
       </div>
       <div

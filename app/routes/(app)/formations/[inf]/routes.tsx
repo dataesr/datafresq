@@ -1,6 +1,8 @@
+import { lazy } from 'react';
 import { Route } from 'react-router';
-import FormationPage from './(tabs)';
 import RedirectToInformations from './index';
+
+const FormationPage = lazy(() => import('./(tabs)'));
 
 export const formationRoutes = (
   <Route path=":inf">

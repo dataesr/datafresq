@@ -1,5 +1,5 @@
 import type { HighchartsReactRefObject } from '@highcharts/react';
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 
 interface ChartWithExporting {
   exportChart: (options?: { type?: string }, chartOptions?: object) => void;
@@ -46,15 +46,18 @@ export function useChartOptions({ chartRef, hideMenu, title, description }: UseC
       chart.setSubtitle({ text: description, style: { display: 'none' } });
   }, [enabled, chartRef, title, description]);
 
-  const switchView = useCallback((next: View) => {
-    if (next === 'table' && chartRef) {
-      const chart = getChartWithExporting(chartRef);
-      if (chart) {
-        setTableHtml(formatTable(chart.getTable()));
+  const switchView = useCallback(
+    (next: View) => {
+      if (next === 'table' && chartRef) {
+        const chart = getChartWithExporting(chartRef);
+        if (chart) {
+          setTableHtml(formatTable(chart.getTable()));
+        }
       }
-    }
-    setView(next);
-  }, [chartRef]);
+      setView(next);
+    },
+    [chartRef],
+  );
 
   if (!enabled) {
     return { enabled: false as const } as const;

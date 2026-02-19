@@ -5,6 +5,7 @@ import ErrorBoundary from '@/components/errors/ErrorBoundary';
 import Footer from '@/components/Footer';
 import { Header } from '@/components/Header';
 import FullPageLoader from '@/components/loaders/FullPageLoader';
+import PageContentLoader from '@/components/loaders/PageContentLoader';
 import { ActiveWorkspaceProvider } from '@/contexts/ActiveWorkspaceContext';
 import Sidemenu from './components/Sidemenu';
 import './styles.css';
@@ -32,7 +33,9 @@ function AppLayoutContent() {
               </div>
               <div className="fx-col-content">
                 <div className="fr-container">
-                  <Outlet />
+                  <Suspense fallback={<PageContentLoader />}>
+                    <Outlet />
+                  </Suspense>
                 </div>
               </div>
             </div>

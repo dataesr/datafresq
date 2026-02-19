@@ -1,12 +1,6 @@
-/**
- * Password Utility
- *
- * Uses Bun's built-in password hashing
- */
-
 export async function hashPassword(password: string): Promise<string> {
   return await Bun.password.hash(password, {
-    algorithm: "argon2id",
+    algorithm: 'argon2id',
     memoryCost: 65536,
     timeCost: 3,
   });

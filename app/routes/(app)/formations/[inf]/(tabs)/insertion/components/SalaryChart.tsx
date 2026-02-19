@@ -70,11 +70,19 @@ export function SalaryChart({ yearData, year }: SalaryChartProps) {
       source="insersup"
       tooltip={
         <span>
-          Quartiles du salaire net mensuel calculés sur les diplômés en emploi salarié à chaque échéance.
-          {' '}<Link to="/guide/indicateurs/salaires">En savoir plus</Link> sur le calcul des salaires.
+          Quartiles du salaire net mensuel calculés sur les diplômés en emploi salarié à chaque
+          échéance. <Link to="/guide/indicateurs/salaires">En savoir plus</Link> sur le calcul des
+          salaires.
         </span>
       }
-      noData={!hasData ? { message: 'Données de salaire insuffisantes pour cette promotion.', icon: 'fr-icon-money-euro-circle-line' } : undefined}
+      noData={
+        !hasData
+          ? {
+              message: 'Données de salaire insuffisantes pour cette promotion.',
+              icon: 'fr-icon-money-euro-circle-line',
+            }
+          : undefined
+      }
     >
       <Chart ref={chartRef}>
         <Credits enabled={false} />

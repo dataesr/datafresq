@@ -97,11 +97,19 @@ export function SalaryEvolutionChart({ sortedByYear }: SalaryEvolutionChartProps
       source="insersup"
       tooltip={
         <span>
-          Salaire net mensuel calculé pour chaque promotion, permettant la comparaison inter-cohortes.
-          {' '}<Link to="/guide/indicateurs/salaires">En savoir plus</Link> sur le calcul des salaires.
+          Salaire net mensuel calculé pour chaque promotion, permettant la comparaison
+          inter-cohortes. <Link to="/guide/indicateurs/salaires">En savoir plus</Link> sur le calcul
+          des salaires.
         </span>
       }
-      noData={!hasData ? { message: "Aucune donnée de salaire disponible pour afficher l'évolution.", icon: 'fr-icon-money-euro-circle-line' } : undefined}
+      noData={
+        !hasData
+          ? {
+              message: "Aucune donnée de salaire disponible pour afficher l'évolution.",
+              icon: 'fr-icon-money-euro-circle-line',
+            }
+          : undefined
+      }
     >
       {/* Internal metric selector */}
       <div className="fr-mb-2w">
@@ -143,9 +151,7 @@ export function SalaryEvolutionChart({ sortedByYear }: SalaryEvolutionChartProps
             data={promo[selectedMetric]}
             options={{
               name: `Promo ${promo.promo}`,
-              color: getChartColor(
-                COHORT_COLORS[index % COHORT_COLORS.length] || 'green-archipel',
-              ),
+              color: getChartColor(COHORT_COLORS[index % COHORT_COLORS.length] || 'green-archipel'),
               marker: { enabled: true },
             }}
           />

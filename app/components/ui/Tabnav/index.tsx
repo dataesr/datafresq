@@ -71,9 +71,7 @@ export function Tabnav({
             {currentLabel}
           </button>
         </div>
-        <ul className={cn('tabnav__list', { 'tabnav__list--open': isExpanded })}>
-          {children}
-        </ul>
+        <ul className={cn('tabnav__list', { 'tabnav__list--open': isExpanded })}>{children}</ul>
       </nav>
     </TabnavContext.Provider>
   );
@@ -100,12 +98,7 @@ export function TabnavItem({ to, children, icon, iconActive, grow, active, disab
           aria-disabled="true"
           title="Bientôt disponible"
         >
-          {icon && (
-            <span
-              className={cn('fr-icon--sm fr-mr-1w', icon)}
-              aria-hidden="true"
-            />
-          )}
+          {icon && <span className={cn('fr-icon--sm fr-mr-1w', icon)} aria-hidden="true" />}
           {children}
         </span>
       ) : (

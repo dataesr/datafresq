@@ -1,6 +1,8 @@
+import { lazy } from 'react';
 import { Route } from 'react-router';
-import Espace from './(tabs)';
 import RedirectToFormations from './index';
+
+const Espace = lazy(() => import('./(tabs)'));
 
 export const espacesIdRoutes = (
   <Route path=":id">

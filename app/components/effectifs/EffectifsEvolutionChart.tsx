@@ -55,8 +55,8 @@ export function EffectifsEvolutionChart(props: EffectifsEvolutionChartProps) {
       source="sise"
       tooltip={
         <span>
-          Somme des étudiants inscrits pour chaque rentrée universitaire, avec ventilation par sexe.
-          {' '}<Link to="/guide/indicateurs/effectifs">En savoir plus</Link> sur le calcul des effectifs.
+          Somme des étudiants inscrits pour chaque rentrée universitaire, avec ventilation par sexe.{' '}
+          <Link to="/guide/indicateurs/effectifs">En savoir plus</Link> sur le calcul des effectifs.
         </span>
       }
     >

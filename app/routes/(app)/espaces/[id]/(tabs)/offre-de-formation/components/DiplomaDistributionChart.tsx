@@ -68,8 +68,8 @@ export function DiplomaDistributionChart({
       source="fresq"
       tooltip={
         <span>
-          Nombre de formations regroupées par type de diplôme.
-          {' '}<Link to="/guide/donnees/fresq">En savoir plus</Link> sur les données Fresq.
+          Nombre de formations regroupées par type de diplôme.{' '}
+          <Link to="/guide/donnees/fresq">En savoir plus</Link> sur les données Fresq.
         </span>
       }
     >

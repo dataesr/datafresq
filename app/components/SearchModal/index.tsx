@@ -67,11 +67,7 @@ function SearchModalRoot({
                 )}
               </div>
 
-              <div
-                className="search-modal__listbox"
-                role="listbox"
-                id={listboxId}
-              >
+              <div className="search-modal__listbox" role="listbox" id={listboxId}>
                 {children}
               </div>
             </div>
@@ -95,21 +91,19 @@ interface ItemProps {
   children: ReactNode;
 }
 
-const Item = forwardRef<HTMLButtonElement, ItemProps>(
-  ({ id, focused, onClick, children }, ref) => (
-    <button
-      ref={ref}
-      role="option"
-      type="button"
-      id={id}
-      className="fr-px-2w fr-py-1w search-modal__item"
-      aria-selected={focused}
-      onClick={onClick}
-    >
-      {children}
-    </button>
-  ),
-);
+const Item = forwardRef<HTMLButtonElement, ItemProps>(({ id, focused, onClick, children }, ref) => (
+  <button
+    ref={ref}
+    role="option"
+    type="button"
+    id={id}
+    className="fr-px-2w fr-py-1w search-modal__item"
+    aria-selected={focused}
+    onClick={onClick}
+  >
+    {children}
+  </button>
+));
 
 Item.displayName = 'SearchModal.Item';
 

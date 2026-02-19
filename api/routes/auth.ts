@@ -1,142 +1,85 @@
 import { Elysia } from 'elysia';
-import { config } from '~/config';
-
-import { collections } from '~/database/mongo';
-import {
-  AccountInactiveError,
-  InvalidCredentialsError,
-  InvalidSessionError,
-  InvalidTokenError,
-  JWTFailedError,
-  MailerFailedError,
-} from '~/errors';
-import { sendPasswordResetEmail } from '~/external/email';
+import { InvalidSessionError, JWTFailedError } from '~/errors';
+import { authMacro } from '~/macros/authMacro';
 import { rateLimitMacro } from '~/macros/rateLimitMacro';
 import { clientInfoPlugin } from '~/plugins/client-info';
 import { cookiesPlugin } from '~/plugins/cookies';
 import { jwtAccessToken } from '~/plugins/jwt';
 import {
-  authCookieSchema,
   forgotPasswordSchema,
+  optionalAuthCookieSchema,
+  registerSchema,
   resetPasswordSchema,
   signinSchema,
 } from '~/schemas/auth';
 import { errorResponseSchema, successResponseSchema } from '~/schemas/common';
-import { generateId } from '~/utils/id';
-import { hashPassword, verifyPassword } from '~/utils/password';
-import { generateSessionInfo, generateTokenWithHash, hashToken } from '~/utils/token';
+import * as authService from '~/services/auth.service';
 
 export const authRoutes = new Elysia({ prefix: '/auth' })
+  .use(authMacro)
   .use(jwtAccessToken)
   .use(clientInfoPlugin)
   .use(cookiesPlugin)
   .use(rateLimitMacro)
+  .guard({
+    allow: 'visitor',
+    detail: { tags: ['Authentification'] },
+    response: { 200: successResponseSchema },
+  })
   .post(
     '/signin',
-    async ({ body, jwtAccessToken, clientInfo: { userAgent, ipAddress }, authCookies }) => {
-      const user = await collections.users.findOne({ email: body.email.toLowerCase() });
-      if (!user) throw new InvalidCredentialsError();
-      if (!user.isActive) throw new AccountInactiveError();
-      if (!user.passwordHash) throw new InvalidCredentialsError();
+    async ({ body, jwtAccessToken, clientInfo, authCookies }) => {
+      const { accessTokenPayload, sessionToken } = await authService.signin(
+        body.email,
+        body.password,
+        clientInfo,
+      );
 
-      const isPasswordValid = await verifyPassword(body.password, user.passwordHash);
-      if (!isPasswordValid) throw new InvalidCredentialsError();
-
-      const payload = { sub: user.id, email: user.email, role: user.role };
-      const accessToken = await jwtAccessToken.sign(payload);
-      const { sessionToken, ...sessionInfo } = generateSessionInfo();
-
-      await collections.sessions.insertOne({
-        id: generateId(),
-        userId: user.id,
-        userAgent,
-        ipAddress,
-        createdAt: new Date(),
-        lastRefreshedAt: new Date(),
-        ...sessionInfo,
-      });
-
-      await collections.users.updateOne({ id: user.id }, { $set: { lastLogin: new Date() } });
-
+      const accessToken = await jwtAccessToken.sign(accessTokenPayload);
       authCookies.set(accessToken, sessionToken);
 
-      return {
-        success: true,
-        message: 'Connexion réussie',
-      };
+      return { success: true, message: 'Connexion réussie' };
     },
     {
       body: signinSchema,
       response: {
-        200: successResponseSchema,
         401: errorResponseSchema,
         403: errorResponseSchema,
-        422: errorResponseSchema,
         429: errorResponseSchema,
       },
       detail: {
-        summary: 'Connexion utilisateur',
-        description: 'Authentifier un utilisateur avec son email et mot de passe',
-        tags: ['Authentification'],
+        summary: 'Se connecter',
+        description:
+          'Authentifie un utilisateur avec son email et ' +
+          'mot de passe. En cas de succès, crée une ' +
+          "session et positionne les cookies d'accès " +
+          '(`fqv_token`) et de session (`fqv_session`). ' +
+          'Limité à 5 tentatives par minute.',
       },
       rateLimit: {
         maxRequests: 5,
         windowSeconds: 60,
         key: 'signin',
-        message: 'Trop de tentatives de connexion. Veuillez réessayer dans quelques instants.',
+        message: 'Trop de tentatives de connexion. ' + 'Veuillez réessayer dans quelques instants.',
       },
     },
   )
   .post(
     '/session/refresh',
-    async ({ jwtAccessToken, clientInfo: { userAgent, ipAddress }, authCookies }) => {
+    async ({ jwtAccessToken, clientInfo, authCookies }) => {
       const { session: currentSessionToken } = authCookies.get();
       if (!currentSessionToken) {
         authCookies.clear();
-        throw new InvalidSessionError('Missing session token');
+        throw new InvalidSessionError('Jeton de session manquant');
       }
 
-      const currentSessionTokenHash = hashToken(currentSessionToken);
-
-      const session = await collections.sessions.findOne({
-        sessionTokenHash: currentSessionTokenHash,
-      });
-
-      if (!session) {
-        authCookies.clear();
-        throw new InvalidSessionError('Invalid or expired session');
-      }
-
-      if (session.expiresAt < new Date()) {
-        authCookies.clear();
-        console.warn('Session expired within mongo TTL delay');
-        throw new InvalidSessionError('Session expired');
-      }
-
-      const user = await collections.users.findOne({ id: session.userId });
-      if (!user || !user.isActive) {
-        authCookies.clear();
-        await collections.sessions.deleteOne({ id: session.id });
-        throw new InvalidSessionError('Utilisateur invalide');
-      }
-
-      const payload = { sub: user.id, email: user.email, role: user.role };
-      const accessToken = await jwtAccessToken.sign(payload);
-      if (!accessToken) throw new JWTFailedError();
-
-      const { sessionToken, ...sessionInfo } = generateSessionInfo();
-
-      await collections.sessions.updateOne(
-        { id: session.id, userId: user.id },
-        {
-          $set: {
-            userAgent,
-            ipAddress,
-            lastRefreshedAt: new Date(),
-            ...sessionInfo,
-          },
-        },
+      const { accessTokenPayload, sessionToken } = await authService.refreshSession(
+        currentSessionToken,
+        clientInfo,
       );
+
+      const accessToken = await jwtAccessToken.sign(accessTokenPayload);
+      if (!accessToken) throw new JWTFailedError();
 
       authCookies.set(accessToken, sessionToken);
 
@@ -147,20 +90,25 @@ export const authRoutes = new Elysia({ prefix: '/auth' })
     },
     {
       response: {
-        200: successResponseSchema,
         401: errorResponseSchema,
+        429: errorResponseSchema,
       },
       detail: {
         summary: "Renouveler le token d'accès",
         description:
-          "Obtenir un nouveau token d'accès en utilisant le token de session (avec rotation)",
-        tags: ['Authentification'],
+          "Génère un nouveau token d'accès à partir du " +
+          'cookie de session. Le token de session subit ' +
+          'une rotation à chaque appel pour limiter les ' +
+          'risques de réutilisation. Limité à 10 appels ' +
+          'par minute.',
       },
       rateLimit: {
         maxRequests: 10,
         windowSeconds: 60,
         key: 'session-refresh',
-        message: "Trop de tentatives de renouvellement de session. Veuillez réessayer dans quelques minutes.",
+        message:
+          'Trop de tentatives de renouvellement de session. ' +
+          'Veuillez réessayer dans quelques minutes.',
       },
     },
   )
@@ -168,138 +116,61 @@ export const authRoutes = new Elysia({ prefix: '/auth' })
     '/signout',
     async ({ authCookies }) => {
       const { session } = authCookies.get();
-
-      if (session) {
-        const tokenHash = hashToken(session);
-        await collections.sessions.deleteOne({ sessionTokenHash: tokenHash });
-      }
-
+      await authService.signout(session);
       authCookies.clear();
 
-      return {
-        success: true,
-        message: 'Déconnexion réussie',
-      };
+      return { success: true, message: 'Déconnexion réussie' };
     },
     {
-      response: {
-        200: successResponseSchema,
-        422: errorResponseSchema,
-      },
       detail: {
-        summary: 'Déconnexion utilisateur',
-        description: 'Révoquer la session et supprimer les cookies',
-        tags: ['Authentification'],
+        summary: 'Se déconnecter',
+        description:
+          'Révoque la session courante côté serveur et ' +
+          "supprime les cookies d'authentification du " +
+          'navigateur. Les autres sessions actives ne ' +
+          'sont pas affectées.',
       },
-      cookie: authCookieSchema,
+      cookie: optionalAuthCookieSchema,
     },
   )
   .post(
-    '/mot-de-passe-oublie',
+    '/forgot-password',
     async ({ body, request }) => {
-      const user = await collections.users.findOne({ email: body.email.toLowerCase() });
-      if (!user) {
-        return {
-          success: true,
-          message: 'Si cet email existe, un lien de réinitialisation a été envoyé',
-        };
-      }
-
-      const { token, tokenHash } = generateTokenWithHash();
-
-      const expiresAt = new Date(Date.now() + config.tokens.resetPasswordExpSeconds * 1000);
-      const tokenInput = {
-        id: generateId(),
-        userId: user.id,
-        type: 'reset-password' as const,
-        tokenHash,
-        createdAt: new Date(),
-        expiresAt,
-        used: false,
-        usedAt: null,
-      };
-
-      await collections.tokens.insertOne(tokenInput);
-
-      const url = new URL(request.url);
-      url.pathname = '/auth/reinitialiser-mot-de-passe';
-      url.searchParams.set('token', token);
-
-      const emailResponse = await sendPasswordResetEmail(body.email, url.toString());
-
-      if (!emailResponse.ok) {
-        console.error('Failed to send reset password email:', await emailResponse.text());
-        throw new MailerFailedError();
-      }
+      await authService.forgotPassword(body.email, request.url);
 
       return {
         success: true,
-        message: 'Si cet email existe, un lien de réinitialisation a été envoyé',
+        message: 'Si cet email existe, un lien de ' + 'réinitialisation a été envoyé',
       };
     },
     {
       body: forgotPasswordSchema,
       response: {
-        200: successResponseSchema,
-        422: errorResponseSchema,
         429: errorResponseSchema,
       },
       detail: {
         summary: 'Mot de passe oublié',
-        description: "Envoyer un token de réinitialisation à l'email de l'utilisateur",
-        tags: ['Authentification'],
+        description:
+          'Envoie un email contenant un lien de ' +
+          'réinitialisation de mot de passe. Le token ' +
+          'est valide pendant 1 heure. Par sécurité, ' +
+          "la réponse est identique que l'email existe " +
+          'ou non. Limité à 3 demandes toutes les ' +
+          '5 minutes.',
       },
       rateLimit: {
         maxRequests: 3,
         windowSeconds: 300,
         key: 'forgot-password',
-        message: 'Trop de demandes de réinitialisation. Veuillez réessayer dans quelques minutes.',
+        message:
+          'Trop de demandes de réinitialisation. ' + 'Veuillez réessayer dans quelques minutes.',
       },
     },
   )
   .post(
-    '/reinitialiser-mot-de-passe',
+    '/reset-password',
     async ({ body }) => {
-      const tokenHash = hashToken(body.token);
-
-      const tokenDoc = await collections.tokens.findOne({
-        tokenHash,
-        type: 'reset-password',
-        used: false,
-      });
-
-      if (!tokenDoc) {
-        throw new InvalidTokenError('Token invalide ou expiré');
-      }
-
-      if (tokenDoc.expiresAt < new Date()) {
-        throw new InvalidTokenError('Token expiré');
-      }
-
-      const passwordHash = await hashPassword(body.password);
-
-      await collections.users.updateOne(
-        { id: tokenDoc.userId },
-        {
-          $set: {
-            passwordHash,
-            lastPasswordChange: new Date(),
-            updatedAt: new Date(),
-          },
-        },
-      );
-
-      await collections.tokens.updateOne(
-        { id: tokenDoc.id },
-        {
-          $set: {
-            used: true,
-            usedAt: new Date(),
-          },
-        },
-      );
-
-      await collections.sessions.deleteMany({ userId: tokenDoc.userId });
+      await authService.resetPassword(body.token, body.password);
 
       return {
         success: true,
@@ -309,23 +180,61 @@ export const authRoutes = new Elysia({ prefix: '/auth' })
     {
       body: resetPasswordSchema,
       response: {
-        200: successResponseSchema,
         400: errorResponseSchema,
-        422: errorResponseSchema,
         429: errorResponseSchema,
       },
       detail: {
         summary: 'Réinitialiser le mot de passe',
         description:
-          "Réinitialiser le mot de passe de l'utilisateur avec le token de réinitialisation",
-        tags: ['Authentification'],
+          "Réinitialise le mot de passe à l'aide du " +
+          'token reçu par email. Le token est à usage ' +
+          'unique et expire après 1 heure. Toutes les ' +
+          'sessions existantes sont révoquées après la ' +
+          'réinitialisation.',
       },
       rateLimit: {
         maxRequests: 5,
         windowSeconds: 300,
         key: 'reset-password',
         message:
-          'Trop de tentatives de réinitialisation. Veuillez réessayer dans quelques minutes.',
+          'Trop de tentatives de réinitialisation. ' + 'Veuillez réessayer dans quelques minutes.',
+      },
+    },
+  )
+  .post(
+    '/register',
+    async ({ body }) => {
+      await authService.registerFromInvitation(
+        body.token,
+        body.firstName,
+        body.lastName,
+        body.password,
+      );
+      return {
+        message: 'Compte activé. Vous pouvez vous connecter',
+      };
+    },
+    {
+      body: registerSchema,
+      response: {
+        400: errorResponseSchema,
+        401: errorResponseSchema,
+        429: errorResponseSchema,
+      },
+      detail: {
+        summary: "Finaliser l'inscription",
+        description:
+          'Active un compte utilisateur en définissant le ' +
+          'mot de passe, le prénom et le nom à partir du ' +
+          "token d'invitation reçu par email. Le token " +
+          'est à usage unique et doit être valide. ' +
+          'Limité à 5 tentatives toutes les 5 minutes.',
+      },
+      rateLimit: {
+        maxRequests: 5,
+        windowSeconds: 300,
+        key: 'register',
+        message: "Trop de tentatives d'inscription. " + 'Veuillez réessayer dans quelques minutes.',
       },
     },
   );

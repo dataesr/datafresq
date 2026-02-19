@@ -1,6 +1,6 @@
 import { Chart, Credits, Legend, Tooltip, XAxis, YAxis } from '@highcharts/react';
 import { Area } from '@highcharts/react/series';
-import { getChartColor, type colorFamily } from '@/components/charts/highcharts/colors';
+import { type colorFamily, getChartColor } from '@/components/charts/highcharts/colors';
 
 type ColorName = (typeof colorFamily)[number];
 

@@ -3,6 +3,18 @@ import { APIError, api } from '@/api/eden-treaty';
 import type { UserRole } from '~/schemas/users';
 
 // =============================================================================
+// API FUNCTIONS (invitations)
+// =============================================================================
+
+async function inviteUser(input: { email: string }) {
+  const { data, error } = await api.admin.invitations.post(input);
+  if (error) {
+    throw new APIError(error);
+  }
+  return data;
+}
+
+// =============================================================================
 // QUERY KEYS
 // =============================================================================
 
@@ -94,5 +106,12 @@ export function useRevokeUserSessions() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: adminQueryKeys.users });
     },
+  });
+}
+
+export function useInviteUser(options?: { onSuccess?: () => void }) {
+  return useMutation({
+    mutationFn: inviteUser,
+    onSuccess: options?.onSuccess,
   });
 }

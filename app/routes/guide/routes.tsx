@@ -1,7 +1,9 @@
+import { lazy } from 'react';
 import { Route } from 'react-router';
-import GuideLayout from './layout';
-import GuideIndex from './index';
-import GuidePage from './components/GuidePage';
+
+const GuideLayout = lazy(() => import('./layout'));
+const GuideIndex = lazy(() => import('./index'));
+const GuidePage = lazy(() => import('./components/GuidePage'));
 
 export const guideRoutes = (
   <Route path="guide" element={<GuideLayout />}>

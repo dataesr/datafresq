@@ -1,161 +1,134 @@
 import { Elysia } from 'elysia';
+import { config } from '~/config';
 
-/**
- * ANSI Color Codes
- */
 const colors = {
   reset: '\x1b[0m',
   bright: '\x1b[1m',
   dim: '\x1b[2m',
 
-  // Methods
-  get: '\x1b[36m', // Cyan
-  post: '\x1b[33m', // Yellow
-  put: '\x1b[35m', // Magenta
-  delete: '\x1b[31m', // Red
-  patch: '\x1b[34m', // Blue
+  get: '\x1b[36m',
+  post: '\x1b[33m',
+  put: '\x1b[35m',
+  delete: '\x1b[31m',
+  patch: '\x1b[34m',
 
-  // Status codes
-  success: '\x1b[32m', // Green (2xx)
-  redirect: '\x1b[36m', // Cyan (3xx)
-  clientError: '\x1b[33m', // Yellow (4xx)
-  serverError: '\x1b[31m', // Red (5xx)
+  success: '\x1b[32m',
+  redirect: '\x1b[36m',
+  clientError: '\x1b[33m',
+  serverError: '\x1b[31m',
 
-  // Timing
-  fast: '\x1b[32m', // Green (< 100ms)
-  medium: '\x1b[33m', // Yellow (100-500ms)
-  slow: '\x1b[31m', // Red (> 500ms)
+  fast: '\x1b[32m',
+  medium: '\x1b[33m',
+  slow: '\x1b[31m',
 
   gray: '\x1b[90m',
   white: '\x1b[37m',
 } as const;
 
-/**
- * Logger Plugin Options
- */
-export interface LoggerOptions {
-  /** Enable logging (default: true in development, false in production) */
-  enabled?: boolean;
-  /** Use colored output (default: true) */
-  colors?: boolean;
-  /** Show timestamp (default: false) */
-  timestamp?: boolean;
-  /** Show query parameters (default: true) */
-  showQuery?: boolean;
-  /** Custom logger function (default: console.log) */
-  log?: (message: string) => void;
-}
-
-/**
- * Get color for HTTP method
- */
 function getMethodColor(method: string): string {
-  const methodColors: Record<string, string> = {
+  const map: Record<string, string> = {
     GET: colors.get,
     POST: colors.post,
     PUT: colors.put,
     DELETE: colors.delete,
     PATCH: colors.patch,
   };
-  return methodColors[method.toUpperCase()] || colors.white;
+  return map[method.toUpperCase()] || colors.white;
 }
 
-/**
- * Get color for status code
- */
-function getStatusColor(status: number | undefined | string): string {
-  if (typeof status === 'string') return colors.white;
-  if (status === undefined) return colors.white;
-  if (status >= 200 && status < 300) return colors.success;
-  if (status >= 300 && status < 400) return colors.redirect;
-  if (status >= 400 && status < 500) return colors.clientError;
+function getStatusColor(status: number): string {
   if (status >= 500) return colors.serverError;
+  if (status >= 400) return colors.clientError;
+  if (status >= 300) return colors.redirect;
+  if (status >= 200) return colors.success;
   return colors.white;
 }
 
-/**
- * Get color for response time
- */
 function getTimingColor(ms: number): string {
   if (ms < 100) return colors.fast;
   if (ms < 500) return colors.medium;
   return colors.slow;
 }
 
-/**
- * Format timing with appropriate unit
- */
 function formatTiming(ms: number): string {
   if (ms < 1) return `${(ms * 1000).toFixed(0)}µs`;
   if (ms < 1000) return `${ms.toFixed(2)}ms`;
   return `${(ms / 1000).toFixed(2)}s`;
 }
 
-/**
- * Request Logger Plugin
- *
- * Logs HTTP requests with colored output and timing information
- *
- * @example
- * ```ts
- * app.use(logger())
- * app.use(logger({ timestamp: true, colors: false }))
- * ```
- */
-export const logger = (options: LoggerOptions = {}) => {
-  const { enabled = true } = options;
+function formatProdLog(
+  time: string,
+  requestId: string,
+  method: string,
+  status: number,
+  duration: string,
+  path: string,
+  query?: string,
+): string {
+  const parts = [
+    `[${time}]`,
+    requestId.slice(0, 8),
+    method.padEnd(7),
+    String(status),
+    duration,
+    path,
+  ];
+  if (query) parts.push(query);
+  return parts.join(' ');
+}
 
+function formatDevLog(
+  time: string,
+  requestId: string,
+  method: string,
+  status: number,
+  duration: number,
+  path: string,
+  query?: string,
+): string {
+  const methodColor = getMethodColor(method);
+  const statusColor = getStatusColor(status);
+  const timingColor = getTimingColor(duration);
+
+  const parts = [
+    `${colors.gray}[${time}]${colors.reset}`,
+    `${colors.gray}${requestId.slice(0, 8)}${colors.reset}`,
+    `${methodColor}${method.padEnd(7)}${colors.reset}`,
+    `${statusColor}${status}${colors.reset}`,
+    `${timingColor}${colors.bright}${formatTiming(duration)}${colors.reset}`,
+    `${colors.white}${path}${colors.reset}`,
+  ];
+  if (query) parts.push(`${colors.dim}${query}${colors.reset}`);
+  return parts.join(' ');
+}
+
+export const logger = () => {
   return new Elysia({ name: 'logger' })
     .state('startTime', 0)
-    .onBeforeHandle(({ store }) => {
-      if (!enabled) return;
-
-      store.startTime = performance.now();
+    .derive(({ request }) => {
+      const requestId = request.headers.get('x-request-id') || crypto.randomUUID();
+      return { requestId };
     })
-    .onAfterResponse(({ request, set, store }) => {
-      if (!enabled) return;
-
-      const startTime = store.startTime || 0;
-      const duration = performance.now() - startTime;
-
-      const { method, url } = request;
-      const status = set.status || 200;
-
-      // Parse URL
-      const urlObj = new URL(url);
-      const path = urlObj.pathname;
-      const query = urlObj.search;
-
-      // Build log message
-      const parts: string[] = [];
-
-      // Timestamp
+    .onBeforeHandle(({ store, set, requestId }) => {
+      store.startTime = performance.now();
+      set.headers['x-request-id'] = requestId;
+    })
+    .onAfterResponse(({ request, set, store, requestId }) => {
+      const duration = performance.now() - (store.startTime || 0);
+      const { method } = request;
+      const url = new URL(request.url);
+      const path = url.pathname;
+      const query = url.search || undefined;
+      const status = (typeof set.status === 'number' ? set.status : undefined) || 200;
       const time = new Date().toLocaleTimeString('fr-FR');
-      parts.push(`${colors.gray}[${time}]${colors.reset}`);
 
-      // Method
-      const methodColor = getMethodColor(method);
-      parts.push(`${methodColor}${method.padEnd(7)}${colors.reset}`);
-
-      // Status
-      const statusColor = getStatusColor(status);
-      parts.push(`${statusColor}${status}${colors.reset}`);
-
-      // Timing
-      const timingStr = formatTiming(duration);
-      const timingColor = getTimingColor(duration);
-      parts.push(`${timingColor}${colors.bright}${timingStr}${colors.reset}`);
-
-      // Path
-      parts.push(`${colors.white}${path}${colors.reset}`);
-
-      // Query
-      if (query) {
-        parts.push(`${colors.dim}${query}${colors.reset}`);
+      if (config.isProduction) {
+        console.log(
+          formatProdLog(time, requestId, method, status, formatTiming(duration), path, query),
+        );
+      } else {
+        console.log(formatDevLog(time, requestId, method, status, duration, path, query));
       }
-
-      // Log
-      console.log(parts.join(' '));
     })
     .as('scoped');
 };

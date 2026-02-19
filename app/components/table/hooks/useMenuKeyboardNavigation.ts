@@ -39,7 +39,7 @@ export function useMenuKeyboardNavigation({
       const items = menuRef.current?.querySelectorAll<HTMLElement>(itemSelector);
       if (!items?.length) return;
 
-      const currentIndex = Array.from(items).findIndex((item) => item === document.activeElement);
+      const currentIndex = Array.from<Element | null>(items).indexOf(document?.activeElement);
 
       switch (event.key) {
         case 'ArrowDown':

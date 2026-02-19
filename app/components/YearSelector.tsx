@@ -32,7 +32,10 @@ export function YearSelector({
 
   const hiddenYearsCount = availableYears.length - maxYears;
   const showMoreIndicator = hiddenYearsCount > 1 && !showAll;
-  const displayYears = showAll || availableYears.length <= maxYears ? availableYears : availableYears.slice(0, maxYears);
+  const displayYears =
+    showAll || availableYears.length <= maxYears
+      ? availableYears
+      : availableYears.slice(0, maxYears);
 
   return (
     <>
@@ -60,7 +63,6 @@ export function YearSelector({
         </select>
       </div>
       <div className="fr-hidden fr-unhidden-md">
-
         <fieldset className={`fr-segmented ${className}`}>
           <legend className="fr-segmented__legend">
             {legend}
@@ -91,12 +93,20 @@ export function YearSelector({
                   id={`${id}-year-extend`}
                   name={`${id}-year`}
                   onChange={() => setShowAll(true)}
-
                 />
-                <label aria-describedby="tooltip-0" className="fr-label" htmlFor={`${id}-year-extend`} title={`${hiddenYearsCount} années supplémentaires disponibles`}>
+                <label
+                  aria-describedby="tooltip-0"
+                  className="fr-label"
+                  htmlFor={`${id}-year-extend`}
+                  title={`${hiddenYearsCount} années supplémentaires disponibles`}
+                >
                   ...
                 </label>
-                <span className="fr-tooltip fr-placement" id="tooltip-0" role="tooltip">{`${hiddenYearsCount} années supplémentaires disponibles`}</span>
+                <span
+                  className="fr-tooltip fr-placement"
+                  id="tooltip-0"
+                  role="tooltip"
+                >{`${hiddenYearsCount} années supplémentaires disponibles`}</span>
               </div>
             )}
             {!hideEvolution && (

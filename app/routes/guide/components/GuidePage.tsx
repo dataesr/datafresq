@@ -1,6 +1,6 @@
 import { useLocation } from 'react-router';
 import { Breadcrumb } from '@/components/Breadcrumb';
-import { getPage, getBreadcrumb, getChildren } from '../guide-content.generated';
+import { getBreadcrumb, getChildren, getPage } from '../guide-content.generated';
 import MarkdownRenderer from './MarkdownRenderer';
 import PageFeedback from './PageFeedback';
 import SectionLinks from './SectionLinks';
@@ -22,15 +22,15 @@ export default function GuidePage() {
           ]}
         />
         <h1>Page introuvable</h1>
-        <p className="fr-text--lead">
-          La page demandée n'existe pas dans le guide.
-        </p>
+        <p className="fr-text--lead">La page demandée n'existe pas dans le guide.</p>
       </div>
     );
   }
 
   const breadcrumbItems = getBreadcrumb(href).map((item) =>
-    item.href ? { label: item.label, href: item.href } : { label: item.label, current: true as const },
+    item.href
+      ? { label: item.label, href: item.href }
+      : { label: item.label, current: true as const },
   );
 
   const children = getChildren(href);

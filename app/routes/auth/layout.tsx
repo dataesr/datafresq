@@ -1,5 +1,7 @@
 import cn from 'classnames';
+import { Suspense } from 'react';
 import { Outlet } from 'react-router';
+import PageContentLoader from '@/components/loaders/PageContentLoader';
 import './styles.css';
 
 const dataesrLogo = '/public/dataesr.svg';
@@ -13,7 +15,9 @@ export default function AuthLayout() {
       </div>
       <div className="fx-flex fx-flex-col fx-items-center fx-justify-center">
         <div className={cn('auth-layout-card-wrapper', 'fr-card', 'fr-card--shadow', 'fr-py-2w')}>
-          <Outlet />
+          <Suspense fallback={<PageContentLoader />}>
+            <Outlet />
+          </Suspense>
         </div>
         <div className={cn('auth-layout-footer-logos', 'fr-mt-2w')}>
           <div className="fr-container-fluid">

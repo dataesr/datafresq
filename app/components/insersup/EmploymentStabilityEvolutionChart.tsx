@@ -85,11 +85,16 @@ export function EmploymentStabilityEvolutionChart({
       source="insersup"
       tooltip={
         <span>
-          Part d'emploi stable calculée pour chaque promotion, permettant la comparaison inter-cohortes.
-          {' '}<Link to="/guide/indicateurs/emploi">En savoir plus</Link> sur le calcul des taux d'emploi.
+          Part d'emploi stable calculée pour chaque promotion, permettant la comparaison
+          inter-cohortes. <Link to="/guide/indicateurs/emploi">En savoir plus</Link> sur le calcul
+          des taux d'emploi.
         </span>
       }
-      noData={!hasData ? { message: "Aucune donnée disponible pour afficher l'évolution de l'emploi stable." } : undefined}
+      noData={
+        !hasData
+          ? { message: "Aucune donnée disponible pour afficher l'évolution de l'emploi stable." }
+          : undefined
+      }
     >
       <Chart ref={chartRef}>
         <Credits enabled={false} />
@@ -103,9 +108,7 @@ export function EmploymentStabilityEvolutionChart({
             data={promo.data}
             options={{
               name: `Promo ${promo.promo}`,
-              color: getChartColor(
-                COHORT_COLORS[index % COHORT_COLORS.length] || 'green-archipel',
-              ),
+              color: getChartColor(COHORT_COLORS[index % COHORT_COLORS.length] || 'green-archipel'),
               marker: { enabled: true },
             }}
           />

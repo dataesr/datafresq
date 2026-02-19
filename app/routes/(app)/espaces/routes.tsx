@@ -1,7 +1,9 @@
+import { lazy } from 'react';
 import { Route } from 'react-router';
 import { espacesIdRoutes } from './[id]/routes';
-import EspacesPage from './index';
-import NouveauEspacePage from './nouveau';
+
+const EspacesPage = lazy(() => import('./index'));
+const NouveauEspacePage = lazy(() => import('./nouveau'));
 
 export const espacesRoutes = (
   <Route path="espaces">

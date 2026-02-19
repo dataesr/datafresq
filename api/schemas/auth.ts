@@ -91,6 +91,11 @@ export const authCookieSchema = t.Cookie({
   [config.cookies.session.name]: t.String(),
 });
 
+export const optionalAuthCookieSchema = t.Cookie({
+  [config.cookies.access.name]: t.Optional(t.String()),
+  [config.cookies.session.name]: t.Optional(t.String()),
+});
+
 // ============================================================================
 // Types
 // ============================================================================

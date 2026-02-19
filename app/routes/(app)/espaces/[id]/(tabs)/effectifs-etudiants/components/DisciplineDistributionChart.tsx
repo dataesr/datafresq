@@ -60,8 +60,8 @@ export function DisciplineDistributionChart({
       source="sise"
       tooltip={
         <span>
-          Calculé par somme des effectifs des formations pour chaque secteur disciplinaire.
-          {' '}<Link to="/guide/indicateurs/effectifs">En savoir plus</Link> sur le calcul des effectifs.
+          Calculé par somme des effectifs des formations pour chaque secteur disciplinaire.{' '}
+          <Link to="/guide/indicateurs/effectifs">En savoir plus</Link> sur le calcul des effectifs.
         </span>
       }
     >

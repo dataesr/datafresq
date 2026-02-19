@@ -8,7 +8,6 @@ import {
 import cn from 'classnames';
 import { useMemo, useState } from 'react';
 import { useProgramsSearch } from '@/api/programs';
-import { AddToWorkspace } from '../AddToWorkspace';
 import {
   ColumnVisibilityToggle,
   createDefaultColumnVisibility,
@@ -20,6 +19,7 @@ import {
   type ProgramColumnId,
 } from '@/components/table';
 import { useProgramsFilters } from '../../hooks/useProgramsFilters';
+import { AddToWorkspace } from '../AddToWorkspace';
 import ExportButton from '../ExportButton';
 
 interface ProgramsTableProps {

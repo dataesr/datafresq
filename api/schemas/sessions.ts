@@ -7,11 +7,20 @@ import { t } from 'elysia';
 export const sessionSchema = t.Object({
   id: t.String(),
   userAgent: t.String(),
-  ipAddress: t.Nullable(t.String()),
-  createdAt: t.String(),
-  lastUsedAt: t.String(),
-  expiresAt: t.String(),
-  isCurrent: t.Boolean(),
+  ipAddress: t.Union([t.String(), t.Null()]),
+  createdAt: t.Date(),
+  lastRefreshedAt: t.Date(),
+  expiresAt: t.Date(),
+});
+
+export const sessionsListResponseSchema = t.Object({
+  sessions: t.Array(sessionSchema),
+  total: t.Number(),
+});
+
+export const currentSessionResponseSchema = t.Object({
+  success: t.Boolean(),
+  data: sessionSchema,
 });
 
 // ============================================================================
@@ -19,3 +28,5 @@ export const sessionSchema = t.Object({
 // ============================================================================
 
 export type Session = typeof sessionSchema.static;
+export type SessionsListResponse = typeof sessionsListResponseSchema.static;
+export type CurrentSessionResponse = typeof currentSessionResponseSchema.static;

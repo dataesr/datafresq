@@ -1,4 +1,4 @@
-import { getChartColor, type colorFamily } from '@/components/charts/highcharts/colors';
+import { type colorFamily, getChartColor } from '@/components/charts/highcharts/colors';
 import './styles.css';
 
 type ColorName = (typeof colorFamily)[number];

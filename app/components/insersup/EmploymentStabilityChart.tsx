@@ -68,11 +68,16 @@ export function EmploymentStabilityChart({ yearData, year }: EmploymentStability
       source="insersup"
       tooltip={
         <span>
-          Part des CDI et postes de fonctionnaire rapportée au nombre total d'emplois salariés.
-          {' '}<Link to="/guide/indicateurs/emploi">En savoir plus</Link> sur le calcul des taux d'emploi.
+          Part des CDI et postes de fonctionnaire rapportée au nombre total d'emplois salariés.{' '}
+          <Link to="/guide/indicateurs/emploi">En savoir plus</Link> sur le calcul des taux
+          d'emploi.
         </span>
       }
-      noData={!hasData ? { message: 'Données insuffisantes pour afficher la part d\'emploi stable.' } : undefined}
+      noData={
+        !hasData
+          ? { message: "Données insuffisantes pour afficher la part d'emploi stable." }
+          : undefined
+      }
     >
       <Chart ref={chartRef}>
         <Credits enabled={false} />

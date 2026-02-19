@@ -10,11 +10,7 @@ export interface SelectFooterProps {
 export function Footer({ children, className, align = 'between' }: SelectFooterProps) {
   return (
     <div
-      className={cn(
-        'select__footer',
-        align !== 'between' && `select__footer--${align}`,
-        className,
-      )}
+      className={cn('select__footer', align !== 'between' && `select__footer--${align}`, className)}
     >
       {children}
     </div>

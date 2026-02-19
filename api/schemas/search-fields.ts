@@ -6,20 +6,9 @@ export interface SearchFieldConfig {
 }
 
 export const PROGRAM_SEARCH_FIELDS: SearchFieldConfig[] = [
-  {
-    field: 'search.label',
-    boost: 8,
-    displayName: 'Intitulé',
-  },
-  {
-    field: 'search.inf',
-    displayName: 'INF',
-  },
-  {
-    field: 'search.disciplinarySector',
-    boost: 2,
-    displayName: 'Secteur disciplinaire',
-  },
+  { field: 'search.label', boost: 8, displayName: 'Intitulé' },
+  { field: 'search.inf', displayName: 'INF' },
+  { field: 'search.disciplinarySector', boost: 2, displayName: 'Secteur disciplinaire' },
   {
     field: 'search.etablissements.name',
     boost: 4,
@@ -50,22 +39,9 @@ export const PROGRAM_SEARCH_FIELDS: SearchFieldConfig[] = [
     displayName: 'Ville',
     displayGroup: 'Établissements',
   },
-  {
-    field: 'search.etablissements.uai',
-    displayName: 'UAI',
-    displayGroup: 'Établissements',
-  },
-  {
-    field: 'search.etapes.label',
-    boost: 3,
-    displayName: 'Intitulé',
-    displayGroup: 'Étapes',
-  },
-  {
-    field: 'search.etapes.infe',
-    displayName: 'INFE',
-    displayGroup: 'Étapes',
-  },
+  { field: 'search.etablissements.uai', displayName: 'UAI', displayGroup: 'Établissements' },
+  { field: 'search.etapes.label', boost: 3, displayName: 'Intitulé', displayGroup: 'Étapes' },
+  { field: 'search.etapes.infe', displayName: 'INFE', displayGroup: 'Étapes' },
   {
     field: 'search.etapes.pedagogicalInfoKeywords',
     boost: 2,
@@ -95,83 +71,27 @@ export const PROGRAM_SEARCH_FIELDS: SearchFieldConfig[] = [
     displayName: 'Attendus',
     displayGroup: 'Recrutement',
   },
-  {
-    field: 'search.parcours.label',
-    boost: 3,
-    displayName: 'Intitulé',
-    displayGroup: 'Parcours',
-  },
-  {
-    field: 'search.parcours.infp',
-    displayName: 'INFP',
-    displayGroup: 'Parcours',
-  },
-  {
-    field: 'search.rncpInfos.rncp',
-    displayName: 'Code RNCP',
-    displayGroup: 'RNCP',
-  },
+  { field: 'search.parcours.label', boost: 3, displayName: 'Intitulé', displayGroup: 'Parcours' },
+  { field: 'search.parcours.infp', displayName: 'INFP', displayGroup: 'Parcours' },
+  { field: 'search.rncpInfos.rncp', displayName: 'Code RNCP', displayGroup: 'RNCP' },
   {
     field: 'search.rncpInfos.typeEmploiAccessibles',
     boost: 2,
     displayName: "Types d'emploi accessibles",
     displayGroup: 'RNCP',
   },
-  {
-    field: 'search.romeInfos.label',
-    boost: 2,
-    displayName: 'Intitulé',
-    displayGroup: 'ROME',
-  },
-  {
-    field: 'search.romeInfos.codeRome',
-    displayName: 'Code ROME',
-    displayGroup: 'ROME',
-  },
-  {
-    field: 'search.romeInfos.level1',
-    displayName: 'Domaine',
-    displayGroup: 'ROME',
-  },
-  {
-    field: 'search.romeInfos.level2',
-    displayName: 'Sous-domaine',
-    displayGroup: 'ROME',
-  },
-  {
-    field: 'search.romeInfos.level3',
-    displayName: 'Famille',
-    displayGroup: 'ROME',
-  },
-  {
-    field: 'search.romeInfos.idLevel1',
-    displayName: 'ID domaine',
-    displayGroup: 'ROME',
-  },
-  {
-    field: 'search.romeInfos.idLevel2',
-    displayName: 'ID sous-domaine',
-    displayGroup: 'ROME',
-  },
-  {
-    field: 'search.romeInfos.ogr',
-    displayName: 'OGR',
-    displayGroup: 'ROME',
-  },
-  {
-    field: 'search.romeInfos.rncp',
-    displayName: 'RNCP',
-    displayGroup: 'ROME',
-  },
+  { field: 'search.romeInfos.label', boost: 2, displayName: 'Intitulé', displayGroup: 'ROME' },
+  { field: 'search.romeInfos.codeRome', displayName: 'Code ROME', displayGroup: 'ROME' },
+  { field: 'search.romeInfos.level1', displayName: 'Domaine', displayGroup: 'ROME' },
+  { field: 'search.romeInfos.level2', displayName: 'Sous-domaine', displayGroup: 'ROME' },
+  { field: 'search.romeInfos.level3', displayName: 'Famille', displayGroup: 'ROME' },
+  { field: 'search.romeInfos.idLevel1', displayName: 'ID domaine', displayGroup: 'ROME' },
+  { field: 'search.romeInfos.idLevel2', displayName: 'ID sous-domaine', displayGroup: 'ROME' },
+  { field: 'search.romeInfos.ogr', displayName: 'OGR', displayGroup: 'ROME' },
+  { field: 'search.romeInfos.rncp', displayName: 'RNCP', displayGroup: 'ROME' },
 ];
 
-export function buildSearchFields(): string[] {
-  return PROGRAM_SEARCH_FIELDS.map((config) =>
-    config.boost ? `${config.field}^${config.boost}` : config.field,
-  );
-}
-
-export function getFieldDisplayName(field: string): string {
+export function getHighlightedFieldDisplayName(field: string): string {
   const config = PROGRAM_SEARCH_FIELDS.find((c) => c.field === field);
   if (!config) return field;
 
@@ -184,9 +104,15 @@ export function getFieldDisplayName(field: string): string {
 export function buildFieldDisplayNameMap(): Record<string, string> {
   return PROGRAM_SEARCH_FIELDS.reduce(
     (acc, config) => {
-      acc[config.field] = getFieldDisplayName(config.field);
+      acc[config.field] = getHighlightedFieldDisplayName(config.field);
       return acc;
     },
     {} as Record<string, string>,
+  );
+}
+
+export function buildSearchFields(): string[] {
+  return PROGRAM_SEARCH_FIELDS.map((config) =>
+    config.boost ? `${config.field}^${config.boost}` : config.field,
   );
 }

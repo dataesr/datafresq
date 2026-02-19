@@ -1,10 +1,3 @@
-/**
- * Token Utility
- *
- * Generates secure random tokens for password reset, email verification, etc.
- */
-
-import { createHash, randomBytes } from 'node:crypto';
 import { config } from '~/config';
 
 export type SessionInfo = {
@@ -13,29 +6,18 @@ export type SessionInfo = {
   expiresAt: Date;
 };
 
-/**
- * Generate a secure random token
- * @param bytes - Number of random bytes (default: 32)
- * @returns Hex string token
- */
-export function generateToken(bytes: number = 32): string {
-  return randomBytes(bytes).toString('hex');
+export function generateToken(bytes = 32): string {
+  const arr = new Uint8Array(bytes);
+  crypto.getRandomValues(arr);
+  return Buffer.from(arr).toString('hex');
 }
 
-/**
- * Hash a token using SHA-256
- * Used to store token hashes in database instead of plaintext
- * @param token - The token to hash
- * @returns SHA-256 hash as hex string
- */
 export function hashToken(token: string): string {
-  return createHash('sha256').update(token).digest('hex');
+  const hasher = new Bun.CryptoHasher('sha256');
+  hasher.update(token);
+  return hasher.digest('hex');
 }
 
-/**
- * Generate a token and its hash
- * @returns Object with token and tokenHash
- */
 export function generateTokenWithHash(): { token: string; tokenHash: string } {
   const token = generateToken();
   const tokenHash = hashToken(token);
@@ -47,8 +29,7 @@ export function generateSessionInfo(): SessionInfo {
   const sessionTokenHash = hashToken(sessionToken);
 
   const sessionExpSeconds = config.cookies.session.config.maxAge;
-  const now = new Date();
-  const expiresAt = new Date(now.getTime() + sessionExpSeconds * 1000);
+  const expiresAt = new Date(Date.now() + sessionExpSeconds * 1000);
 
   return {
     sessionToken,

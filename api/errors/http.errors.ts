@@ -1,28 +1,25 @@
 import { AppError } from './base.error';
 
 export class BadRequestError extends AppError {
-  status = 400;
   code = 'BAD_REQUEST';
 
-  constructor(message = 'Bad request') {
+  constructor(message = 'Requête invalide') {
     super(message);
   }
 }
 
 export class NotFoundError extends AppError {
-  status = 404;
   code = 'NOT_FOUND';
 
-  constructor(message = 'Resource not found') {
+  constructor(message = 'Ressource introuvable') {
     super(message);
   }
 }
 
 export class InternalServerError extends AppError {
-  status = 500;
   code = 'INTERNAL_SERVER_ERROR';
 
-  constructor(message = 'Internal server error') {
+  constructor(message = 'Erreur interne du serveur') {
     super(message);
   }
 }

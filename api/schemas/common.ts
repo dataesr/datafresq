@@ -19,6 +19,14 @@ export const queryParamSchema = t.Optional(
   t.Object({ q: t.Optional(t.String({ description: 'Terme recherché' })) }),
 );
 
+export const idParamSchema = t.Object({
+  id: t.String(),
+});
+
+export const infParamSchema = t.Object({
+  inf: t.String(),
+});
+
 // ============================================================================
 // Types
 // ============================================================================
@@ -26,3 +34,5 @@ export const queryParamSchema = t.Optional(
 export type ErrorResponse = typeof errorResponseSchema.static;
 export type SuccessResponse = typeof successResponseSchema.static;
 export type QueryParam = typeof queryParamSchema.static;
+export type IdParam = typeof idParamSchema.static;
+export type InfParam = typeof infParamSchema.static;

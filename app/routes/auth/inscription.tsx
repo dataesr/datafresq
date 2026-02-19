@@ -1,7 +1,7 @@
 import { useForm } from '@tanstack/react-form';
 import { useState } from 'react';
 import { Link, useSearchParams } from 'react-router';
-import { useRegister } from '@/api/invitations';
+import { useRegister } from '@/api/auth';
 import { Input } from '@/components/Input';
 import { Password } from '@/components/Password';
 

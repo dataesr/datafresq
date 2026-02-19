@@ -340,10 +340,7 @@ export function ProgramsTable({ yearData }: ProgramsTableProps) {
               setPageIndex(0);
             }}
           />
-          <ExportButton
-            onExport={handleExport}
-            disabled={programTableData.length === 0}
-          />
+          <ExportButton onExport={handleExport} disabled={programTableData.length === 0} />
         </div>
       </div>
       <div

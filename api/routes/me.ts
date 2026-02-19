@@ -1,127 +1,64 @@
 import { Elysia } from 'elysia';
-
-import { collections } from '~/database/mongo';
-import { InvalidCredentialsError, NotFoundError } from '~/errors';
 import { authMacro } from '~/macros/authMacro';
 import { errorResponseSchema, successResponseSchema } from '~/schemas/common';
-import {
-  changePasswordSchema,
-  USER_ME_PROJECTION,
-  updateUserSchema,
-  userMeSchema,
-} from '~/schemas/users';
-import { hashPassword, verifyPassword } from '~/utils/password';
+import { changePasswordSchema, updateUserSchema, userMeSchema } from '~/schemas/users';
+import * as authService from '~/services/auth.service';
+import * as usersService from '~/services/users.service';
 
 export const meRoutes = new Elysia({ prefix: '/me' })
   .use(authMacro)
-  .get(
-    '/',
-    async ({ user }) => {
-      const userDoc = await collections.users.findOne(
-        { email: user.email },
-        { projection: USER_ME_PROJECTION },
-      );
-      if (!userDoc) throw new NotFoundError('Utilisateur introuvable');
-
-      return userDoc;
+  .guard({
+    isAuth: true,
+    allow: ['user', 'admin', 'root'],
+    detail: { tags: ['Utilisateur connecté'] },
+    response: {
+      401: errorResponseSchema,
+      404: errorResponseSchema,
     },
-    {
-      isAuth: true,
-      response: {
-        200: userMeSchema,
-        401: errorResponseSchema,
-        404: errorResponseSchema,
-        422: errorResponseSchema,
-      },
-      detail: {
-        summary: 'Get current user infos',
-        description: 'Get current user infos',
-        tags: ['Utilisateur'],
-      },
+  })
+  .get('/', ({ user }) => usersService.getMe(user.email), {
+    response: { 200: userMeSchema },
+    detail: {
+      summary: 'Obtenir mon profil',
+      description:
+        "Retourne les informations du profil de l'utilisateur " +
+        'connecté : email, prénom, nom, rôle et dates ' +
+        "de dernière connexion. Nécessite d'être " +
+        'authentifié.',
     },
-  )
-  .patch(
-    '/',
-    async ({ user, body }) => {
-      const userDoc = await collections.users.findOne({ email: user.email });
-      if (!userDoc) throw new NotFoundError('Utilisateur introuvable');
-
-      const updateData: Record<string, unknown> = { updatedAt: new Date() };
-      if (body.firstName !== undefined) updateData.firstName = body.firstName;
-      if (body.lastName !== undefined) updateData.lastName = body.lastName;
-
-      await collections.users.updateOne({ id: userDoc.id }, { $set: updateData });
-
-      const updatedUser = await collections.users.findOne(
-        { id: userDoc.id },
-        { projection: USER_ME_PROJECTION },
-      );
-      if (!updatedUser) throw new NotFoundError('Utilisateur introuvable');
-
-      return updatedUser;
+  })
+  .patch('/', ({ user, body }) => usersService.updateMe(user.email, body), {
+    body: updateUserSchema,
+    response: { 200: userMeSchema },
+    detail: {
+      summary: 'Modifier mon profil',
+      description:
+        'Met à jour les informations du profil de ' +
+        "l'utilisateur connecté. Seuls le prénom et " +
+        'le nom peuvent être modifiés. Retourne le ' +
+        'profil complet après mise à jour.',
     },
-    {
-      isAuth: true,
-      body: updateUserSchema,
-      response: {
-        200: userMeSchema,
-        401: errorResponseSchema,
-        404: errorResponseSchema,
-        422: errorResponseSchema,
-      },
-      detail: {
-        summary: 'Update current user profile',
-        description: 'Update the authenticated user profile information',
-        tags: ['Utilisateur'],
-      },
-    },
-  )
+  })
   .post(
     '/change-password',
     async ({ user, body }) => {
-      const userDoc = await collections.users.findOne({ email: user.email });
-      if (!userDoc) throw new NotFoundError('Utilisateur introuvable');
-
-      if (!userDoc.passwordHash) throw new InvalidCredentialsError('Mot de passe actuel incorrect');
-      const isPasswordValid = await verifyPassword(
-        body.currentPassword,
-        userDoc.passwordHash,
-      );
-      if (!isPasswordValid) {
-        throw new InvalidCredentialsError('Mot de passe actuel incorrect');
-      }
-
-      const newPasswordHash = await hashPassword(body.newPassword);
-
-      await collections.users.updateOne(
-        { id: userDoc.id },
-        {
-          $set: {
-            passwordHash: newPasswordHash,
-            lastPasswordChange: new Date(),
-            updatedAt: new Date(),
-          },
-        },
-      );
-
+      await authService.changePassword(user.email, body.currentPassword, body.newPassword);
       return {
         success: true,
         message: 'Mot de passe modifié avec succès',
       };
     },
     {
-      isAuth: true,
       body: changePasswordSchema,
-      response: {
-        200: successResponseSchema,
-        401: errorResponseSchema,
-        404: errorResponseSchema,
-        422: errorResponseSchema,
-      },
+      response: { 200: successResponseSchema },
       detail: {
-        summary: 'Change password',
-        description: 'Change the authenticated user password',
-        tags: ['Utilisateur'],
+        summary: 'Changer mon mot de passe',
+        description:
+          "Modifie le mot de passe de l'utilisateur " +
+          'connecté. Le mot de passe actuel doit être ' +
+          'fourni pour vérification. Les sessions ' +
+          'existantes restent actives après le ' +
+          'changement.',
       },
     },
   );

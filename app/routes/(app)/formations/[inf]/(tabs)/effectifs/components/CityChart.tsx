@@ -55,8 +55,8 @@ export function CityChart(props: CityChartProps) {
       source="sise"
       tooltip={
         <span>
-          Somme des étudiants inscrits dans chaque commune d'implantation de la formation.
-          {' '}<Link to="/guide/indicateurs/effectifs">En savoir plus</Link> sur le calcul des effectifs.
+          Somme des étudiants inscrits dans chaque commune d'implantation de la formation.{' '}
+          <Link to="/guide/indicateurs/effectifs">En savoir plus</Link> sur le calcul des effectifs.
         </span>
       }
     >

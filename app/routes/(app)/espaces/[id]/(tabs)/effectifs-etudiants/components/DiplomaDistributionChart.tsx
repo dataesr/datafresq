@@ -63,8 +63,8 @@ export function DiplomaDistributionChart({ data, year, limit = 8 }: DiplomaDistr
       source="sise"
       tooltip={
         <span>
-          Somme des étudiants inscrits regroupés par type de diplôme préparé.
-          {' '}<Link to="/guide/indicateurs/effectifs">En savoir plus</Link> sur le calcul des effectifs.
+          Somme des étudiants inscrits regroupés par type de diplôme préparé.{' '}
+          <Link to="/guide/indicateurs/effectifs">En savoir plus</Link> sur le calcul des effectifs.
         </span>
       }
     >

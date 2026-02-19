@@ -55,8 +55,8 @@ export function StudyYearChart(props: StudyYearChartProps) {
       source="sise"
       tooltip={
         <span>
-          Somme des étudiants inscrits par année dans le cursus de la formation.
-          {' '}<Link to="/guide/indicateurs/effectifs">En savoir plus</Link> sur le calcul des effectifs.
+          Somme des étudiants inscrits par année dans le cursus de la formation.{' '}
+          <Link to="/guide/indicateurs/effectifs">En savoir plus</Link> sur le calcul des effectifs.
         </span>
       }
     >

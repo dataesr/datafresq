@@ -5,7 +5,10 @@ import SearchModal, { useSearchModal } from '@/components/SearchModal';
 import { searchGuide } from '../guide-content.generated';
 
 function isSection(href: string): boolean {
-  const segments = href.replace(/^\/guide\/?/, '').split('/').filter(Boolean);
+  const segments = href
+    .replace(/^\/guide\/?/, '')
+    .split('/')
+    .filter(Boolean);
   return segments.length <= 1;
 }
 
@@ -45,7 +48,7 @@ export default function GuideSearchModal() {
 
   useEffect(() => {
     search.resetFocus();
-  }, [deferredQuery, search.resetFocus]);
+  }, [search.resetFocus]);
 
   useGlobalShortcut('k', search.open);
 
@@ -56,7 +59,7 @@ export default function GuideSearchModal() {
 
   return (
     <>
-      <div className="fr-search-bar" role="search">
+      <search className="fr-search-bar">
         <label className="fr-label" htmlFor="guide-search-launcher">
           Rechercher dans le guide
         </label>
@@ -66,7 +69,10 @@ export default function GuideSearchModal() {
           type="search"
           placeholder="Rechercher… (Ctrl+K)"
           readOnly
-          onFocus={(e) => { e.target.blur(); search.open(); }}
+          onFocus={(e) => {
+            e.target.blur();
+            search.open();
+          }}
           onClick={search.open}
         />
         <button
@@ -77,7 +83,7 @@ export default function GuideSearchModal() {
         >
           Rechercher
         </button>
-      </div>
+      </search>
 
       <SearchModal
         modalProps={search.modalProps}
@@ -106,9 +112,7 @@ export default function GuideSearchModal() {
         }
       >
         {showResults && results.length === 0 && (
-          <SearchModal.Empty>
-            Aucun résultat pour « {deferredQuery} »
-          </SearchModal.Empty>
+          <SearchModal.Empty>Aucun résultat pour « {deferredQuery} »</SearchModal.Empty>
         )}
 
         {results.map((entry, index) => {

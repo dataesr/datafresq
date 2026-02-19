@@ -1,7 +1,7 @@
 import cn from 'classnames';
 import { useId, useState } from 'react';
 import { Link } from 'react-router';
-import './styles.css'
+import './styles.css';
 
 type PasswordProps = {
   message?: string;

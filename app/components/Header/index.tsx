@@ -133,9 +133,7 @@ export function Header({ showSidemenu = false, sidemenuContent, searchContent }:
                   </Dropdown>
                 </div>
                 {searchContent && (
-                  <div className="fr-header__search fr-hidden fr-unhidden-lg">
-                    {searchContent}
-                  </div>
+                  <div className="fr-header__search fr-hidden fr-unhidden-lg">{searchContent}</div>
                 )}
               </div>
             )}

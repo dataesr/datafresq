@@ -53,8 +53,8 @@ export function RomeSpiderChart({ data, limit = TOP_ROME_LIMIT }: RomeSpiderChar
       source={['fresq', 'rome']}
       tooltip={
         <span>
-          Nombre de formations associées à chaque code métier ROME.
-          {' '}<Link to="/guide/donnees/fresq">En savoir plus</Link> sur les données Fresq.
+          Nombre de formations associées à chaque code métier ROME.{' '}
+          <Link to="/guide/donnees/fresq">En savoir plus</Link> sur les données Fresq.
         </span>
       }
     >

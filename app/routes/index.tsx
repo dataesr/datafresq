@@ -1,12 +1,11 @@
+import { Suspense } from 'react';
 import { Navigate, Routes, useLocation } from 'react-router';
 import { useAuth } from '@/api/auth';
 import FullPageLoader from '@/components/loaders/FullPageLoader';
-
 import { appRoutes } from './(app)/routes';
 import { adminRoutes } from './admin/routes';
 import { authRoutes } from './auth/routes';
 import { guideRoutes } from './guide/routes';
-import { Suspense } from 'react';
 
 /**
  * Redirect to login with current path as redirect param
@@ -29,10 +28,11 @@ function RedirectToApp() {
 }
 
 export default function AppRouter() {
-  const { user } = useAuth();
+  const { user, isLoading } = useAuth();
   const location = useLocation();
   const isAuthPage = location.pathname.startsWith('/auth/');
 
+  if (isLoading) return <FullPageLoader />;
   if (!user && !isAuthPage) return <RedirectToLogin />;
   if (user && isAuthPage) return <RedirectToApp />;
 

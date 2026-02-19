@@ -26,8 +26,6 @@ type YearContentProps = {
   programCount: number;
 };
 
-
-
 const YearContent = memo(function YearContent({ yearData, year, programCount }: YearContentProps) {
   return (
     <>

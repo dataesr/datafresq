@@ -40,7 +40,11 @@ function useChartData(data: AcademyData[], limit: number) {
   }, [data, limit]);
 }
 
-export function AcademyDistributionChart({ data, year, limit = 10 }: AcademyDistributionChartProps) {
+export function AcademyDistributionChart({
+  data,
+  year,
+  limit = 10,
+}: AcademyDistributionChartProps) {
   const chartRef = useRef<HighchartsReactRefObject | null>(null);
   const { hasData, categories, femaleData, maleData } = useChartData(data, limit);
 
@@ -56,8 +60,8 @@ export function AcademyDistributionChart({ data, year, limit = 10 }: AcademyDist
       source="sise"
       tooltip={
         <span>
-          Calculé par somme des effectifs des formations pour chaque académie.
-          {' '}<Link to="/guide/indicateurs/effectifs">En savoir plus</Link> sur le calcul des effectifs.
+          Calculé par somme des effectifs des formations pour chaque académie.{' '}
+          <Link to="/guide/indicateurs/effectifs">En savoir plus</Link> sur le calcul des effectifs.
         </span>
       }
     >

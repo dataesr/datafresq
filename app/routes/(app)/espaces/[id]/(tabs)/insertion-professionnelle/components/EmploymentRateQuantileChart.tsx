@@ -135,11 +135,19 @@ export function EmploymentRateQuantileChart({ yearData, year }: EmploymentRateQu
       source="insersup"
       tooltip={
         <span>
-          Distribution statistique du taux d'emploi salarié calculée sur l'ensemble des formations de l'espace.
-          {' '}<Link to="/guide/indicateurs/emploi">En savoir plus</Link> sur le calcul des taux d'emploi.
+          Distribution statistique du taux d'emploi salarié calculée sur l'ensemble des formations
+          de l'espace. <Link to="/guide/indicateurs/emploi">En savoir plus</Link> sur le calcul des
+          taux d'emploi.
         </span>
       }
-      noData={!hasData ? { message: "Pas assez de formations avec des données suffisantes pour calculer les quartiles (minimum 4 formations avec au moins 20 sortants chacune)." } : undefined}
+      noData={
+        !hasData
+          ? {
+              message:
+                'Pas assez de formations avec des données suffisantes pour calculer les quartiles (minimum 4 formations avec au moins 20 sortants chacune).',
+            }
+          : undefined
+      }
     >
       <Chart ref={chartRef}>
         <Credits enabled={false} />
@@ -162,7 +170,7 @@ export function EmploymentRateQuantileChart({ yearData, year }: EmploymentRateQu
           options={{
             name: 'Distribution',
             color: getChartColor('blue-cumulus'),
-            fillColor: getChartColor('blue-cumulus') + '40',
+            fillColor: `${getChartColor('blue-cumulus')}40`,
             medianColor: getChartColor('green-archipel'),
             medianWidth: 3,
           }}

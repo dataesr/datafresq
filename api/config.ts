@@ -18,7 +18,7 @@ export const config = {
 
   // JWT
   jwt: {
-    secret: process.env.JWT_SECRET || '',
+    secret: process.env.JWT_SECRET,
   },
 
   // Tokens & Sessions
@@ -63,11 +63,11 @@ export const config = {
       password: process.env.ELASTIC_PASSWORD || '',
     },
     indexes: {
-        programs: process.env.ES_PROGRAMS_INDEX,
-        institutions: process.env.ES_INSTITUTIONS_INDEX,
-        specializations: process.env.ES_SPECIALIZATIONS_INDEX,
-        careers: process.env.ES_CAREERS_INDEX,
-    }
+      programs: process.env.ES_PROGRAMS_INDEX,
+      institutions: process.env.ES_INSTITUTIONS_INDEX,
+      specializations: process.env.ES_SPECIALIZATIONS_INDEX,
+      careers: process.env.ES_CAREERS_INDEX,
+    },
   },
 } as const;
 

@@ -4,7 +4,9 @@ import { t } from 'elysia';
 // Schemas
 // ============================================================================
 
-export const userRoleSchema = t.Union([t.Literal('user'), t.Literal('admin')], { default: 'user' });
+export const userRoleSchema = t.Union([t.Literal('user'), t.Literal('admin'), t.Literal('root')], {
+  default: 'user',
+});
 
 export const updateUserSchema = t.Object({
   firstName: t.Optional(
@@ -79,6 +81,19 @@ export const userSearchSchema = t.Object({
   lastName: t.Nullable(t.String()),
 });
 
+export const userSearchQuerySchema = t.Object({
+  q: t.String({
+    minLength: 2,
+    description: 'Terme de recherche (min. 2 caractères)',
+  }),
+  limit: t.Optional(
+    t.String({
+      default: '10',
+      description: 'Nombre maximum de résultats',
+    }),
+  ),
+});
+
 // ============================================================================
 // Types
 // ============================================================================
@@ -91,6 +106,7 @@ export type UserMe = typeof userMeSchema.static;
 export type UserAdmin = typeof userAdminSchema.static;
 export type UserLight = typeof userLightSchema.static;
 export type UserSearch = typeof userSearchSchema.static;
+export type UserSearchQuery = typeof userSearchQuerySchema.static;
 
 // ============================================================================
 // MongoDB Projections

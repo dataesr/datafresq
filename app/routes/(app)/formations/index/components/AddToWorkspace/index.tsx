@@ -1,6 +1,6 @@
 import cn from 'classnames';
-import { useCallback, useState } from 'react';
-import { Link, useNavigate } from 'react-router';
+import { useCallback } from 'react';
+import { Link } from 'react-router';
 import { useAddPrograms, usePreviewAddPrograms } from '@/api/workspaces';
 import { Dropdown, useDropdownContext } from '@/components/ui/Dropdown';
 import { toast } from '@/components/ui/Toast';
@@ -50,8 +50,7 @@ function useAddToWorkspace({ programIds, searchParams, onSuccess }: UseAddToWork
     isOpen && !!activeWorkspace,
   );
 
-  const canAdd =
-    (hasSelection || preview && preview.toAdd > 0) && !isPending && !isError;
+  const canAdd = (hasSelection || (preview && preview.toAdd > 0)) && !isPending && !isError;
 
   const handleAdd = useCallback(() => {
     if (!activeWorkspace || !preview) return;
@@ -90,7 +89,11 @@ function useAddToWorkspace({ programIds, searchParams, onSuccess }: UseAddToWork
   };
 }
 
-function AddToActiveWorkspaceInner({ programIds, searchParams, onSuccess }: UseAddToWorkspaceOptions) {
+function AddToActiveWorkspaceInner({
+  programIds,
+  searchParams,
+  onSuccess,
+}: UseAddToWorkspaceOptions) {
   const {
     activeWorkspace,
     clearActiveWorkspace,
@@ -202,10 +205,7 @@ function AddToActiveWorkspaceInner({ programIds, searchParams, onSuccess }: UseA
   );
 }
 
-function buildNouveauUrl(
-  programIds?: string[],
-  searchParams?: WorkspaceSearchParams,
-): string {
+function buildNouveauUrl(programIds?: string[], searchParams?: WorkspaceSearchParams): string {
   const url = new URL('/espaces/nouveau', window.location.origin);
 
   const hasSelection = programIds && programIds.length > 0;
@@ -228,7 +228,6 @@ interface CreateWorkspaceInnerProps {
 }
 
 function CreateWorkspaceInner({ programIds, searchParams, totalCount }: CreateWorkspaceInnerProps) {
-
   const hasSelection = programIds && programIds.length > 0;
   const count = hasSelection ? programIds.length : totalCount;
 
@@ -269,11 +268,9 @@ function CreateWorkspaceInner({ programIds, searchParams, totalCount }: CreateWo
             <span>Ajout volumineux ({count.toLocaleString('fr-FR')} formations)</span>
           </div>
         )}
-
       </Dropdown.Content>
 
       <Dropdown.Footer className="fr-p-2w" align="end">
-
         <Link
           to={nouveauUrl}
           className="fr-btn fr-btn--sm fr-icon-add-circle-line fr-btn--icon-left"
@@ -324,7 +321,11 @@ export function AddToWorkspace({
       outline
       disabled={disabled || exceedsLimit}
     >
-      <AddToActiveWorkspaceInner programIds={programIds} searchParams={searchParams} onSuccess={onSuccess} />
+      <AddToActiveWorkspaceInner
+        programIds={programIds}
+        searchParams={searchParams}
+        onSuccess={onSuccess}
+      />
     </Dropdown>
   );
 }

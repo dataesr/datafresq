@@ -14,9 +14,9 @@ import {
   useAdminUsers,
   useChangeUserRole,
   useDeleteUser,
+  useInviteUser,
   useRevokeUserSessions,
 } from '@/api/admin';
-import { useInviteUser } from '@/api/invitations';
 import { DebouncedInput } from '@/components/debounced-input';
 import { Modal, useModal } from '@/components/Modal';
 import {

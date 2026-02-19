@@ -1,6 +1,8 @@
+import { lazy } from 'react';
 import { Route } from 'react-router';
-import UserSettings from './[tab]';
 import RedirectToProfil from './index';
+
+const UserSettings = lazy(() => import('./[tab]'));
 
 export const utilisateurRoutes = (
   <Route path="utilisateur">

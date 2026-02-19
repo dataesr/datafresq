@@ -1,15 +1,20 @@
-import { type ComponentPropsWithoutRef, type ElementType } from 'react';
 import cn from 'classnames';
+import type { ComponentPropsWithoutRef, ElementType } from 'react';
 import ReactMarkdown from 'react-markdown';
-import remarkGfm from 'remark-gfm';
-import rehypeSlug from 'rehype-slug';
 import { Link } from 'react-router';
+import rehypeSlug from 'rehype-slug';
+import remarkGfm from 'remark-gfm';
 
 function isInternalLink(href: string): boolean {
   return href.startsWith('/') || href.startsWith('#');
 }
 
-function DsfrLink({ href, children, node: _node, ...props }: ComponentPropsWithoutRef<'a'> & { node?: unknown }) {
+function DsfrLink({
+  href,
+  children,
+  node: _node,
+  ...props
+}: ComponentPropsWithoutRef<'a'> & { node?: unknown }) {
   if (href && isInternalLink(href)) {
     return (
       <Link to={href} {...props}>
@@ -24,7 +29,11 @@ function DsfrLink({ href, children, node: _node, ...props }: ComponentPropsWitho
   );
 }
 
-function DsfrTable({ children, node: _node, ...props }: ComponentPropsWithoutRef<'table'> & { node?: unknown }) {
+function DsfrTable({
+  children,
+  node: _node,
+  ...props
+}: ComponentPropsWithoutRef<'table'> & { node?: unknown }) {
   return (
     <div className="fr-table">
       <table {...props}>{children}</table>
@@ -44,7 +53,12 @@ function createDsfrHeading(level: 'h1' | 'h2' | 'h3' | 'h4' | 'h5' | 'h6') {
   const Tag: ElementType = level;
   const styles = HEADING_STYLES[level];
 
-  return function DsfrHeading({ children, className, node: _node, ...props }: ComponentPropsWithoutRef<typeof level> & { node?: unknown }) {
+  return function DsfrHeading({
+    children,
+    className,
+    node: _node,
+    ...props
+  }: ComponentPropsWithoutRef<typeof level> & { node?: unknown }) {
     return (
       <Tag className={cn(styles, className)} {...props}>
         {children}
@@ -84,7 +98,7 @@ const variants = new Map([
   ['NOTE', 'note'],
   ['WARNING', 'warning'],
   ['TIP', 'tip'],
-  ['ATTENTION', 'attention']
+  ['ATTENTION', 'attention'],
 ]);
 
 function remarkCallouts() {
@@ -113,7 +127,7 @@ function remarkCallouts() {
 
       node.data = node.data || {};
       (node.data as Record<string, unknown>).hProperties = {
-        ...((node.data as Record<string, unknown>).hProperties as Record<string, unknown> || {}),
+        ...(((node.data as Record<string, unknown>).hProperties as Record<string, unknown>) || {}),
         'data-callout': variant,
       };
     });
@@ -128,10 +142,19 @@ interface BlockquoteProps extends ComponentPropsWithoutRef<'div'> {
   'data-callout'?: string;
 }
 
-function DsfrBlockquote({ children, node: _node, cite: _cite, 'data-callout': callout, ...props }: BlockquoteProps) {
+function DsfrBlockquote({
+  children,
+  node: _node,
+  cite: _cite,
+  'data-callout': callout,
+  ...props
+}: BlockquoteProps) {
   if (callout === 'warning') {
     return (
-      <div className="fr-callout fr-icon-warning-line fr-callout--brown-caramel fr-my-3w" {...props}>
+      <div
+        className="fr-callout fr-icon-warning-line fr-callout--brown-caramel fr-my-3w"
+        {...props}
+      >
         <div>{children}</div>
       </div>
     );
@@ -147,7 +170,10 @@ function DsfrBlockquote({ children, node: _node, cite: _cite, 'data-callout': ca
 
   if (callout === 'tip') {
     return (
-      <div className="fr-callout fr-icon-lightbulb-line fr-callout--green-emeraude fr-my-3w" {...props}>
+      <div
+        className="fr-callout fr-icon-lightbulb-line fr-callout--green-emeraude fr-my-3w"
+        {...props}
+      >
         <div>{children}</div>
       </div>
     );
@@ -155,7 +181,10 @@ function DsfrBlockquote({ children, node: _node, cite: _cite, 'data-callout': ca
 
   if (callout === 'attention') {
     return (
-      <div className="fr-callout fr-icon-warning-line fr-callout--orange-terre-battue fr-my-3w" {...props}>
+      <div
+        className="fr-callout fr-icon-warning-line fr-callout--orange-terre-battue fr-my-3w"
+        {...props}
+      >
         <div>{children}</div>
       </div>
     );

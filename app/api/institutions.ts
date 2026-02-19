@@ -1,6 +1,7 @@
 import { useQuery } from '@tanstack/react-query';
 import { useMemo } from 'react';
 import { APIError, api } from '@/api/eden-treaty';
+import type { InstitutionSearchParams } from '~/schemas/institutions';
 
 // =============================================================================
 // QUERY KEYS
@@ -10,24 +11,6 @@ const queryKeys = {
   search: (queryParams: InstitutionSearchParams) =>
     ['institutions', 'search', queryParams] as const,
 };
-
-// =============================================================================
-// TYPES
-// =============================================================================
-
-export interface InstitutionSearchParams {
-  q?: string;
-  page?: number;
-  pageSize?: number;
-}
-
-export interface Institution {
-  id: string; // paysage_elt.id - used for filtering programs
-  label: string; // paysage_elt.name - display name
-  uai?: string;
-  city?: string;
-  nature?: string;
-}
 
 // =============================================================================
 // API FUNCTIONS
@@ -66,7 +49,7 @@ export function useInstitutionsSearch(
     staleTime: 30 * 1000, // 30 seconds
   });
 
-  const institutions: Institution[] = data?.institutions ?? [];
+  const institutions = data?.institutions ?? [];
   const totalCount = data?.totalCount ?? 0;
 
   // Transform institutions to filter options format

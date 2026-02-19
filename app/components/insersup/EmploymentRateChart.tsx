@@ -63,8 +63,9 @@ export function EmploymentRateChart({ yearData, year }: EmploymentRateChartProps
       source="insersup"
       tooltip={
         <span>
-          Calculé en rapportant le nombre de diplômés en emploi au nombre total de sortants, à chaque échéance.
-          {' '}<Link to="/guide/indicateurs/emploi">En savoir plus</Link> sur le calcul des taux d'emploi.
+          Calculé en rapportant le nombre de diplômés en emploi au nombre total de sortants, à
+          chaque échéance. <Link to="/guide/indicateurs/emploi">En savoir plus</Link> sur le calcul
+          des taux d'emploi.
         </span>
       }
       noData={!canShow ? { message: noDataMessage, icon: 'fr-icon-lock-line' } : undefined}

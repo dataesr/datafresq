@@ -6,7 +6,10 @@ interface SectionLinksProps {
   title?: string;
 }
 
-export default function SectionLinks({ sectionHref, title = 'Dans cette section' }: SectionLinksProps) {
+export default function SectionLinks({
+  sectionHref,
+  title = 'Dans cette section',
+}: SectionLinksProps) {
   const children = getChildren(sectionHref);
   if (children.length === 0) return null;
 
@@ -19,7 +22,10 @@ export default function SectionLinks({ sectionHref, title = 'Dans cette section'
             <Link to={child.href} className="fr-link">
               {child.title}
             </Link>
-            <span className="fr-text--sm fr-text-mention--grey fr-mb-0" style={{ display: 'block' }}>
+            <span
+              className="fr-text--sm fr-text-mention--grey fr-mb-0"
+              style={{ display: 'block' }}
+            >
               {child.description}
             </span>
           </li>

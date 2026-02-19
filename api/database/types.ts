@@ -1,9 +1,5 @@
-import type {
-  InsersupAggregations,
-  ProgramAggregations,
-  SiseAggregations,
-} from '~/schemas/aggregations';
-import type { programSchema } from '~/schemas/programs';
+import type { WorkspaceAggregationsResponse } from '~/schemas/aggregations';
+import type { Program } from '~/schemas/programs';
 
 // Workspace user role
 export type WorkspaceUserRole = 'viewer' | 'editor';
@@ -92,7 +88,7 @@ export interface SessionDoc {
   lastRefreshedAt: Date;
 }
 
-export type ProgramDoc = typeof programSchema.static;
+export type ProgramDoc = Program;
 
 export type SiseDoc = {
   annee_universitaire: string;
@@ -270,11 +266,14 @@ export interface InsersupDoc {
 
 // Workspace cache document stored in MongoDB
 // Uses types from ~/schemas/aggregations.ts as the source of truth
-export interface WorkspaceCacheDoc {
-  workspaceId: string;
-  updatedAt: Date;
-  programCount: number;
-  studentsAggregations: SiseAggregations;
-  programAggregations: ProgramAggregations;
-  insersupAggregations: InsersupAggregations;
+export type WorkspaceCacheDoc = WorkspaceAggregationsResponse;
+
+export interface GuideReviewDoc {
+  id: string;
+  userId: string;
+  userEmail: string;
+  pageId: string;
+  thumb: 1 | -1;
+  comment: string | null;
+  createdAt: Date;
 }

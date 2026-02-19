@@ -52,11 +52,7 @@ function SidemenuItem({ item, idPrefix }: { item: NavItem; idPrefix: string }) {
             </Link>
           </li>
           {item.children!.map((child) => (
-            <SidemenuItem
-              key={child.href}
-              item={child}
-              idPrefix={idPrefix}
-            />
+            <SidemenuItem key={child.href} item={child} idPrefix={idPrefix} />
           ))}
         </ul>
       </div>

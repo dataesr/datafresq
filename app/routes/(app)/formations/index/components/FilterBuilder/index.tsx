@@ -891,7 +891,12 @@ export function FilterBuilder({
   );
 
   const handleValuesChange = useCallback(
-    (filterKey: keyof FilterState, values: string[], institutions?: Institution[], careers?: Career[]) => {
+    (
+      filterKey: keyof FilterState,
+      values: string[],
+      institutions?: Institution[],
+      careers?: Career[],
+    ) => {
       const config = FILTER_CONFIGS.find((c) => c.key === filterKey);
       if (config) {
         if (config.type === 'boolean') {

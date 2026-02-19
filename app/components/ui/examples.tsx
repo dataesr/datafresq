@@ -1,9 +1,10 @@
 import { useMemo, useState } from 'react';
-import { type Institution, useInstitutionsSearch } from '@/api/institutions';
+import { useInstitutionsSearch } from '@/api/institutions';
 import { Dropdown } from './Dropdown';
 import { useDebounce } from './hooks/useDebounce';
 import { Select } from './Select';
 import { toast } from './Toast';
+import type { InstitutionSearchResponse } from '~/schemas/institutions';
 
 // =============================================================================
 // EXAMPLE WRAPPER COMPONENT
@@ -342,7 +343,7 @@ export function SelectWithGroups() {
 
 export function SelectAsyncSearch() {
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
-  const [selectedItems, setSelectedItems] = useState<Institution[]>([]);
+  const [selectedItems, setSelectedItems] = useState<InstitutionSearchResponse["institutions"]>([]);
   const [query, setQuery] = useState('');
 
   const debouncedQuery = useDebounce(query, { delay: 300 });
@@ -355,7 +356,7 @@ export function SelectAsyncSearch() {
     pageSize: 20,
   });
 
-  const handleToggle = (inst: Institution) => {
+  const handleToggle = (inst: InstitutionSearchResponse["institutions"][number]) => {
     if (selectedIds.includes(inst.id)) {
       setSelectedIds(selectedIds.filter((id) => id !== inst.id));
       setSelectedItems(selectedItems.filter((i) => i.id !== inst.id));

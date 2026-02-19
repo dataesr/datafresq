@@ -18,7 +18,7 @@ export const colorFamily = [
   'beige-gris-galet',
 ] as const;
 
-type ColorFamily = typeof colorFamily[number];
+type ColorFamily = (typeof colorFamily)[number];
 
 export const major: Record<ColorFamily, string> = {
   'green-tilleul-verveine': '#66673d',
@@ -39,7 +39,6 @@ export const major: Record<ColorFamily, string> = {
   'brown-opera': '#745b47',
   'beige-gris-galet': '#6a6156',
 };
-
 
 export const minor: Record<ColorFamily, string> = {
   'green-tilleul-verveine': '#b7a73f',

@@ -2,39 +2,46 @@ import { Activity, useMemo, useState } from 'react';
 import { EffectifsEvolutionChart, EmptyState } from '@/components/effectifs';
 import { AutoGrid } from '@/components/Grids/AutoGrid';
 import { YearSelector } from '@/components/YearSelector';
-import type { SiseRecord } from '~/schemas/programs';
+import type { ProgramSiseStats, ProgramSiseYearStats } from '~/schemas/programs';
 import { CityChart } from './components/CityChart';
 import { EffectifsStatsCards } from './components/EffectifsStatsCards';
 import { StudyYearChart } from './components/StudyYearChart';
-import { type SiseYearStats, useSiseStats } from './useSiseStats';
 
 interface EffectifsProps {
-  siseData: SiseRecord[];
+  siseData: ProgramSiseStats;
 }
 
 export default function Effectifs({ siseData }: EffectifsProps) {
-  const stats = useSiseStats(siseData);
+  const { byYear } = siseData;
 
-  // Available years sorted descending (most recent first)
   const availableYears = useMemo(
-    () => [...stats.years].sort((a, b) => b.localeCompare(a)),
-    [stats.years],
+    () => byYear.map((y) => y.year).sort((a, b) => b.localeCompare(a)),
+    [byYear],
   );
 
-  // Year data map for quick lookup
   const yearDataMap = useMemo(() => {
-    const map = new Map<string, SiseYearStats>();
-    for (const yearStats of stats.byYear) {
+    const map = new Map<string, ProgramSiseYearStats>();
+    for (const yearStats of byYear) {
       map.set(yearStats.year, yearStats);
     }
     return map;
-  }, [stats.byYear]);
+  }, [byYear]);
 
-  const canShowEvolution = stats.showEvolutionChart;
+  const canShowEvolution = byYear.length > 1;
+
+  const evolutionData = useMemo(() => {
+    const sorted = [...byYear].sort((a, b) => a.year.localeCompare(b.year));
+    return {
+      years: sorted.map((y) => y.year),
+      totalTrend: sorted.map((y) => y.total),
+      womenTrend: sorted.map((y) => y.women),
+      menTrend: sorted.map((y) => y.men),
+    };
+  }, [byYear]);
 
   const [selectedYear, setSelectedYear] = useState<string | null>(() => availableYears[0] || null);
 
-  if (!stats.hasData) {
+  if (byYear.length === 0) {
     return (
       <section id="effectifs">
         <EmptyState />
@@ -55,7 +62,6 @@ export default function Effectifs({ siseData }: EffectifsProps) {
           disableEvolutionTooltip="Pas assez d'années pour afficher l'évolution (minimum 2 requises)"
         />
 
-        {/* Year Views - one Activity per year, only the selected one is visible */}
         {availableYears.map((year) => {
           const yearData = yearDataMap.get(year);
           if (!yearData) return null;
@@ -69,20 +75,20 @@ export default function Effectifs({ siseData }: EffectifsProps) {
               />
 
               <AutoGrid min={500}>
-                {yearData.showStudyYearChart && (
+                {yearData.byStudyYear.length > 1 && (
                   <StudyYearChart
-                    categories={yearData.studyYearData.categories}
-                    women={yearData.studyYearData.women}
-                    men={yearData.studyYearData.men}
+                    categories={yearData.byStudyYear.map((d) => d.key)}
+                    women={yearData.byStudyYear.map((d) => d.women)}
+                    men={yearData.byStudyYear.map((d) => d.men)}
                     latestYear={yearData.year}
                   />
                 )}
 
-                {yearData.showCityChart && (
+                {yearData.byCity.length > 1 && (
                   <CityChart
-                    categories={yearData.cityData.categories}
-                    women={yearData.cityData.women}
-                    men={yearData.cityData.men}
+                    categories={yearData.byCity.map((d) => d.key)}
+                    women={yearData.byCity.map((d) => d.women)}
+                    men={yearData.byCity.map((d) => d.men)}
                     latestYear={yearData.year}
                   />
                 )}
@@ -91,14 +97,13 @@ export default function Effectifs({ siseData }: EffectifsProps) {
           );
         })}
 
-        {/* Evolution View - shown when no specific year is selected */}
         <Activity mode={selectedYear ? 'hidden' : 'visible'}>
           <AutoGrid min={600}>
             <EffectifsEvolutionChart
-              years={stats.years}
-              totalTrend={stats.totalTrend}
-              womenTrend={stats.womenTrend}
-              menTrend={stats.menTrend}
+              years={evolutionData.years}
+              totalTrend={evolutionData.totalTrend}
+              womenTrend={evolutionData.womenTrend}
+              menTrend={evolutionData.menTrend}
             />
           </AutoGrid>
         </Activity>

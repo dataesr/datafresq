@@ -3,7 +3,11 @@ import { programsParamsSchema } from './programs';
 import { userLightSchema } from './users';
 
 // Search params for workspace operations (without pagination)
-export const workspaceSearchParamsSchema = t.Omit(programsParamsSchema, ['page', 'pageSize', 'sort']);
+export const workspaceSearchParamsSchema = t.Omit(programsParamsSchema, [
+  'page',
+  'pageSize',
+  'sort',
+]);
 
 // ============================================================================
 // Schemas
@@ -74,7 +78,6 @@ export const workspaceEventTypeSchema = t.Union([
   t.Literal('user_role_changed'),
   t.Literal('program_added'),
   t.Literal('program_removed'),
-  t.Literal('ownership_transferred'),
 ]);
 
 export const workspaceEventDetailsSchema = t.Object({
@@ -110,50 +113,6 @@ export const workspaceHistoryResponseSchema = t.Object({
     total: t.Number(),
     limit: t.Number(),
     offset: t.Number(),
-  }),
-});
-
-// Aggregation bucket schema for cache
-const aggregationBucketSchema = t.Object({
-  total: t.Number(),
-  female: t.Number(),
-  male: t.Number(),
-});
-
-export const workspaceCacheSchema = t.Object({
-  workspaceId: t.String(),
-  updatedAt: t.Date(),
-  programCount: t.Number(),
-  aggregations: t.Object({
-    totalPrograms: t.Number(),
-    totalStudents: t.Number(),
-    totalFemale: t.Number(),
-    totalMale: t.Number(),
-    byYear: t.Array(t.Composite([t.Object({ year: t.String() }), aggregationBucketSchema])),
-    byCycle: t.Array(t.Composite([t.Object({ cycle: t.String() }), aggregationBucketSchema])),
-    byAcademy: t.Array(t.Composite([t.Object({ academy: t.String() }), aggregationBucketSchema])),
-    byRegion: t.Array(t.Composite([t.Object({ region: t.String() }), aggregationBucketSchema])),
-    byDiploma: t.Array(
-      t.Composite([
-        t.Object({ diploma: t.String(), diplomaLabel: t.String() }),
-        aggregationBucketSchema,
-      ]),
-    ),
-    byInstitution: t.Array(
-      t.Composite([t.Object({ id: t.String(), name: t.String() }), aggregationBucketSchema]),
-    ),
-    byDiscipline: t.Array(
-      t.Composite([
-        t.Object({ discipline: t.String(), disciplineLabel: t.String() }),
-        aggregationBucketSchema,
-      ]),
-    ),
-    byLargeDiscipline: t.Array(
-      t.Composite([
-        t.Object({ largeDiscipline: t.String(), largeDisciplineLabel: t.String() }),
-        aggregationBucketSchema,
-      ]),
-    ),
   }),
 });
 
@@ -195,6 +154,28 @@ export const removeProgramsSchema = t.Object({
   programs: t.Array(t.String()),
 });
 
+export const listPublicWorkspacesQuerySchema = t.Optional(
+  t.Object({
+    query: t.Optional(t.String()),
+    size: t.Optional(t.Numeric()),
+    sortBy: t.Optional(t.String()),
+    sortOrder: t.Optional(t.Union([t.Numeric(t.Literal(1)), t.Numeric(t.Literal(-1))])),
+  }),
+);
+
+export const listUserWorkspacesQuerySchema = t.Optional(
+  t.Object({
+    query: t.Optional(t.String()),
+    filter: t.Optional(t.Union([t.Literal('all'), t.Literal('owned'), t.Literal('shared')])),
+  }),
+);
+
+export const workspaceHistoryQuerySchema = t.Object({
+  limit: t.Optional(t.String()),
+  offset: t.Optional(t.String()),
+  type: t.Optional(t.String()),
+});
+
 // ============================================================================
 // Types
 // ============================================================================
@@ -209,7 +190,6 @@ export type WorkspaceEventType = typeof workspaceEventTypeSchema.static;
 export type WorkspaceEventDetails = typeof workspaceEventDetailsSchema.static;
 export type WorkspaceEvent = typeof workspaceEventSchema.static;
 export type WorkspaceHistoryResponse = typeof workspaceHistoryResponseSchema.static;
-export type WorkspaceCache = typeof workspaceCacheSchema.static;
 export type AddUsers = typeof addUsersSchema.static;
 export type RemoveUsers = typeof removeUsersSchema.static;
 export type UpdateUserRole = typeof updateUserRoleSchema.static;
@@ -218,3 +198,6 @@ export type RemovePrograms = typeof removeProgramsSchema.static;
 export type PreviewAddPrograms = typeof previewAddProgramsSchema.static;
 export type PreviewAddProgramsResponse = typeof previewAddProgramsResponseSchema.static;
 export type WorkspaceSearchParams = typeof workspaceSearchParamsSchema.static;
+export type ListPublicWorkspacesQuery = NonNullable<typeof listPublicWorkspacesQuerySchema.static>;
+export type ListUserWorkspacesQuery = NonNullable<typeof listUserWorkspacesQuerySchema.static>;
+export type WorkspaceHistoryQuery = typeof workspaceHistoryQuerySchema.static;

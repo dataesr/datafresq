@@ -1,66 +1,40 @@
-import { Elysia, t } from 'elysia';
-
-import { collections } from '~/database/mongo';
+import { Elysia } from 'elysia';
 import { InvalidSessionError } from '~/errors';
 import { authMacro } from '~/macros/authMacro';
 import { cookiesPlugin } from '~/plugins/cookies';
 import { authCookieSchema } from '~/schemas/auth';
-import { errorResponseSchema, successResponseSchema } from '~/schemas/common';
-import { USER_ME_PROJECTION } from '~/schemas/users';
-import { hashToken } from '~/utils/token';
+import { errorResponseSchema, idParamSchema, successResponseSchema } from '~/schemas/common';
+import { currentSessionResponseSchema, sessionsListResponseSchema } from '~/schemas/sessions';
+import * as sessionsService from '~/services/sessions.service';
 
 export const sessionsRoutes = new Elysia({ prefix: '/sessions' })
   .use(authMacro)
   .use(cookiesPlugin)
+  .guard({
+    isAuth: true,
+    allow: ['user', 'admin', 'root'],
+    detail: { tags: ['Sessions'] },
+    response: {
+      401: errorResponseSchema,
+    },
+  })
   .get(
     '/',
     async ({ user }) => {
-      const userDoc = await collections.users.findOne({ email: user.email });
-      if (!userDoc) throw new InvalidSessionError('Utilisateur introuvable');
-
-      const sessions = await collections.sessions
-        .find({ userId: userDoc.id })
-        .sort({ lastRefreshedAt: -1 })
-        .toArray();
-
-      const formattedSessions = sessions.map(
-        ({ id, userAgent, ipAddress, createdAt, lastRefreshedAt, expiresAt }) => ({
-          id,
-          userAgent,
-          ipAddress,
-          createdAt,
-          lastRefreshedAt,
-          expiresAt,
-        }),
-      );
-
-      return {
-        sessions: formattedSessions,
-        total: formattedSessions.length,
-      };
+      const sessions = await sessionsService.listSessionsForEmail(user.email);
+      return { sessions, total: sessions.length };
     },
     {
-      isAuth: true,
       response: {
-        200: t.Object({
-          sessions: t.Array(
-            t.Object({
-              id: t.String(),
-              userAgent: t.String(),
-              ipAddress: t.Union([t.String(), t.Null()]),
-              createdAt: t.Date(),
-              lastRefreshedAt: t.Date(),
-              expiresAt: t.Date(),
-            }),
-          ),
-          total: t.Number(),
-        }),
-        401: errorResponseSchema,
+        200: sessionsListResponseSchema,
       },
       detail: {
-        summary: 'List active sessions',
-        description: 'Get all active sessions for the authenticated user',
-        tags: ['Sessions'],
+        summary: 'Lister les sessions actives',
+        description:
+          "Retourne toutes les sessions actives de l'utilisateur " +
+          'connecté, triées par date de dernier rafraîchissement. ' +
+          'Chaque session contient les informations du navigateur, ' +
+          "l'adresse IP et les dates de création/expiration.",
       },
     },
   )
@@ -68,54 +42,24 @@ export const sessionsRoutes = new Elysia({ prefix: '/sessions' })
     '/current',
     async ({ user, authCookies }) => {
       const { session: currentSessionToken } = authCookies.get();
-      if (!currentSessionToken) throw new InvalidSessionError('Missing session token');
+      if (!currentSessionToken) {
+        throw new InvalidSessionError('Jeton de session manquant');
+      }
 
-      const userDoc = await collections.users.findOne(
-        { email: user.email },
-        { projection: USER_ME_PROJECTION },
-      );
-      if (!userDoc) throw new InvalidSessionError('Utilisateur introuvable');
-
-      const currentSessionTokenHash = hashToken(currentSessionToken);
-      const session = await collections.sessions.findOne({
-        sessionTokenHash: currentSessionTokenHash,
-        userId: userDoc.id,
-      });
-
-      if (!session) throw new InvalidSessionError('Session introuvable');
-
-      return {
-        success: true,
-        data: {
-          id: session.id,
-          userAgent: session.userAgent,
-          ipAddress: session.ipAddress,
-          createdAt: session.createdAt,
-          lastRefreshedAt: session.lastRefreshedAt,
-          expiresAt: session.expiresAt,
-        },
-      };
+      const data = await sessionsService.getCurrentSessionForEmail(user.email, currentSessionToken);
+      return { success: true, data };
     },
     {
-      isAuth: true,
       response: {
-        200: t.Object({
-          success: t.Boolean(),
-          data: t.Object({
-            id: t.String(),
-            userAgent: t.String(),
-            ipAddress: t.Union([t.String(), t.Null()]),
-            createdAt: t.Date(),
-            lastRefreshedAt: t.Date(),
-            expiresAt: t.Date(),
-          }),
-        }),
-        401: errorResponseSchema,
+        200: currentSessionResponseSchema,
       },
       detail: {
-        summary: 'Get current session info',
-        description: 'Get all active sessions for the authenticated user',
-        tags: ['Sessions'],
+        summary: 'Obtenir la session courante',
+        description:
+          'Retourne les détails de la session associée au cookie ' +
+          "de session actuel. Permet au client d'identifier " +
+          "quelle session correspond à l'appareil en cours " +
+          "d'utilisation.",
       },
       cookie: authCookieSchema,
     },
@@ -123,66 +67,45 @@ export const sessionsRoutes = new Elysia({ prefix: '/sessions' })
   .delete(
     '/:id',
     async ({ params, user }) => {
-      const userDoc = await collections.users.findOne({ email: user.email });
-      if (!userDoc) throw new InvalidSessionError('Utilisateur introuvable');
-
-      // Ensure user can only delete their own sessions
-      const result = await collections.sessions.deleteOne({
-        id: params.id,
-        userId: userDoc.id,
-      });
-
-      if (result.deletedCount === 0) {
-        throw new InvalidSessionError('Session introuvable');
-      }
-
-      return {
-        success: true,
-        message: 'Session révoquée',
-      };
+      await sessionsService.revokeSessionForEmail(params.id, user.email);
+      return { success: true, message: 'Session révoquée' };
     },
     {
-      isAuth: true,
-      params: t.Object({
-        id: t.String(),
-      }),
+      params: idParamSchema,
       response: {
         200: successResponseSchema,
-        401: errorResponseSchema,
         404: errorResponseSchema,
       },
       detail: {
-        summary: 'Sign out specific device',
-        description: 'Revoke a specific session by ID',
-        tags: ['Sessions'],
+        summary: 'Révoquer une session spécifique',
+        description:
+          'Révoque une session par son identifiant. Permet à ' +
+          "l'utilisateur de déconnecter un appareil spécifique " +
+          'sans affecter ses autres sessions actives.',
       },
     },
   )
   .delete(
     '/',
     async ({ user, authCookies }) => {
-      const userDoc = await collections.users.findOne({ email: user.email });
-      if (!userDoc) throw new InvalidSessionError('Utilisateur introuvable');
-
-      const result = await collections.sessions.deleteMany({ userId: userDoc.id });
-
+      const deletedCount = await sessionsService.revokeAllSessionsForEmail(user.email);
       authCookies.clear();
 
       return {
         success: true,
-        message: `${result.deletedCount} session(s) révoquée(s)`,
+        message: `${deletedCount} session(s) révoquée(s)`,
       };
     },
     {
-      isAuth: true,
       response: {
         200: successResponseSchema,
-        401: errorResponseSchema,
       },
       detail: {
-        summary: 'Sign out all devices',
-        description: 'Revoke all sessions for the authenticated user',
-        tags: ['Sessions'],
+        summary: 'Révoquer toutes les sessions',
+        description:
+          "Révoque toutes les sessions actives de l'utilisateur " +
+          'connecté et supprime les cookies de session. Équivaut ' +
+          'à une déconnexion globale de tous les appareils.',
       },
     },
   );

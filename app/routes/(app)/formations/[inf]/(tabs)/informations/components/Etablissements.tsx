@@ -1,7 +1,7 @@
 import { useMemo } from 'react';
 import { AutoGrid } from '@/components/Grids/AutoGrid';
-import FormationMap from './FormationMap';
 import type { Etablissement as EtablissementType, Program } from '~/schemas/programs';
+import FormationMap from './FormationMap';
 
 type EtablissementsProps = {
   etabs: Program['etablissements'];

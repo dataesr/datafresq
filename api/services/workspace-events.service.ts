@@ -1,21 +1,13 @@
 import { collections } from '~/database/mongo';
 import type { WorkspaceEventDoc, WorkspaceUserRole } from '~/database/types';
 
-/**
- * Log a workspace event for history tracking
- */
-export async function logWorkspaceEvent(
-  event: Omit<WorkspaceEventDoc, 'timestamp'>,
-): Promise<void> {
+async function logWorkspaceEvent(event: Omit<WorkspaceEventDoc, 'timestamp'>): Promise<void> {
   await collections.workspaceEvents.insertOne({
     ...event,
     timestamp: new Date(),
   });
 }
 
-/**
- * Log workspace creation event
- */
 export async function logWorkspaceCreated(
   workspaceId: string,
   workspaceName: string,
@@ -25,15 +17,10 @@ export async function logWorkspaceCreated(
     workspaceId,
     type: 'workspace_created',
     actor,
-    details: {
-      workspaceName,
-    },
+    details: { workspaceName },
   });
 }
 
-/**
- * Log workspace update event
- */
 export async function logWorkspaceUpdated(
   workspaceId: string,
   actor: string,
@@ -45,15 +32,10 @@ export async function logWorkspaceUpdated(
     workspaceId,
     type: 'workspace_updated',
     actor,
-    details: {
-      changes,
-    },
+    details: { changes },
   });
 }
 
-/**
- * Log user added to workspace event
- */
 export async function logUserAdded(
   workspaceId: string,
   actor: string,
@@ -64,16 +46,10 @@ export async function logUserAdded(
     workspaceId,
     type: 'user_added',
     actor,
-    details: {
-      targetUserId,
-      userRole,
-    },
+    details: { targetUserId, userRole },
   });
 }
 
-/**
- * Log user removed from workspace event
- */
 export async function logUserRemoved(
   workspaceId: string,
   actor: string,
@@ -83,15 +59,10 @@ export async function logUserRemoved(
     workspaceId,
     type: 'user_removed',
     actor,
-    details: {
-      targetUserId,
-    },
+    details: { targetUserId },
   });
 }
 
-/**
- * Log user role changed event
- */
 export async function logUserRoleChanged(
   workspaceId: string,
   actor: string,
@@ -106,20 +77,11 @@ export async function logUserRoleChanged(
     details: {
       targetUserId,
       userRole: newRole,
-      changes: [
-        {
-          field: 'role',
-          oldValue: oldRole,
-          newValue: newRole,
-        },
-      ],
+      changes: [{ field: 'role', oldValue: oldRole, newValue: newRole }],
     },
   });
 }
 
-/**
- * Log programs added to workspace event
- */
 export async function logProgramsAdded(
   workspaceId: string,
   actor: string,
@@ -131,15 +93,10 @@ export async function logProgramsAdded(
     workspaceId,
     type: 'program_added',
     actor,
-    details: {
-      programIds,
-    },
+    details: { programIds },
   });
 }
 
-/**
- * Log programs removed from workspace event
- */
 export async function logProgramsRemoved(
   workspaceId: string,
   actor: string,
@@ -151,26 +108,6 @@ export async function logProgramsRemoved(
     workspaceId,
     type: 'program_removed',
     actor,
-    details: {
-      programIds,
-    },
-  });
-}
-
-/**
- * Log ownership transferred event
- */
-export async function logOwnershipTransferred(
-  workspaceId: string,
-  actor: string,
-  newOwnerId: string,
-): Promise<void> {
-  await logWorkspaceEvent({
-    workspaceId,
-    type: 'ownership_transferred',
-    actor,
-    details: {
-      targetUserId: newOwnerId,
-    },
+    details: { programIds },
   });
 }

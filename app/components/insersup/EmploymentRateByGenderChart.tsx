@@ -78,8 +78,9 @@ export function EmploymentRateByGenderChart({ yearData, year }: EmploymentRateBy
       source="insersup"
       tooltip={
         <span>
-          Taux d'emploi salarié calculé séparément pour les femmes et les hommes de la promotion.
-          {' '}<Link to="/guide/indicateurs/emploi">En savoir plus</Link> sur le calcul des taux d'emploi.
+          Taux d'emploi salarié calculé séparément pour les femmes et les hommes de la promotion.{' '}
+          <Link to="/guide/indicateurs/emploi">En savoir plus</Link> sur le calcul des taux
+          d'emploi.
         </span>
       }
       noData={!canShow ? { message: noDataMessage, icon: 'fr-icon-lock-line' } : undefined}

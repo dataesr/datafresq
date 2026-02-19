@@ -19,7 +19,7 @@ export const jwtAccessToken = new Elysia({
 }).use(
   jwt({
     name: 'jwtAccessToken',
-    secret: config.jwt.secret,
+    secret: config.jwt.secret!,
     exp: `${ACCESS_TOKEN_EXP}s`,
     schema: jwtSchema,
   }),

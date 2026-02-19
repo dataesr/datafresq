@@ -48,9 +48,10 @@ export function WorkspaceSelector({
 
   useEffect(() => {
     search.resetFocus();
-  }, [searchValue, search.resetFocus]);
+  }, [search.resetFocus]);
 
-  const focusedItem = search.focusedIndex >= 0 ? filteredWorkspaces[search.focusedIndex] : undefined;
+  const focusedItem =
+    search.focusedIndex >= 0 ? filteredWorkspaces[search.focusedIndex] : undefined;
   const focusedWorkspace = focusedItem ? `workspace-${focusedItem.id}` : undefined;
 
   return (
@@ -80,15 +81,13 @@ export function WorkspaceSelector({
         listboxId="workspace-selector-listbox"
         activedescendant={focusedWorkspace}
         footer={
-          <>
-            <p className="fr-text--xs fr-text-mention--grey fr-mb-0">
-              <SearchModal.Kbd>↑↓</SearchModal.Kbd> naviguer
-              {' · '}
-              <SearchModal.Kbd>↩</SearchModal.Kbd> sélectionner
-              {' · '}
-              <SearchModal.Kbd>esc</SearchModal.Kbd> fermer
-            </p>
-          </>
+          <p className="fr-text--xs fr-text-mention--grey fr-mb-0">
+            <SearchModal.Kbd>↑↓</SearchModal.Kbd> naviguer
+            {' · '}
+            <SearchModal.Kbd>↩</SearchModal.Kbd> sélectionner
+            {' · '}
+            <SearchModal.Kbd>esc</SearchModal.Kbd> fermer
+          </p>
         }
       >
         {filteredWorkspaces.length === 0 && (
@@ -123,7 +122,7 @@ export function WorkspaceSelector({
               {activeWorkspace?.id === workspace.id && (
                 <span
                   className="fr-icon-check-line fr-text-label--blue-france fx-flex-shrink-0"
-                  aria-label="Espace actif"
+                  aria-hidden="true"
                 />
               )}
             </div>

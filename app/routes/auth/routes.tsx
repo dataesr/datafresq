@@ -1,9 +1,11 @@
+import { lazy } from 'react';
 import { Navigate, Route } from 'react-router';
-import CreerUnCompte from './inscription';
-import ReinitialiserMotDePasse from './reinitialiser-mot-de-passe';
-import MotDePasseOublie from './mot-de-passe-oublie';
-import SignIn from './se-connecter';
 import AuthLayout from './layout';
+
+const SignIn = lazy(() => import('./se-connecter'));
+const MotDePasseOublie = lazy(() => import('./mot-de-passe-oublie'));
+const ReinitialiserMotDePasse = lazy(() => import('./reinitialiser-mot-de-passe'));
+const CreerUnCompte = lazy(() => import('./inscription'));
 
 export const authRoutes = (
   <Route path="auth" element={<AuthLayout />}>

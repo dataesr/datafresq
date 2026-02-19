@@ -124,7 +124,6 @@ export const insersupGenderStatsSchema = t.Object({
   emploiSalFr: t.Union([employmentCountsSchema, t.Null()]),
   emploiNonSal: t.Union([employmentCountsSchema, t.Null()]),
   emploiStable: t.Union([employmentCountsSchema, t.Null()]),
-  salaires: t.Union([salaryQuartilesSchema, t.Null()]),
 });
 
 // Program data within a year - only inf, frontend will lookup full program details
@@ -136,7 +135,6 @@ const insersupProgramDataSchema = t.Object({
   emploiSalFr: t.Union([employmentCountsSchema, t.Null()]),
   emploiNonSal: t.Union([employmentCountsSchema, t.Null()]),
   emploiStable: t.Union([employmentCountsSchema, t.Null()]),
-  salaires: t.Union([salaryQuartilesSchema, t.Null()]),
 });
 
 export const insersupYearStatsSchema = t.Object({
@@ -147,7 +145,6 @@ export const insersupYearStatsSchema = t.Object({
   emploiSalFr: t.Union([employmentCountsSchema, t.Null()]),
   emploiNonSal: t.Union([employmentCountsSchema, t.Null()]),
   emploiStable: t.Union([employmentCountsSchema, t.Null()]),
-  salaires: t.Union([salaryQuartilesSchema, t.Null()]),
   byGender: t.Object({
     femme: t.Union([insersupGenderStatsSchema, t.Null()]),
     homme: t.Union([insersupGenderStatsSchema, t.Null()]),
@@ -217,6 +214,7 @@ export const programAggregationsSchema = t.Object({
 // ============================================================================
 
 export const workspaceAggregationsResponseSchema = t.Object({
+  workspaceId: t.String(),
   programCount: t.Number(),
   studentsAggregations: t.Union([siseAggregationsSchema, t.Null()]),
   programAggregations: t.Union([programAggregationsSchema, t.Null()]),

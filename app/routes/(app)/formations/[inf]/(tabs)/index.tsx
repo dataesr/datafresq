@@ -55,7 +55,7 @@ export default function FormationPage() {
       label: 'Effectifs étudiants',
       iconLine: 'fr-icon-team-line',
       iconFill: 'fr-icon-team-fill',
-      disabled: !data.sise?.length,
+      disabled: !data.sise?.byYear?.length,
     },
     {
       id: 'insertion',

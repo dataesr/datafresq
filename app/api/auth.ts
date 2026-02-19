@@ -1,7 +1,6 @@
-import { useMutation, useQuery, useQueryClient, useSuspenseQuery } from '@tanstack/react-query';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { APIError, api } from '@/api/eden-treaty';
-import { queryClient } from '@/api/query-client';
-import { hasAuthCookie } from '@/utils/hasAuthCookie';
+import type { Register } from '~/schemas/auth';
 
 // =============================================================================
 // QUERY KEYS
@@ -16,13 +15,9 @@ export const authKeys = {
 // =============================================================================
 
 async function checkAuth() {
-  if (!hasAuthCookie()) return null;
-
   const refreshResult = await api.auth.session.refresh.post();
 
   if (refreshResult.error) {
-    // Refresh failed - session is invalid, clear all cached data
-    queryClient.clear();
     return null;
   }
 
@@ -30,8 +25,6 @@ async function checkAuth() {
 
   if (error) {
     if (error.status === 401) {
-      // Unexpected 401 after refresh - clear cache
-      queryClient.clear();
       return null;
     }
     throw new APIError(error);
@@ -45,7 +38,7 @@ async function checkAuth() {
 // =============================================================================
 
 export function useAuth() {
-  const { data: user, isLoading } = useSuspenseQuery({
+  const { data: user, isLoading } = useQuery({
     queryKey: authKeys.user,
     queryFn: checkAuth,
     staleTime: 5 * 60 * 1000,
@@ -100,7 +93,7 @@ export function useSignOut(options?: { redirectTo?: string }) {
 export function useForgotPassword(options?: { onSuccess?: () => void }) {
   return useMutation({
     mutationFn: async (input: { email: string }) => {
-      const { error } = await api.auth['mot-de-passe-oublie'].post(input);
+      const { error } = await api.auth['forgot-password'].post(input);
       if (error) throw new APIError(error);
     },
     onSuccess: options?.onSuccess,
@@ -110,8 +103,19 @@ export function useForgotPassword(options?: { onSuccess?: () => void }) {
 export function useResetPassword(options?: { onSuccess?: () => void }) {
   return useMutation({
     mutationFn: async (input: { token: string; password: string }) => {
-      const { error } = await api.auth['reinitialiser-mot-de-passe'].post(input);
+      const { error } = await api.auth['reset-password'].post(input);
       if (error) throw new APIError(error);
+    },
+    onSuccess: options?.onSuccess,
+  });
+}
+
+export function useRegister(options?: { onSuccess?: () => void }) {
+  return useMutation({
+    mutationFn: async (input: Register) => {
+      const { data, error } = await api.auth.register.post(input);
+      if (error) throw new APIError(error);
+      return data;
     },
     onSuccess: options?.onSuccess,
   });

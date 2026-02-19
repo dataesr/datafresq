@@ -1,5 +1,4 @@
 import { Outlet } from 'react-router';
-import { Link } from 'react-router';
 import ErrorBoundary from '@/components/errors/ErrorBoundary';
 import Footer from '@/components/Footer';
 import { Header } from '@/components/Header';
@@ -10,7 +9,11 @@ import './styles.css';
 export default function GuideLayout() {
   return (
     <>
-      <Header showSidemenu sidemenuContent={<DocSidemenu idPrefix="mobile-sidemenu" />} searchContent={<GuideSearchModal />} />
+      <Header
+        showSidemenu
+        sidemenuContent={<DocSidemenu idPrefix="mobile-sidemenu" />}
+        searchContent={<GuideSearchModal />}
+      />
       <ErrorBoundary>
         <main>
           <div className="fr-container--fluid">

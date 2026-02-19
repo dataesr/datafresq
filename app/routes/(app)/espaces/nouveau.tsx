@@ -109,8 +109,8 @@ export default function NouveauEspacePage() {
         <div className="fr-alert fr-alert--info fr-mb-3w">
           <p className="fr-alert__title">
             {formationIds.length} formation{formationIds.length > 1 ? 's' : ''} sera
-            {formationIds.length > 1 ? 'ont' : ''} ajoutée{formationIds.length > 1 ? 's' : ''} à
-            cet espace
+            {formationIds.length > 1 ? 'ont' : ''} ajoutée{formationIds.length > 1 ? 's' : ''} à cet
+            espace
           </p>
         </div>
       )}

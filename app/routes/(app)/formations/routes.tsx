@@ -1,6 +1,8 @@
+import { lazy } from 'react';
 import { Route } from 'react-router';
 import { formationRoutes } from './[inf]/routes';
-import FormationsListPage from './index/index';
+
+const FormationsListPage = lazy(() => import('./index/index'));
 
 export const formationsRoutes = (
   <Route path="formations">

@@ -90,9 +90,7 @@ function TocList({ nodes, activeId }: { nodes: TocNode[]; activeId: string }) {
           >
             {node.entry.text}
           </a>
-          {node.children.length > 0 && (
-            <TocList nodes={node.children} activeId={activeId} />
-          )}
+          {node.children.length > 0 && <TocList nodes={node.children} activeId={activeId} />}
         </li>
       ))}
     </ol>
@@ -112,7 +110,7 @@ export default function TableOfContents({ entries }: TableOfContentsProps) {
   const tree = buildTocTree(entries);
 
   return (
-    <nav className="fr-summary docs-toc" role="navigation" aria-label="Sommaire">
+    <nav className="fr-summary docs-toc" aria-label="Sommaire">
       <p className="fr-summary__title">Sur cette page</p>
       <TocList nodes={tree} activeId={activeId} />
     </nav>

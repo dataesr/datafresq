@@ -7,10 +7,34 @@ import AdminUtilisateurs from './utilisateurs';
 type TabId = 'utilisateurs' | 'groupes' | 'taches' | 'domaines';
 
 const tabs: { id: TabId; label: string; iconLine: string; iconFill: string; enabled: boolean }[] = [
-  { id: 'utilisateurs', label: 'Utilisateurs', iconLine: 'fr-icon-group-line', iconFill: 'fr-icon-group-fill', enabled: true },
-  { id: 'groupes', label: 'Groupes', iconLine: 'fr-icon-team-line', iconFill: 'fr-icon-team-fill', enabled: false },
-  { id: 'taches', label: 'Tâches', iconLine: 'fr-icon-calendar-event-line', iconFill: 'fr-icon-calendar-event-fill', enabled: false },
-  { id: 'domaines', label: 'Domaines', iconLine: 'fr-icon-global-line', iconFill: 'fr-icon-global-fill', enabled: false },
+  {
+    id: 'utilisateurs',
+    label: 'Utilisateurs',
+    iconLine: 'fr-icon-group-line',
+    iconFill: 'fr-icon-group-fill',
+    enabled: true,
+  },
+  {
+    id: 'groupes',
+    label: 'Groupes',
+    iconLine: 'fr-icon-team-line',
+    iconFill: 'fr-icon-team-fill',
+    enabled: false,
+  },
+  {
+    id: 'taches',
+    label: 'Tâches',
+    iconLine: 'fr-icon-calendar-event-line',
+    iconFill: 'fr-icon-calendar-event-fill',
+    enabled: false,
+  },
+  {
+    id: 'domaines',
+    label: 'Domaines',
+    iconLine: 'fr-icon-global-line',
+    iconFill: 'fr-icon-global-fill',
+    enabled: false,
+  },
 ];
 
 function ComingSoon({ label }: { label: string }) {

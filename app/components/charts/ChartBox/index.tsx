@@ -1,9 +1,9 @@
-import { Activity, useId } from 'react';
-import { Dropdown } from '@/components/ui/Dropdown';
-import { BlurredNoData } from '@/components/charts/BlurredNoData';
-import { type SourceRef, renderSources } from '@/components/charts/sources';
-import { useChartOptions } from './useChartOptions';
 import type { HighchartsReactRefObject } from '@highcharts/react';
+import { Activity, useId } from 'react';
+import { BlurredNoData } from '@/components/charts/BlurredNoData';
+import { renderSources, type SourceRef } from '@/components/charts/sources';
+import { Dropdown } from '@/components/ui/Dropdown';
+import { useChartOptions } from './useChartOptions';
 import './styles.css';
 
 type ChartRef = React.RefObject<HighchartsReactRefObject | null>;
@@ -41,7 +41,12 @@ export function ChartBox({
   const segmentedId = useId();
 
   const effectiveChartRef = noData ? undefined : chartRef;
-  const chartOptions = useChartOptions({ chartRef: effectiveChartRef, hideMenu, title, description });
+  const chartOptions = useChartOptions({
+    chartRef: effectiveChartRef,
+    hideMenu,
+    title,
+    description,
+  });
 
   return (
     <div className="fx-card fx-card--shadow">
@@ -58,44 +63,59 @@ export function ChartBox({
             )}
           </div>
           <div className="fx-flex fx-flex-wrap-0 fx-gap-1w">
-          <Activity mode={tooltip ? 'visible' : 'hidden'}>
-            <button aria-describedby={`${titleId}-tooltip`} type="button" className="fr-btn--tooltip fr-btn">infobulle</button>
-            <span className="fr-tooltip fr-placement" id={`${titleId}-tooltip`} role="tooltip">{tooltip}</span>
-          </Activity>
-          <Activity mode={chartOptions.enabled ? 'visible' : 'hidden'}>
-            {chartOptions.enabled && (
-              <Dropdown
-                icon="settings-5-line"
-                size="sm"
-                outline={false}
-                title="Options"
-                aria-label="Options"
+            <Activity mode={tooltip ? 'visible' : 'hidden'}>
+              <button
+                aria-describedby={`${titleId}-tooltip`}
+                type="button"
+                className="fr-btn--tooltip fr-btn"
               >
-                <Dropdown.Header>Exporter</Dropdown.Header>
-                <Dropdown.Item icon="image-line" onClick={chartOptions.handleExportPng}>
-                  Export PNG
-                </Dropdown.Item>
-                <Dropdown.Item icon="file-pdf-line" onClick={chartOptions.handleExportPdf}>
-                  Export PDF
-                </Dropdown.Item>
-                <Dropdown.Separator />
-                <Dropdown.Header>Télécharger</Dropdown.Header>
-                <Dropdown.Item icon="download-line" onClick={chartOptions.handleDownloadCsv}>
-                  Télécharger CSV
-                </Dropdown.Item>
-              </Dropdown>
-            )}
-          </Activity>
+                infobulle
+              </button>
+              <span className="fr-tooltip fr-placement" id={`${titleId}-tooltip`} role="tooltip">
+                {tooltip}
+              </span>
+            </Activity>
+            <Activity mode={chartOptions.enabled ? 'visible' : 'hidden'}>
+              {chartOptions.enabled && (
+                <Dropdown
+                  icon="settings-5-line"
+                  size="sm"
+                  outline={false}
+                  title="Options"
+                  aria-label="Options"
+                >
+                  <Dropdown.Header className="fr-text--xs fr-mb-0 fr-text-mention--grey fx-text--uppercase">
+                    Exporter
+                  </Dropdown.Header>
+                  <Dropdown.Item icon="image-line" onClick={chartOptions.handleExportPng}>
+                    Export PNG
+                  </Dropdown.Item>
+                  <Dropdown.Item icon="file-pdf-line" onClick={chartOptions.handleExportPdf}>
+                    Export PDF
+                  </Dropdown.Item>
+                  <Dropdown.Separator />
+                  <Dropdown.Header className="fr-text--xs fr-mb-0 fr-text-mention--grey fx-text--uppercase">
+                    Télécharger
+                  </Dropdown.Header>
+                  <Dropdown.Item icon="download-line" onClick={chartOptions.handleDownloadCsv}>
+                    Télécharger CSV
+                  </Dropdown.Item>
+                </Dropdown>
+              )}
+            </Activity>
           </div>
         </div>
 
-        <div
-          aria-labelledby={titleId}
-          aria-describedby={description ? descriptionId : undefined}
-          className="fx-width-100"
-        >
-          <Activity mode={!chartOptions.enabled || chartOptions.view === 'chart' ? 'visible' : 'hidden'}>
-            <div role="img" aria-labelledby={titleId} className="chartbox__chart" style={{ height }}>
+        <div aria-describedby={titleId} className="fx-width-100">
+          <Activity
+            mode={!chartOptions.enabled || chartOptions.view === 'chart' ? 'visible' : 'hidden'}
+          >
+            <div
+              role="img"
+              aria-labelledby={titleId}
+              className="chartbox__chart"
+              style={{ height }}
+            >
               {noData ? (
                 <BlurredNoData noData icon={noData.icon} message={noData.message}>
                   {children}
@@ -115,12 +135,14 @@ export function ChartBox({
                         className="fr-table__content"
                         /* biome-ignore lint/security/noDangerouslySetInnerHtml: HTML comes from Highcharts getTable() */
                         dangerouslySetInnerHTML={{ __html: chartOptions.tableHtml }}
-                        />
+                      />
                     </div>
                   </div>
                 </div>
               ) : (
-                <p className="fr-text--sm fr-text-mention--grey">Aucune donnée tabulaire disponible.</p>
+                <p className="fr-text--sm fr-text-mention--grey">
+                  Aucune donnée tabulaire disponible.
+                </p>
               )}
             </Activity>
           )}
@@ -154,11 +176,7 @@ export function ChartBox({
                       checked={chartOptions.view === 'chart'}
                       onChange={() => chartOptions.switchView('chart')}
                     />
-                    <label
-                      className="fr-label"
-                      htmlFor={`${segmentedId}-chart`}
-                      title="Graphique"
-                    >
+                    <label className="fr-label" htmlFor={`${segmentedId}-chart`} title="Graphique">
                       <span aria-hidden="true" className="fr-icon-pie-chart-2-fill fr-icon--sm" />
                       <span className="fr-sr-only">Vue graphique</span>
                     </label>
@@ -172,11 +190,7 @@ export function ChartBox({
                       checked={chartOptions.view === 'table'}
                       onChange={() => chartOptions.switchView('table')}
                     />
-                    <label
-                      className="fr-label"
-                      htmlFor={`${segmentedId}-table`}
-                      title="Tableau"
-                    >
+                    <label className="fr-label" htmlFor={`${segmentedId}-table`} title="Tableau">
                       <span className="fr-icon-table-2 fr-icon fr-icon--sm" aria-hidden="true" />
                       <span className="fr-sr-only">Vue tableau</span>
                     </label>

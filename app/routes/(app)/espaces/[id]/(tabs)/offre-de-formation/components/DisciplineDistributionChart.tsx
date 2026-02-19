@@ -65,8 +65,8 @@ export function DisciplineDistributionChart({
       source="fresq"
       tooltip={
         <span>
-          Nombre de formations comptées par secteur disciplinaire.
-          {' '}<Link to="/guide/donnees/fresq">En savoir plus</Link> sur les données Fresq.
+          Nombre de formations comptées par secteur disciplinaire.{' '}
+          <Link to="/guide/donnees/fresq">En savoir plus</Link> sur les données Fresq.
         </span>
       }
     >
