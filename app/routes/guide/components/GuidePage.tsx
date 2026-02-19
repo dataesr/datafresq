@@ -1,6 +1,6 @@
 import { useLocation } from 'react-router';
 import { Breadcrumb } from '@/components/Breadcrumb';
-import { getBreadcrumb, getChildren, getPage } from '../guide-content.generated';
+import { getBreadcrumb, getChildren, getPage } from '../guide-utils';
 import MarkdownRenderer from './MarkdownRenderer';
 import PageFeedback from './PageFeedback';
 import SectionLinks from './SectionLinks';

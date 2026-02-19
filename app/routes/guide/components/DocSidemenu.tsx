@@ -1,5 +1,6 @@
 import { Link, useLocation } from 'react-router';
-import { getNavItems, type NavItem } from '../guide-content.generated';
+import { getNavItems } from '../guide-utils';
+import type { NavItem } from '../types';
 
 const NAV_ITEMS = getNavItems();
 

@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import type { TocEntry } from '../guide-content.generated';
+import type { TocEntry } from '../types';
 
 interface TocNode {
   entry: TocEntry;

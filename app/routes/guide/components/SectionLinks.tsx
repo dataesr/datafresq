@@ -1,5 +1,5 @@
 import { Link } from 'react-router';
-import { getChildren } from '../guide-content.generated';
+import { getChildren } from '../guide-utils';
 
 interface SectionLinksProps {
   sectionHref: string;

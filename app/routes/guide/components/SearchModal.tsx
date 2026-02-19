@@ -2,7 +2,7 @@ import cn from 'classnames';
 import { useCallback, useDeferredValue, useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router';
 import SearchModal, { useSearchModal } from '@/components/SearchModal';
-import { searchGuide } from '../guide-content.generated';
+import { searchGuide } from '../guide-utils';
 
 function isSection(href: string): boolean {
   const segments = href
@@ -30,7 +30,7 @@ export default function GuideSearchModal() {
   const [query, setQuery] = useState('');
   const deferredQuery = useDeferredValue(query);
   const results = useMemo(() => searchGuide(deferredQuery), [deferredQuery]);
-  const showResults = deferredQuery.trim().length > 0;
+  const hasQuery = deferredQuery.trim().length > 0;
 
   const handleSelect = useCallback(
     (index: number) => {
@@ -111,8 +111,14 @@ export default function GuideSearchModal() {
           </>
         }
       >
-        {showResults && results.length === 0 && (
+        {hasQuery && results.length === 0 && (
           <SearchModal.Empty>Aucun résultat pour « {deferredQuery} »</SearchModal.Empty>
+        )}
+
+        {!hasQuery && results.length > 0 && (
+          <p className="fr-text--xs fr-text-mention--grey fr-mb-0 fr-px-2w fr-pt-2w">
+            Rubriques du guide
+          </p>
         )}
 
         {results.map((entry, index) => {

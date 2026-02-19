@@ -36,7 +36,7 @@ scripts
 !scripts/generate-guide.ts
 
 # generated guide content
-app/routes/guide/guide-content.generated.ts
+app/routes/guide/*.generated.json
 
 .rules
 _saved

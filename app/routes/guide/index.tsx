@@ -1,7 +1,7 @@
 import { Link } from 'react-router';
 import { Breadcrumb } from '@/components/Breadcrumb';
 import { AutoGrid } from '@/components/Grids/AutoGrid';
-import { getSections } from './guide-content.generated';
+import { getSections } from './guide-utils';
 
 const sections = getSections();
 
