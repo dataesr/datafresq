@@ -7,7 +7,7 @@
     "postinstall": "cp -r node_modules/@gouvfr/dsfr/dist/artwork node_modules/@gouvfr/dsfr/dist/favicon public/",
     "dev": "bun run generate:guide && bun --hot server.ts",
     "generate:guide": "bun docs/generate-guide.ts",
-    "build": "bun run generate:guide && bun build src/client/main.tsx --outdir=dist/client --target=browser --minify --sourcemap",
+    "build": "bun run generate:guide && bun build --target=bun --production --outdir=dist ./server.ts",
     "start": "NODE_ENV=production bun server.ts",
     "typecheck": "tsc --noEmit",
     "preview:emails:server": "bun --hot src/emails/preview-server.ts",

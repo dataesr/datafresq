@@ -11,7 +11,7 @@ RUN bun install --frozen-lockfile
 COPY . .
 
 ENV NODE_ENV=production
-RUN bun build --target=bun --production --outdir=dist ./server.ts
+RUN bun run build
 
 # ----------- FINAL STAGE -----------
 FROM oven/bun:1-slim
