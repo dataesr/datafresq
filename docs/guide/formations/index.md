@@ -11,7 +11,7 @@ Chaque formation de l'enseignement supérieur dispose d'une fiche détaillée re
 informations administratives, ses effectifs étudiants, les données d'insertion
 professionnelle et les débouchés associés.
 
-## Accéder à une fiche
+## Accéder à une fiche.
 
 Depuis la page [Formations](/formations), cliquez sur l'intitulé d'une
 formation dans le tableau de résultats pour accéder à sa fiche détaillée.
