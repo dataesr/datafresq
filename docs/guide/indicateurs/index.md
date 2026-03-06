@@ -1,15 +1,13 @@
 ---
 label: "Indicateurs et méthodologie"
 title: "Indicateurs et méthodologie"
-description: "Détail des calculs, des seuils de confidentialité et de la méthodologie utilisée pour chaque indicateur."
+description: "Cette section détaille les méthodes de calcul des indicateurs affichés dans DataFresq,
+les règles d'agrégation appliquées dans les espaces de travail et les seuils de
+confidentialité qui conditionnent l'affichage des données."
 icon: "fr-icon-line-chart-line"
 order: 5
 keywords: [indicateurs, méthodologie, calcul, formule, seuil]
 ---
-
-Cette section détaille les méthodes de calcul des indicateurs affichés dans DataFresq,
-les règles d'agrégation appliquées dans les espaces de travail et les seuils de
-confidentialité qui conditionnent l'affichage des données.
 
 Ces pages servent de référence partagée : elles décrivent **comment** les indicateurs
 sont calculés, indépendamment du contexte d'affichage
@@ -46,7 +44,7 @@ indicateur donné :
 |-----------|---------------------|-------------|
 | **Formation récente** | Effectifs, Insertion | Les données SISE ou InserSup ne sont pas encore disponibles. Les données SISE arrivent avec un décalage d'un an, et les données InserSup nécessitent plusieurs mois après le diplôme. |
 | **Effectifs insuffisants** | Insertion, Salaires | Le nombre de sortants ou de diplômés salariés est inférieur aux [seuils de confidentialité](/guide/indicateurs/seuils). |
-| **Appariement impossible** | Effectifs, Insertion | La formation ne dispose pas des codes SISE nécessaires pour être reliée aux bases de données sources. |
+| **Appariement impossible** | Effectifs, Insertion | La formation ne dispose pas des codes nécessaires pour être reliée aux bases de données sources. |
 | **Formation non couverte** | Insertion | Certains types de formations ne sont pas couverts par le dispositif InserSup (formations courtes, certains diplômes d'établissement, etc.). |
 | **Pas de certification RNCP** | Débouchés (ROME) | La formation n'est pas enregistrée au RNCP. Sans code RNCP, aucun lien vers les métiers ROME ne peut être établi. |
 | **Accréditation expirée** | Tous (potentiellement) | Les formations dont l'accréditation a expiré peuvent progressivement perdre leurs données lorsque les dernières cohortes de diplômés ont été suivies. |
