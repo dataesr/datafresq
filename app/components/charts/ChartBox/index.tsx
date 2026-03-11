@@ -15,6 +15,7 @@ export interface ChartBoxProps {
   source?: SourceRef | SourceRef[];
   children: React.ReactNode;
   tooltip?: React.ReactNode;
+  selector?: React.ReactNode;
   chartRef?: ChartRef;
   hideMenu?: boolean;
   height?: number;
@@ -30,6 +31,7 @@ export function ChartBox({
   details,
   source,
   children,
+  selector,
   tooltip,
   chartRef,
   hideMenu = false,
@@ -107,6 +109,7 @@ export function ChartBox({
         </div>
 
         <div aria-describedby={titleId} className="fx-width-100">
+          {selector && <div className="fr-mb-2w">{selector}</div>}
           <Activity
             mode={!chartOptions.enabled || chartOptions.view === 'chart' ? 'visible' : 'hidden'}
           >

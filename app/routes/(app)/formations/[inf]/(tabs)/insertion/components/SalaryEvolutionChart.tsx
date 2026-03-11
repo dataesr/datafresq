@@ -110,9 +110,7 @@ export function SalaryEvolutionChart({ sortedByYear }: SalaryEvolutionChartProps
             }
           : undefined
       }
-    >
-      {/* Internal metric selector */}
-      <div className="fr-mb-2w">
+      selector={
         <fieldset className="fr-segmented fr-segmented--sm fr-segmented--no-legend">
           <legend className="fr-sr-only">Choix de la métrique de salaire</legend>
           <div className="fr-segmented__elements">
@@ -133,8 +131,8 @@ export function SalaryEvolutionChart({ sortedByYear }: SalaryEvolutionChartProps
             ))}
           </div>
         </fieldset>
-      </div>
-
+      }
+    >
       <Chart ref={chartRef}>
         <Credits enabled={false} />
         <Legend align="center" />
