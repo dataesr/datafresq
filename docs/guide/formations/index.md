@@ -1,32 +1,32 @@
 ---
-label: "Fiches formation"
-title: "Fiches formation"
-description: "Découvrez les informations disponibles sur chaque formation : effectifs, insertion professionnelle, débouchés."
+label: "Fiches formations"
+title: "Fiches formations"
+description: "Pour chaque formation renseignée dans [Fresq](https://fresq.enseignementsup.gouv.fr/), découvrez lorsqu'elles sont disponibles, des informations relatives aux effectifs d'étudiants inscrits, d'insertion professionnelle, de débouchés."
 icon: "fr-icon-file-text-line"
 order: 2
 keywords: [fiche, formation, détail, onglet, diplôme, accréditation]
 ---
 
-Chaque formation de l'enseignement supérieur dispose d'une fiche détaillée regroupant ses
-informations administratives, ses effectifs étudiants, les données d'insertion
-professionnelle et les débouchés associés.
+Chaque formation de l'enseignement supérieur reconnue de qualité et présente dans [Fresq](https://fresq.enseignementsup.gouv.fr/) dispose d'une fiche détaillée exposant des
+informations générales, des données d'effectifs étudiants, d'insertion
+professionnelle et les débouchés associés à cette formation.
 
 ## Accéder à une fiche
 
 Depuis la page [Formations](/formations), cliquez sur l'intitulé d'une
-formation dans le tableau de résultats pour accéder à sa fiche détaillée.
+formation présente dans le tableau de résultats d'une recherche pour accéder à sa fiche détaillée.
 
 En haut de la fiche, vous trouverez le type de diplôme, le statut d'accréditation ainsi
-qu'un lien vers la fiche Fresq officielle. Le ou les établissements porteurs sont
+qu'un lien vers la fiche de la formation dans [Fresq](https://fresq.enseignementsup.gouv.fr/). Le ou les établissements porteurs sont
 indiqués sous l'intitulé.
 
 ## Onglets disponibles
 
 | Onglet | Contenu | Source de données |
 |--------|---------|-------------------|
-| **[Informations générales](/guide/formations/informations)** | Identité, diplôme, accréditation, établissements, localisation | [Fresq](/guide/donnees/fresq) |
-| **[Parcours](/guide/formations/parcours)** | Spécialisations, options, capacités, modalités, lieux de formation | [Fresq](/guide/donnees/fresq) |
-| **[Effectifs étudiants](/guide/formations/effectifs)** | Inscriptions, répartition par genre, évolution | [SISE](/guide/donnees/sise) |
+| **[Informations générales](/guide/formations/informations)** | Description, diplôme, accréditation, identifiants, établissements, localisation | [Fresq](/guide/donnees/fresq) |
+| **[Parcours](/guide/formations/parcours)** | Spécialisations, options, capacités, modalités, informations pédagogiques, lieux de formation | [Fresq](/guide/donnees/fresq) |
+| **[Effectifs étudiants](/guide/formations/effectifs)** | Nombre d'étudiants inscrits, répartition par genre, évolution | [SISE](/guide/donnees/sise) |
 | **[Insertion professionnelle](/guide/formations/insertion)** | Taux d'emploi, salaires, évolution par cohorte | [InserSup](/guide/donnees/insersup) |
 | **[Débouchés](/guide/formations/debouches)** | Métiers ROME et types d'emploi RNCP | [ROME / RNCP](/guide/donnees/rome) |
 
