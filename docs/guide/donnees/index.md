@@ -1,30 +1,30 @@
 ---
 label: "Sources de données"
 title: "Sources de données"
-description: "Comprenez d'où proviennent les données affichées : Fresq, SISE, InserSup, Paysage, ROME."
+description: "dataFresq agrège plusieurs sources de données officielles du Ministère de l'Enseignement
+Supérieur et de la Recherche et de l'Espace (MESRE) et de France Travail. Cette page présente une vue
+d'ensemble de chaque source et de leur articulation"
 icon: "fr-icon-database-line"
 order: 4
 keywords: [sources, données, Fresq, SISE, InserSup, Paysage, ROME, RNCP]
 ---
 
-DataFresq agrège plusieurs sources de données officielles du Ministère de l'Enseignement
-Supérieur et de la Recherche (MESR) et de France Travail. Cette page présente une vue
-d'ensemble de chaque source et de leur articulation.
+Comprenez d'où proviennent les données affichées : Fresq, SISE, InserSup, Paysage, ROME
 
 ## Vue d'ensemble
 
 | Source | Producteur | Contenu principal | Fréquence |
 |--------|------------|-------------------|-----------|
-| **Fresq** | MESR | Référentiel des formations (identité, accréditations) | Continue |
-| **SISE** | MESR | Effectifs étudiants (inscriptions, genre, géographie) | Annuelle |
-| **InserSup** | MESR | Insertion professionnelle (emploi, salaires) | Semestrielle |
-| **Paysage** | MESR | Référentiel des établissements (suivi dans le temps, successions) | Continue |
+| **Fresq** | MESRE | Référentiel des formations (identité, accréditations) | Continue |
+| **SISE** | MESRE | Effectifs étudiants (inscriptions, genre, géographie) | Annuelle |
+| **InserSup** | MESRE | Insertion professionnelle (emploi, salaires) | Semestrielle |
+| **Paysage** | MESRE | Référentiel des établissements (suivi dans le temps, successions) | Continue |
 | **ROME** | France Travail | Répertoire des métiers et emplois | Continue |
 | **RNCP** | France Compétences | Certifications professionnelles (lien formation → métiers) | Continue |
 
 ## Appariement entre les sources
 
-DataFresq croise ces différentes sources de données en s'appuyant sur des identifiants
+dataFresq croise ces différentes sources de données en s'appuyant sur des identifiants
 communs :
 
 | Lien | Identifiant utilisé |
@@ -44,7 +44,7 @@ données statistiques dans le temps.
 [Paysage](/guide/donnees/paysage) résout ce problème en attribuant à chaque
 établissement un identifiant stable (`id_paysage`) et en traçant les successions et
 fusions. Les données SISE et InserSup intègrent ces identifiants Paysage, ce qui permet
-à DataFresq de rattacher les données historiques à la bonne formation même lorsque
+à dataFresq de rattacher les données historiques à la bonne formation même lorsque
 l'établissement porteur a été réorganisé.
 
 Lorsqu'un appariement ne peut pas être établi (code manquant, formation non couverte),
