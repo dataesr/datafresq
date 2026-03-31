@@ -2,6 +2,7 @@
 import { type Collection, type Db, MongoClient } from 'mongodb';
 import { config } from '~/config';
 import type {
+  EtablissementAggDoc,
   GuideReviewDoc,
   InsersupDoc,
   ProgramDoc,
@@ -28,6 +29,7 @@ export type Collections = {
   programs: Collection<ProgramDoc>;
   rateLimits: Collection<RateLimitDoc>;
   guideReviews: Collection<GuideReviewDoc>;
+  etablissementsAgg: Collection<EtablissementAggDoc>;
 };
 
 let client: MongoClient | null = null;
@@ -65,6 +67,7 @@ export async function connect(): Promise<Collections> {
     programs: db.collection<ProgramDoc>('programs'),
     rateLimits: db.collection<RateLimitDoc>('rate_limits'),
     guideReviews: db.collection<GuideReviewDoc>('guide_reviews'),
+    etablissementsAgg: db.collection<EtablissementAggDoc>('etablissements_agg'),
   };
 
   // Ensure indexes
@@ -142,4 +145,12 @@ async function ensureIndexes(cols: Collections): Promise<void> {
   await cols.guideReviews.createIndex({ userId: 1 });
   await cols.guideReviews.createIndex({ pageId: 1, createdAt: -1 });
   await cols.guideReviews.createIndex({ createdAt: -1 });
+
+  // === ETABLISSEMENTS AGG ===
+  await cols.etablissementsAgg.createIndex({ paysageId: 1 }, { unique: true });
+  await cols.etablissementsAgg.createIndex({ name: 'text' });
+  await cols.etablissementsAgg.createIndex({ academie: 1 });
+  await cols.etablissementsAgg.createIndex({ region: 1 });
+  await cols.etablissementsAgg.createIndex({ type: 1 });
+  await cols.etablissementsAgg.createIndex({ totalStudents: -1 });
 }

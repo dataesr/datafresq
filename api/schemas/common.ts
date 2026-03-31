@@ -27,6 +27,10 @@ export const infParamSchema = t.Object({
   inf: t.String(),
 });
 
+export const paysageIdParamSchema = t.Object({
+  paysageId: t.String(),
+});
+
 // ============================================================================
 // Types
 // ============================================================================
@@ -36,3 +40,4 @@ export type SuccessResponse = typeof successResponseSchema.static;
 export type QueryParam = typeof queryParamSchema.static;
 export type IdParam = typeof idParamSchema.static;
 export type InfParam = typeof infParamSchema.static;
+export type PaysageIdParam = typeof paysageIdParamSchema.static;

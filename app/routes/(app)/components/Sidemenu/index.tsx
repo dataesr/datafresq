@@ -53,7 +53,7 @@ function ActiveWorkspaceSection() {
   return (
     <div className="fr-px-1w fr-mb-2w">
       <div className="fx-flex fx-items-center fx-gap-1w fr-pb-1w">
-        <span className="fr-text--md fr-mb-0 fr-text--heavy fx-flex-grow">ESPACE ACTIF</span>
+        <span className="fr-text--sm fr-mb-0 fr-text--heavy fx-flex-grow">ESPACE ACTIF</span>
         <WorkspaceSelector
           title="Définir l'espace actif"
           buttonIcon="fr-icon-arrow-left-right-fill"
@@ -105,6 +105,11 @@ const menuLinks = [
     path: '/formations',
   },
   {
+    label: 'Établissements',
+    icon: 'fr-icon-building',
+    path: '/etablissements',
+  },
+  {
     label: 'Espaces',
     icon: 'fr-icon-folder-2',
     path: '/espaces',
@@ -152,7 +157,7 @@ export default function Sidemenu() {
         <hr className="fr-py-1v fr-my-1w" />
         <div className="fr-px-1w">
           <div className="fx-flex fx-justify-between fx-items-center fr-pb-1w">
-            <span className="fr-text--md fr-mb-0 fr-text--heavy">MES ESPACES</span>
+            <span className="fr-text--sm fr-mb-0 fr-text--heavy">MES ESPACES</span>
             <div className="fx-flex fx-gap-1v">
               <Link
                 to="/espaces/nouveau"

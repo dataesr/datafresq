@@ -10,6 +10,7 @@ import { logger } from '~/plugins/logger';
 import { adminRoutes } from '~/routes/admin';
 import { authRoutes } from '~/routes/auth';
 import { careersRoutes } from '~/routes/careers';
+import { etablissementsRoutes } from '~/routes/etablissements';
 import { guideRoutes } from '~/routes/guide';
 import { institutionsRoutes } from '~/routes/institutions';
 import { meRoutes } from '~/routes/me';
@@ -46,6 +47,7 @@ export const app = new Elysia({ prefix: '/api' })
   .use(adminRoutes)
   .use(authRoutes)
   .use(careersRoutes)
+  .use(etablissementsRoutes)
   .use(guideRoutes)
   .use(institutionsRoutes)
   .use(meRoutes)

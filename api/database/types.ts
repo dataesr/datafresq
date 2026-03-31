@@ -1,4 +1,5 @@
 import type { WorkspaceAggregationsResponse } from '~/schemas/aggregations';
+import type { EtablissementAgg } from '~/schemas/etablissements';
 import type { Program } from '~/schemas/programs';
 
 // Workspace user role
@@ -89,6 +90,8 @@ export interface SessionDoc {
 }
 
 export type ProgramDoc = Program;
+
+export type EtablissementAggDoc = EtablissementAgg;
 
 export type SiseDoc = {
   annee_universitaire: string;

@@ -1,6 +1,16 @@
 // Components
 
 export { ColumnVisibilityToggle } from './ColumnVisibilityToggle';
+// Column definitions - Etablissements
+export {
+  createDefaultEtablissementColumnVisibility,
+  createEtablissementColumns,
+  ETABLISSEMENT_COLUMN_IDS,
+  ETABLISSEMENT_COLUMN_LABELS,
+  type EtablissementColumnId,
+  getEtablissementColumns,
+  getToggleableEtablissementColumnLabels,
+} from './columns/etablissementColumns';
 // Column definitions - Programs
 export {
   createDefaultColumnVisibility,
