@@ -115,7 +115,7 @@ const menuLinks = [
     path: '/guide',
   },
   {
-    label: 'Effectifs SISE',
+    label: 'Etablissements - Effectifs',
     icon: 'fr-icon-building',
     path: '/etablissements',
   },
