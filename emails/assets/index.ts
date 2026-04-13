@@ -1,9 +1,9 @@
+import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 
 function imageToDataUrl(relativePath: string): string {
   const fullPath = join(process.cwd(), 'public/emails', relativePath);
-  const buffer = Bun.file(fullPath);
-  const base64 = buffer.toString();
+  const base64 = readFileSync(fullPath, 'base64');
   const mimeType = relativePath.endsWith('.png') ? 'image/png' : 'image/jpeg';
   return `data:${mimeType};base64,${base64}`;
 }

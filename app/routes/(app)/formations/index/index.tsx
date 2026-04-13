@@ -8,7 +8,14 @@ import { useProgramsFilters } from './hooks/useProgramsFilters';
 export default function FormationsListPage() {
   const [selectedPrograms, setSelectedPrograms] = useState<string[]>([]);
 
-  const { params, currentFilters, handleSearchChange, handleApplyFilters } = useProgramsFilters();
+  const {
+    params,
+    currentFilters,
+    handleSearchChange,
+    handleApplyFilters,
+    handlePageChange,
+    handlePageSizeChange,
+  } = useProgramsFilters();
 
   const {
     programs,
@@ -61,6 +68,15 @@ export default function FormationsListPage() {
             <ProgramsTable
               selectedPrograms={selectedPrograms}
               onSelectionChange={setSelectedPrograms}
+              programs={programs}
+              totalCount={totalCount}
+              isFetching={isProgramsFetching}
+              searchQuery={params.q}
+              currentFilters={currentFilters}
+              page={params.page}
+              pageSize={Number(params.pageSize)}
+              onPageChange={handlePageChange}
+              onPageSizeChange={handlePageSizeChange}
             />
           )}
 

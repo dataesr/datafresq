@@ -1,5 +1,5 @@
 import { Map as MapLibre, Marker } from '@vis.gl/react-maplibre';
-import { useMemo, useState } from 'react';
+import { useMemo, useRef, useState } from 'react';
 import 'maplibre-gl/dist/maplibre-gl.css';
 import { YearSelector } from '@/components/YearSelector';
 import type { Etape, Location, Parcours, Program } from '~/schemas/programs';
@@ -124,8 +124,17 @@ function MiniMap({ locations, isVisible }: { locations: Location[]; isVisible: b
     (loc) => loc.geo?.coordinates && loc.geo.coordinates.length === 2,
   );
 
+  // Each time isVisible flips back to true, bump the key to force a clean remount.
+  // This prevents MapLibre from trying to update a stale/destroyed WebGL context.
+  const mountKeyRef = useRef(0);
+  const prevVisibleRef = useRef(isVisible);
+  if (isVisible && !prevVisibleRef.current) {
+    mountKeyRef.current += 1;
+  }
+  prevVisibleRef.current = isVisible;
+
   if (validLocations.length === 0) return null;
-  if (!isVisible) return <div style={{ width: '180px', height: '140px', flexShrink: 0 }} />;
+  if (!isVisible) return null;
 
   const firstLoc = validLocations[0];
   const theme =
@@ -138,6 +147,7 @@ function MiniMap({ locations, isVisible }: { locations: Location[]; isVisible: b
   return (
     <div style={{ width: '180px', height: '140px', flexShrink: 0 }}>
       <MapLibre
+        key={mountKeyRef.current}
         initialViewState={{
           longitude: firstLoc?.geo?.coordinates?.[0] ?? 2.3522,
           latitude: firstLoc?.geo?.coordinates?.[1] ?? 46.6034,

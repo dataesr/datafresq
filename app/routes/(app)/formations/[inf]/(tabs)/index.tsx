@@ -147,6 +147,7 @@ export default function FormationPage() {
               parcours={formation.parcours ?? []}
               etapes={formation.etapes}
               locations={formation.locations}
+              isVisible={activeTab === 'parcours'}
             />
           </TabActivityPanel>
 

@@ -37,8 +37,17 @@ export default function EtablissementsListPage() {
         ]}
       />
 
-      <h1 className="fr-h2">Explorer les établissements</h1>
-
+      <h1 className="fr-h2">Explorer les effectifs d'étudiants inscrits par établissement</h1>
+      <div className="fr-my-2w fr-callout fr-icon-alert-line fr-callout--yellow-moutarde">
+        <p className="fr-callout__title fr-text--lg">Attention</p>
+        <p className="fr-callout__text fr-text--md">
+          Cette page permet d'explorer et de visualiser les effectifs d’étudiants inscrits dans les
+          établissements d’enseignement supérieur, à partir des données SISE.
+          <br />
+          Ces données couvrent l’ensemble des étudiants inscrits déclarés par les établissements,
+          au-delà du périmètre des formations reconnues de qualité recensées dans FRESQ.
+        </p>
+      </div>
       <FilterBar
         searchQuery={params.q}
         onSearchQueryChange={handleSearchChange}

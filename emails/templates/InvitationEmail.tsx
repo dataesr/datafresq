@@ -24,8 +24,6 @@ export function InvitationEmail({ invitationUrl }: InvitationEmailProps) {
       </EmailHeading>
 
       <EmailSection backgroundColor={colors.backgroundDefault}>
-        <EmailText>Bonjour,</EmailText>
-
         <EmailText>
           Vous avez été invité(e) à rejoindre dataFresq. Cliquez sur le bouton ci-dessous pour créer
           votre compte et commencer à utiliser le service.

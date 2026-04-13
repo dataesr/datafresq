@@ -33,7 +33,10 @@ export function getEtablissementColumns(): Record<
       accessorKey: 'name',
       header: 'Nom',
       cell: ({ row }) => (
-        <Link to={`/etablissements/${row.original.paysageId}`} className="fr-link">
+        <Link
+          to={`/etablissements/${row.original.paysageId}`}
+          className="table-link fr-text--sm fx-clamp-1"
+        >
           {row.original.name}
         </Link>
       ),

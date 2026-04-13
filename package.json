@@ -10,7 +10,7 @@
     "build": "bun run generate:guide && bun build --target=bun --production --outdir=dist ./server.ts",
     "start": "NODE_ENV=production bun server.ts",
     "typecheck": "tsc --noEmit",
-    "preview:emails:server": "bun --hot src/emails/preview-server.ts",
+    "preview:emails:server": "bun --hot emails/preview-server.ts",
     "lint": "biome lint .",
     "lint:fix": "biome lint --write .",
     "format": "biome format .",

@@ -19,27 +19,42 @@ import { StatsCards } from './components/StatsCards';
 // Sub-components
 // ============================================================================
 
-function LocationInfo({
+function SubtitleInfo({
   commune,
   departement,
   academie,
   region,
+  offreUrl,
 }: {
   commune: string | null;
   departement: string;
   academie: string;
   region: string;
+  offreUrl: string;
 }) {
   const parts = [commune, departement, academie ? `académie de ${academie}` : null, region].filter(
     Boolean,
   );
 
   if (!parts.length) return null;
+  if (!offreUrl) {
+    return (
+      <p className="fr-text--sm fr-text-mention--grey fr-mb-0">
+        <span className="fr-icon-map-pin-2-line fr-icon--sm fr-mr-1w" aria-hidden="true" />
+        {parts.join(' · ')}
+      </p>
+    );
+  }
 
   return (
     <p className="fr-text--sm fr-text-mention--grey fr-mb-0">
       <span className="fr-icon-map-pin-2-line fr-icon--sm fr-mr-1w" aria-hidden="true" />
       {parts.join(' · ')}
+      {' · '}
+      <Link className="fr-text--sm" to={offreUrl}>
+        Voir l'offre de formation FRESQ{' '}
+        <span className="fr-icon-arrow-right-line fr-icon--sm" aria-hidden="true" />
+      </Link>
     </p>
   );
 }
@@ -124,19 +139,23 @@ function EtablissementContent() {
           )}
         </div>
         <h1 className="fr-h3 fr-mb-1w">{data.name}</h1>
-        <LocationInfo
+        <SubtitleInfo
           commune={data.commune}
           departement={data.departement}
           academie={data.academie}
           region={data.region}
+          offreUrl={`/formations?paysageId=${data.paysageId}`}
         />
-        <Link
-          to={`/formations?paysageId=${data.paysageId}`}
-          className="fr-link fr-icon-arrow-right-line fr-link--icon-right fr-mt-2w"
-          style={{ display: 'inline-flex' }}
-        >
-          L'offre de formation
-        </Link>
+        <div className="fr-my-2w fr-callout fr-icon-alert-line fr-callout--yellow-moutarde">
+          <p className="fr-callout__title fr-text--lg">Attention</p>
+          <p className="fr-callout__text fr-text--md">
+            Cette page permet d'explorer et de visualiser les effectifs d’étudiants inscrits dans
+            l'établissement, à partir des données SISE.
+            <br />
+            Ces données couvrent l’ensemble des étudiants inscrits déclarés par l'établissement,
+            au-delà du périmètre des formations reconnues de qualité recensées dans FRESQ.
+          </p>
+        </div>
       </div>
 
       {/* Data section */}

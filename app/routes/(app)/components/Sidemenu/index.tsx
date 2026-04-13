@@ -105,11 +105,6 @@ const menuLinks = [
     path: '/formations',
   },
   {
-    label: 'Établissements',
-    icon: 'fr-icon-building',
-    path: '/etablissements',
-  },
-  {
     label: 'Espaces',
     icon: 'fr-icon-folder-2',
     path: '/espaces',
@@ -118,6 +113,11 @@ const menuLinks = [
     label: 'Guide',
     icon: 'fr-icon-book-2',
     path: '/guide',
+  },
+  {
+    label: 'Effectifs SISE',
+    icon: 'fr-icon-building',
+    path: '/etablissements',
   },
 ];
 

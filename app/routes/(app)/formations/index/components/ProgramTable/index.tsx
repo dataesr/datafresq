@@ -7,7 +7,7 @@ import {
 } from '@tanstack/react-table';
 import cn from 'classnames';
 import { useMemo, useState } from 'react';
-import { useProgramsSearch } from '@/api/programs';
+import type { FilterState } from '@/api/programs';
 import {
   ColumnVisibilityToggle,
   createDefaultColumnVisibility,
@@ -18,13 +18,23 @@ import {
   PROGRAM_COLUMN_IDS,
   type ProgramColumnId,
 } from '@/components/table';
-import { useProgramsFilters } from '../../hooks/useProgramsFilters';
+import type { ProgramSearch } from '~/schemas/programs';
+import type { PageSize } from '../../hooks/useProgramsFilters';
 import { AddToWorkspace } from '../AddToWorkspace';
 import ExportButton from '../ExportButton';
 
 interface ProgramsTableProps {
   selectedPrograms: string[];
   onSelectionChange: (selectedIds: string[]) => void;
+  programs: ProgramSearch[];
+  totalCount: number;
+  isFetching: boolean;
+  searchQuery: string;
+  currentFilters: FilterState;
+  page: number;
+  pageSize: number;
+  onPageChange: (page: number) => void;
+  onPageSizeChange: (pageSize: PageSize) => void;
 }
 
 // All columns available in this table
@@ -58,15 +68,19 @@ const TOGGLEABLE_COLUMNS: ProgramColumnId[] = [
   PROGRAM_COLUMN_IDS.rome,
 ];
 
-export default function ProgramsTable({ selectedPrograms, onSelectionChange }: ProgramsTableProps) {
-  const { params, currentFilters, handlePageChange, handlePageSizeChange } = useProgramsFilters();
-  const { programs, totalCount, isFetching } = useProgramsSearch({
-    query: params.q,
-    page: params.page,
-    pageSize: Number(params.pageSize),
-    filters: currentFilters,
-  });
-
+export default function ProgramsTable({
+  selectedPrograms,
+  onSelectionChange,
+  programs,
+  totalCount,
+  isFetching,
+  searchQuery,
+  currentFilters,
+  page,
+  pageSize,
+  onPageChange,
+  onPageSizeChange,
+}: ProgramsTableProps) {
   const data = programs;
 
   // Convert selectedPrograms array to rowSelection object
@@ -102,7 +116,7 @@ export default function ProgramsTable({ selectedPrograms, onSelectionChange }: P
     useState<VisibilityState>(defaultColumnVisibility);
 
   // Determine if score should be visible (only when there's a text search query)
-  const hasSearchQuery = Boolean(params.q && params.q.trim().length > 0);
+  const hasSearchQuery = Boolean(searchQuery && searchQuery.trim().length > 0);
 
   const table = useReactTable({
     columns,
@@ -131,8 +145,7 @@ export default function ProgramsTable({ selectedPrograms, onSelectionChange }: P
   });
 
   // Pagination values
-  const pageSize = Number(params.pageSize);
-  const currentPage = params.page;
+  const currentPage = page;
   const totalPages = Math.ceil(totalCount / pageSize);
 
   // Empty state
@@ -151,7 +164,7 @@ export default function ProgramsTable({ selectedPrograms, onSelectionChange }: P
           <AddToWorkspace
             programIds={selectedPrograms}
             searchParams={{
-              q: params.q || undefined,
+              q: searchQuery || undefined,
               cycle: currentFilters.cycle.length > 0 ? currentFilters.cycle : undefined,
               diplomaType:
                 currentFilters.diplomaType.length > 0 ? currentFilters.diplomaType : undefined,
@@ -178,7 +191,7 @@ export default function ProgramsTable({ selectedPrograms, onSelectionChange }: P
           />
         </div>
         <div className="fx-flex fx-gap-2w fx-items-center">
-          <PageSizeSelector onChange={handlePageSizeChange} value={pageSize.toString()} />
+          <PageSizeSelector onChange={onPageSizeChange} value={pageSize.toString()} />
           <ColumnVisibilityToggle table={table} columnLabels={columnLabels} />
           <ExportButton totalCount={totalCount} />
         </div>
@@ -270,7 +283,7 @@ export default function ProgramsTable({ selectedPrograms, onSelectionChange }: P
         totalPages={totalPages}
         pageSize={pageSize}
         totalCount={totalCount}
-        onPageChange={handlePageChange}
+        onPageChange={onPageChange}
       />
     </div>
   );
