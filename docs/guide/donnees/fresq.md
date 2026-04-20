@@ -1,14 +1,14 @@
 ---
-label: "Base Fresq"
-title: "Base Fresq"
-description: "Référentiel officiel des formations : identité, accréditation, établissements."
+label: "FRESQ"
+title: "FRESQ"
+description: "Référentiel officiel des formations reconnues de qualité par l'Etat : identité, accréditation, établissements."
 order: 1
-keywords: [Fresq, référentiel, formation, accréditation, INF, MESR]
+keywords: [Fresq, référentiel, formation, accréditation, INF, MESRE]
 ---
 
-La base **Fresq** (Formation Reconnues de l’Enseignement Supérieur de Qualité)
+La base **FRESQ** (Formation Reconnues de l’Enseignement Supérieur de Qualité)
 est le référentiel officiel des formations de l'enseignement supérieur français,
-maintenu par le MESR. Elle constitue le socle de DataFresq : chaque formation affichée
+maintenu par le MESRE. Elle constitue le socle de DataFresq : chaque formation affichée
 dans la plateforme provient de ce référentiel.
 
 ## Données fournies
@@ -24,12 +24,12 @@ dans la plateforme provient de ce référentiel.
 
 ## Rôle dans DataFresq
 
-La base Fresq est la source principale de DataFresq. C'est elle qui détermine la liste
+La base FRESQ est la source principale de DataFresq. C'est elle qui détermine la liste
 des formations consultables sur la plateforme. Les autres sources de données
 ([SISE](/guide/donnees/sise),
 [InserSup](/guide/donnees/insersup),
 [ROME/RNCP](/guide/donnees/rome)) sont appariées à partir des
-identifiants fournis par Fresq.
+identifiants fournis par FRESQ.
 
 Concrètement, lorsque vous consultez une
 [fiche formation](/guide/formations/informations), toutes les
@@ -37,11 +37,11 @@ informations des onglets « Informations générales » et « Parcours » provie
 
 ## Mise à jour
 
-La base Fresq est mise à jour en continu par les établissements et le MESR. Les
+La base FRESQ est mise à jour en continu par les établissements et le MESRE. Les
 modifications sont répercutées dans DataFresq lors des mises à jour périodiques de la
 plateforme.
 
 > [!NOTE]
-> Un décalage peut exister entre une modification dans le référentiel Fresq et sa prise
+> Un décalage peut exister entre une modification dans le référentiel FRESQ et sa prise
 > en compte dans DataFresq. Si vous constatez une information obsolète, elle sera
 > corrigée lors de la prochaine synchronisation.
