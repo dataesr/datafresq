@@ -19,7 +19,7 @@ En haut de l'onglet, des cartes de synthèse résument les données clés pour l
 | **Nombre de diplômés suivis** | Nombre total de diplômés suivis |
 | **Nombre de sortants** | Nombre de diplômés entrés sur le marché du travail |
 | **Nombre de poursuivants** | Nombre de diplômés en poursuite d'études |
-| **Taux de poursuivant** | Pourcentage de poursuivants parmi les diplômés suivis |
+| **Taux de poursuivants** | Pourcentage de poursuivants parmi les diplômés suivis |
 
 
 Plusieurs courbes présentent les indicateurs d'emploi à chaque échéance après le diplôme
