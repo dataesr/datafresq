@@ -47,4 +47,4 @@ les lieux de formation ainsi que les coordonnées géographiques de chaque étab
 Les marqueurs sont de différents types :
 
 - **Marqueur bleu** — établissement porteur de la formation
-- **Marqueur vert** — lieux de formation
+- **Marqueur vert** — lieu de formation
