@@ -54,7 +54,7 @@ Les graphiques de salaires sont disponibles sur les
 Dans un [espace de travail](/guide/espaces/insertion), les données salariales ne sont pas disponibles,
 car les données inserSup fournies par formation sont déjà agrégées sous forme de quartiles.
 Il serait dès lors confusant d'afficher, par exemple, des moyennes (ou des médianes)
-de médianes, qui ne seraient pas représentatives du salaire médiant pour les formations
+de médianes, qui ne seraient pas représentatives du salaire médian pour les formations
 présentes dans l'espace.
 
 
