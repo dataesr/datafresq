@@ -8,7 +8,7 @@ keywords: [InserSup, insertion, diplômés, emploi, salaire, cohorte, sortants, 
 
 **InserSup** est un système d'information développé par la sous-direction des Systèmes
 d'information et des études statistiques (SIES) du ministère de l'Enseignement supérieur
-et de la Recherche (MESR). Il permet de mesurer et qualifier l'insertion professionnelle
+et de la Recherche et de l'Espace (MESRE). Il permet de mesurer et qualifier l'insertion professionnelle
 des diplômés de l'enseignement supérieur à partir d'appariements de fichiers
 administratifs.
 
