@@ -55,7 +55,7 @@ Les données SISE sont ventilées dans DataFresq selon les dimensions suivantes 
 
 ## Couverture et limites
 
-- Les données couvrent les **établissements publics sous tutelle du MESR** disposant d'une personnalité morale et remontant via SISE. Certains établissements publics remontant par d'autres dispositifs ne sont pas inclus.
+- Les données couvrent les **établissements publics sous tutelle du MESRE** disposant d'une personnalité morale et remontant via SISE. Certains établissements publics remontant par d'autres dispositifs ne sont pas inclus.
 - L'appariement entre les formations [Fresq](/guide/donnees/fresq) et les données SISE repose sur les **codes SISE** associés à la formation et ses parcours. Si ces codes sont absents ou incorrects, les données ne peuvent pas être reliées.
 - Les données sont disponibles à partir de l'année universitaire **2015-2016**.
 
@@ -75,6 +75,6 @@ disponibles qu'avec un décalage.
 ## Source
 
 Les données sont issues du jeu de données ouvert
-[Effectifs d'étudiants inscrits dans les établissements publics sous tutelle du MESR](https://data.enseignementsup-recherche.gouv.fr/explore/dataset/fr-esr-sise-effectifs-d-etudiants-inscrits-esr-public/)
+[Effectifs d'étudiants inscrits dans les établissements publics sous tutelle du MESRE](https://data.enseignementsup-recherche.gouv.fr/explore/dataset/fr-esr-sise-effectifs-d-etudiants-inscrits-esr-public/)
 produit par la sous-direction des Systèmes d'information et études statistiques (SIES),
 publié sous Licence Ouverte.
