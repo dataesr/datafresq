@@ -1,13 +1,13 @@
 ---
 label: "Paysage"
 title: "Paysage"
-description: "Référentiel des établissements du MESR : suivi dans le temps, successions et appariement des données."
+description: "Référentiel des établissements du MESRE : suivi dans le temps, successions et appariement des données."
 order: 4
 keywords: [Paysage, établissements, UAI, BCE, appariement, identifiant, fusion, succession]
 ---
 
-**Paysage** est un système d'information du ministère de l'Enseignement supérieur et de
-la Recherche (MESR) qui assure le suivi des établissements d'enseignement supérieur et
+**Paysage** est un système d'information du ministère de l'Enseignement supérieur, de
+la Recherche et de l'Espace (MESRE) qui assure le suivi des établissements d'enseignement supérieur et
 de recherche dans le temps. Il constitue un maillon essentiel de DataFresq pour relier
 les formations à leurs données statistiques.
 
