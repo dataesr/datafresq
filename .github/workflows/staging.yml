@@ -9,7 +9,7 @@ env:
   DEPLOYMENT: datafresq
   DEPLOYMENT_NAMESPACE: datafresq
   DEPLOYMENT_URL: https://datafresq.staging.dataesr.ovh
-  MM_NOTIFICATION_CHANNEL: 'bots'
+  MM_NOTIFICATION_CHANNEL: bots
   REGISTRY: ghcr.io
   IMAGE_NAME: ${{ github.repository }}
 
@@ -73,6 +73,7 @@ jobs:
           restart: ${{ env.DEPLOYMENT }}
 
   notify:
+    name: Notify
     needs: deploy
     if: always()
     runs-on: ubuntu-latest
