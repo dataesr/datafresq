@@ -44,7 +44,7 @@ Les résultats s'affichent sous forme de tableau. Vous pouvez :
 - **Ajuster le nombre de résultats** par page (10, 25, 50, 100)
 - **Sélectionner des formations** individuellement via les cases à cocher pour les ajouter à un [espace de travail](/guide/espaces)
 - **Ajouter tous les résultats d'une recherche** en un clic à un [espace de travail](/guide/espaces)
-- **Exporter les résultats** grâce au bouton 3télécharger"
+- **Exporter les résultats** grâce au bouton "Télécharger"
 - **Cliquer sur une formation** pour accéder à sa [fiche détaillée](/guide/formations)
 
 > [!NOTE]

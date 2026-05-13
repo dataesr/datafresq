@@ -292,7 +292,10 @@ export async function exportPrograms(
   set: { headers: Record<string, string | number | undefined> },
 ) {
   const { q, format, ...rest } = params;
-  const esQuery = buildElasticsearchQuery({ q, ...rest });
+  // Fix by annelhote
+  const { diplomaType, ...rest2 } = rest;
+  const diplomaType2 = typeof diplomaType === 'string' ? diplomaType.split(',') : diplomaType;
+  const esQuery = buildElasticsearchQuery({ q, diplomaType: diplomaType2, ...rest2 });
   const timestamp = new Date().toISOString().split('T')[0];
 
   const { results: allPrograms } = await scroll<
