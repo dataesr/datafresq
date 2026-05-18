@@ -15,7 +15,7 @@ suffisamment important. Deux seuils distincts sont appliqués.
 | Indicateur | Seuil minimum | Population concernée | Justification |
 |------------|---------------|----------------------|---------------|
 | **Taux d'emploi** (salarié, non-salarié, stable) | ≥ 20 sortants | Diplômés sortants (non-poursuivants d'études) | Représentativité statistique et protection des individus |
-| **Données salariales** (Q1, médiane, Q3) | ≥ 5 diplômés salariés | Diplômés pour lesquels un salaire est observé dans les DSN | Seuil plus bas car les données sont agrégées (quartiles) et non individuelles |
+| **Données salariales** (Q1, médiane, Q3) | ≥ 20 diplômés salariés | Diplômés pour lesquels un salaire est observé dans les DSN | Représentativité statistique et protection des individus |
 
 ## Pourquoi deux seuils différents ?
 
