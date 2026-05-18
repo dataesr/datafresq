@@ -3,7 +3,7 @@ label: "Seuils de confidentialité"
 title: "Seuils de confidentialité"
 description: "Seuils minimum pour l'affichage des taux d'emploi et des salaires."
 order: 4
-keywords: [seuils, confidentialité, sortants, diplômés salariés, masqué, minimum, 20, 5]
+keywords: [seuils, confidentialité, sortants, diplômés salariés, masqué, minimum, 20,]
 ---
 
 Pour protéger la confidentialité des individus et garantir la fiabilité statistique des
@@ -20,14 +20,14 @@ suffisamment important. Deux seuils distincts sont appliqués.
 ## Pourquoi deux seuils différents ?
 
 Le seuil des taux d'emploi (20 sortants) est plus élevé que celui des salaires
-(5 diplômés salariés) car les taux d'emploi sont des proportions calculées sur l'ensemble des
+(20 diplômés salariés) car les taux d'emploi sont des proportions calculées sur l'ensemble des
 sortants. Un échantillon trop faible produirait des taux peu représentatifs : avec
 10 sortants, un seul individu en plus ou en moins fait varier le taux de 10 points.
 
 Les données salariales, en revanche, sont présentées sous forme de
 [quartiles](/guide/indicateurs/salaires) (Q1, médiane, Q3). Ces
 statistiques agrégées sont moins sensibles aux petits échantillons et ne révèlent pas de
-valeurs individuelles. Un seuil de 5 diplômés salariés suffit à garantir qu'aucun salaire
+valeurs individuelles. Un seuil de 20 diplômés salariés suffit à garantir qu'aucun salaire
 individuel ne puisse être déduit des quartiles publiés. Les salaires sont observés
 dans les déclarations sociales nominatives (DSN) et non déclarés par les diplômés
 eux-mêmes.
