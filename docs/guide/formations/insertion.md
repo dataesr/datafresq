@@ -56,7 +56,7 @@ Cet onglet n'est disponible que si des données InserSup existent pour cette for
 Les formations non couvertes par InserSup n'affichent pas cet onglet (il apparaît grisé).
 
 Les données d'insertion ne sont affichées que lorsque les seuils de confidentialité
-sont atteints : au moins 20 sortants pour les taux d'emploi, au moins 5 diplômés
+sont atteints : au moins 20 sortants pour les taux d'emploi, au moins 20 diplômés
 salariés pour les données salariales. Lorsqu'un seuil n'est pas atteint, un message explicatif est
 affiché à la place des graphiques.
 
