@@ -1,5 +1,8 @@
 import cn from 'classnames';
 
+// Fix by annelhote
+import { version } from '../../package.json';
+
 const siesLogo = '/public/sies_logo_signature.svg';
 
 export default function Footer({ sm = false }: { sm?: boolean }) {
@@ -94,6 +97,11 @@ export default function Footer({ sm = false }: { sm?: boolean }) {
             <li className="fr-footer__bottom-item">
               <a className="fr-footer__bottom-link" href="/">
                 Accessibilité : non/partiellement/totalement conforme
+              </a>
+            </li>
+            <li className="fr-footer__bottom-item">
+              <a className="fr-footer__bottom-link" href={`https://github.com/dataesr/datafresq/releases/tag/v${version}`} target='_blank'>
+                Version de l'application {version}
               </a>
             </li>
           </ul>
