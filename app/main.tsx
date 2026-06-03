@@ -3,10 +3,12 @@ import { NuqsAdapter } from 'nuqs/adapters/react-router/v7';
 import { StrictMode, useEffect } from 'react';
 import { createRoot } from 'react-dom/client';
 import { BrowserRouter, useLocation } from 'react-router';
+
 import { queryClient } from '@/api/query-client';
+import '@/components/charts/highcharts';
+import MatomoTracker from "@/components/MatomoTracker";
 import { Toaster } from '@/components/ui/Toast';
 import AppRouter from '@/routes';
-import '@/components/charts/highcharts';
 
 import './styles/index.css';
 
@@ -41,6 +43,8 @@ const app = (
         <QueryClientProvider client={queryClient}>
           <DSFRInitializer>
             <ScrollToTop />
+            {/* Fix by annelhote */}
+            <MatomoTracker />
             <AppRouter />
             <Toaster />
           </DSFRInitializer>
