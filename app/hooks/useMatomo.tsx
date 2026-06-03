@@ -12,17 +12,17 @@ export function useMatomo() {
   const initialized = useRef(false)
 
   useEffect(() => {
-    if (!import.meta.env.MATOMO_URL || !import.meta.env.MATOMO_SITE_ID) return
+    if (!process.env.MATOMO_URL || !process.env.MATOMO_SITE_ID) return
 
     if (!initialized.current) {
       initialized.current = true;
       window._paq = window._paq || []
-      window._paq.push(["setTrackerUrl", `${import.meta.env.MATOMO_URL}matomo.php`])
-      window._paq.push(["setSiteId", import.meta.env.MATOMO_SITE_ID])
+      window._paq.push(["setTrackerUrl", `${process.env.MATOMO_URL}matomo.php`])
+      window._paq.push(["setSiteId", process.env.MATOMO_SITE_ID])
       window._paq.push(["enableLinkTracking"])
       const g = document.createElement("script")
       g.async = true
-      g.src = `${import.meta.env.MATOMO_URL}matomo.js`
+      g.src = `${process.env.MATOMO_URL}matomo.js`
       document.head.appendChild(g)
     }
 
