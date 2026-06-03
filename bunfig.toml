@@ -1,2 +1,2 @@
 [serve.static]
-env = "inline" # "inline" or "BUN_PUBLIC_*" for prefixed Fix by annelhote
+env = "BUN_PUBLIC_*" # "inline" or "BUN_PUBLIC_*" for prefixed # Fix by annelhote
