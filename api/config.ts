@@ -24,7 +24,7 @@ export const config = {
   // Tokens & Sessions
   tokens: {
     accessExpSeconds: Number(process.env.ACCESS_EXP_SECONDS || '900'), // 15 minutes
-    invitationExpSeconds: Number(process.env.INVITATION_EXP_SECONDS || '172800'), // 2 days
+    invitationExpSeconds: Number(process.env.INVITATION_EXP_SECONDS || '432000'), // 5 days
     resetPasswordExpSeconds: Number(process.env.RESET_PASSWORD_EXP_SECONDS || '3600'), // 1 hour
   },
 
