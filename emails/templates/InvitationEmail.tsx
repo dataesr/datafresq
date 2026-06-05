@@ -8,8 +8,8 @@ interface InvitationEmailProps {
 export function InvitationEmail({ invitationUrl }: InvitationEmailProps) {
   return (
     <EmailLayout
-      title="Invitation à rejoindre la plateforme"
-      preheader="Vous avez été invité(e) à rejoindre notre plateforme"
+      title="Invitation à rejoindre dataFresq"
+      preheader="Vous avez été invité(e) à rejoindre dataFresq"
       footer={
         <span>
           Cet email a été envoyé automatiquement. Merci de ne pas y répondre directement.
@@ -20,7 +20,7 @@ export function InvitationEmail({ invitationUrl }: InvitationEmailProps) {
       }
     >
       <EmailHeading level={1} backgroundColor={colors.primaryBackground}>
-        Invitation à rejoindre la dataFresq
+        Invitation à rejoindre dataFresq
       </EmailHeading>
 
       <EmailSection backgroundColor={colors.backgroundDefault}>
@@ -30,7 +30,7 @@ export function InvitationEmail({ invitationUrl }: InvitationEmailProps) {
         </EmailText>
 
         <EmailText variant="muted" style={{ marginBottom: 24 }}>
-          Ce lien est valable pendant 48 heures.
+          Ce lien est valable pendant 5 jours.
         </EmailText>
       </EmailSection>
 
