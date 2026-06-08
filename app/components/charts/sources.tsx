@@ -1,10 +1,10 @@
 import { Link } from 'react-router';
 
 const SOURCES = {
-  sise: { label: 'SISE (MESRE)', href: '/guide/donnees/sise' },
-  insersup: { label: 'InserSup (MESRE)', href: '/guide/donnees/insersup' },
-  fresq: { label: 'Fresq (MESRE)', href: '/guide/donnees/fresq' },
-  paysage: { label: 'Paysage (MESRE)', href: '/guide/donnees/paysage' },
+  sise: { label: 'SISE (MESR)', href: '/guide/donnees/sise' },
+  insersup: { label: 'InserSup (MESR)', href: '/guide/donnees/insersup' },
+  fresq: { label: 'Fresq (MESR)', href: '/guide/donnees/fresq' },
+  paysage: { label: 'Paysage', href: '/guide/donnees/paysage' },
   rome: { label: 'ROME (France Travail)', href: '/guide/donnees/rome' },
 } as const;
 
