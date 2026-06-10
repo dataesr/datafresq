@@ -1,14 +1,16 @@
-import { QueryClientProvider } from '@tanstack/react-query';
-import { NuqsAdapter } from 'nuqs/adapters/react-router/v7';
-import { StrictMode, useEffect } from 'react';
-import { createRoot } from 'react-dom/client';
-import { BrowserRouter, useLocation } from 'react-router';
-import { queryClient } from '@/api/query-client';
-import { Toaster } from '@/components/ui/Toast';
-import AppRouter from '@/routes';
-import '@/components/charts/highcharts';
+import { QueryClientProvider } from '@tanstack/react-query'
+import { NuqsAdapter } from 'nuqs/adapters/react-router/v7'
+import { StrictMode, useEffect } from 'react'
+import { createRoot } from 'react-dom/client'
+import { BrowserRouter, useLocation } from 'react-router'
 
-import './styles/index.css';
+import { queryClient } from '@/api/query-client'
+import MatomoTracker from "@/components/MatomoTracker"
+import '@/components/charts/highcharts'
+import { Toaster } from '@/components/ui/Toast'
+import AppRouter from '@/routes'
+
+import './styles/index.css'
 
 function DSFRInitializer({ children }: { children: React.ReactNode }) {
   useEffect(() => {
@@ -41,6 +43,8 @@ const app = (
         <QueryClientProvider client={queryClient}>
           <DSFRInitializer>
             <ScrollToTop />
+            {/* Fix by annelhote */}
+            <MatomoTracker />
             <AppRouter />
             <Toaster />
           </DSFRInitializer>
