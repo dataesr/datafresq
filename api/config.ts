@@ -64,8 +64,6 @@ export const config = {
     },
     indexes: {
       programs: process.env.ES_PROGRAMS_INDEX,
-      institutions: process.env.ES_INSTITUTIONS_INDEX,
-      specializations: process.env.ES_SPECIALIZATIONS_INDEX,
       careers: process.env.ES_CAREERS_INDEX,
     },
   },
@@ -114,14 +112,6 @@ export function validateConfig() {
 
     if (!config.elastic.indexes.programs) {
       errors.push('ES_PROGRAMS_INDEX must be explicitly set in production');
-    }
-
-    if (!config.elastic.indexes.institutions) {
-      errors.push('ES_INSTITUTIONS_INDEX must be explicitly set in production');
-    }
-
-    if (!config.elastic.indexes.specializations) {
-      errors.push('ES_SPECIALIZATIONS_INDEX must be explicitly set in production');
     }
 
     if (!config.elastic.indexes.careers) {
