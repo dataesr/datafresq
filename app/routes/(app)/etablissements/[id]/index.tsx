@@ -3,6 +3,7 @@ import { Link, useParams } from 'react-router';
 import { useEtablissement } from '@/api/etablissements';
 import '@/components/charts/highcharts';
 import { Breadcrumb } from '@/components/Breadcrumb';
+import { ChartContextProvider } from '@/components/charts/ChartContext';
 import { EffectifsEvolutionChart } from '@/components/effectifs/EffectifsEvolutionChart';
 import { EmptyState } from '@/components/effectifs/EmptyState';
 import ErrorBoundary from '@/components/errors/ErrorBoundary';
@@ -121,76 +122,78 @@ function EtablissementContent() {
   if (!data) return null;
 
   return (
-    <div>
-      <Breadcrumb
-        items={[
-          { label: 'Accueil', href: '/' },
-          { label: 'Établissements', href: '/etablissements' },
-          { label: data.name, current: true },
-        ]}
-      />
-
-      {/* Header */}
-      <div className="fr-mb-3w">
-        <div className="fr-mb-1w fx-flex fx-flex-wrap fx-gap-1w">
-          {data.type && <p className="fr-badge fr-badge--sm">{data.type}</p>}
-          {data.typologie && (
-            <p className="fr-badge fr-badge--sm fr-badge--info">{data.typologie}</p>
-          )}
-        </div>
-        <h1 className="fr-h3 fr-mb-1w">{data.name}</h1>
-        <SubtitleInfo
-          commune={data.commune}
-          departement={data.departement}
-          academie={data.academie}
-          region={data.region}
-          offreUrl={`/formations?paysageId=${data.paysageId}`}
+    <ChartContextProvider value={`Établissement : ${data.name}`}>
+      <div>
+        <Breadcrumb
+          items={[
+            { label: 'Accueil', href: '/' },
+            { label: 'Établissements', href: '/etablissements' },
+            { label: data.name, current: true },
+          ]}
         />
-        <div className="fr-my-2w fr-callout fr-icon-alert-line fr-callout--yellow-moutarde">
-          <p className="fr-callout__title fr-text--lg">Attention</p>
-          <p className="fr-callout__text fr-text--md">
-            Cette page permet d'explorer et de visualiser les effectifs d’étudiants inscrits dans
-            l'établissement, à partir des données SISE.
-            <br />
-            Ces données couvrent l’ensemble des étudiants inscrits déclarés par l'établissement,
-            au-delà du périmètre des formations reconnues de qualité recensées dans FRESQ.
-          </p>
-        </div>
-      </div>
 
-      {/* Data section */}
-      {availableYears.length > 0 ? (
-        <div>
-          <YearSelector
-            availableYears={availableYears}
-            selectedYear={selectedYear}
-            onYearChange={setSelectedYear}
-            legend="Année universitaire"
-            hint="Afficher les données pour une rentrée spécifique ou l'évolution à travers les années"
-            disableEvolution={!canShowEvolution}
-            disableEvolutionTooltip="Pas assez d'années pour afficher l'évolution (minimum 2 requises)"
-            maxYears={4}
+        {/* Header */}
+        <div className="fr-mb-3w">
+          <div className="fr-mb-1w fx-flex fx-flex-wrap fx-gap-1w">
+            {data.type && <p className="fr-badge fr-badge--sm">{data.type}</p>}
+            {data.typologie && (
+              <p className="fr-badge fr-badge--sm fr-badge--info">{data.typologie}</p>
+            )}
+          </div>
+          <h1 className="fr-h3 fr-mb-1w">{data.name}</h1>
+          <SubtitleInfo
+            commune={data.commune}
+            departement={data.departement}
+            academie={data.academie}
+            region={data.region}
+            offreUrl={`/formations?paysageId=${data.paysageId}`}
           />
-          <hr />
-
-          {availableYears.map((year) => {
-            const yearData = yearDataMap.get(year);
-            if (!yearData) return null;
-            return (
-              <Activity key={year} mode={selectedYear === year ? 'visible' : 'hidden'}>
-                <YearContent yearData={yearData} />
-              </Activity>
-            );
-          })}
-
-          <Activity mode={canShowEvolution && selectedYear === null ? 'visible' : 'hidden'}>
-            <EvolutionContent byYear={data.byYear} />
-          </Activity>
+          <div className="fr-my-2w fr-callout fr-icon-alert-line fr-callout--yellow-moutarde">
+            <p className="fr-callout__title fr-text--lg">Attention</p>
+            <p className="fr-callout__text fr-text--md">
+              Cette page permet d'explorer et de visualiser les effectifs d’étudiants inscrits dans
+              l'établissement, à partir des données SISE.
+              <br />
+              Ces données couvrent l’ensemble des étudiants inscrits déclarés par l'établissement,
+              au-delà du périmètre des formations reconnues de qualité recensées dans FRESQ.
+            </p>
+          </div>
         </div>
-      ) : (
-        <EmptyState />
-      )}
-    </div>
+
+        {/* Data section */}
+        {availableYears.length > 0 ? (
+          <div>
+            <YearSelector
+              availableYears={availableYears}
+              selectedYear={selectedYear}
+              onYearChange={setSelectedYear}
+              legend="Année universitaire"
+              hint="Afficher les données pour une rentrée spécifique ou l'évolution à travers les années"
+              disableEvolution={!canShowEvolution}
+              disableEvolutionTooltip="Pas assez d'années pour afficher l'évolution (minimum 2 requises)"
+              maxYears={4}
+            />
+            <hr />
+
+            {availableYears.map((year) => {
+              const yearData = yearDataMap.get(year);
+              if (!yearData) return null;
+              return (
+                <Activity key={year} mode={selectedYear === year ? 'visible' : 'hidden'}>
+                  <YearContent yearData={yearData} />
+                </Activity>
+              );
+            })}
+
+            <Activity mode={canShowEvolution && selectedYear === null ? 'visible' : 'hidden'}>
+              <EvolutionContent byYear={data.byYear} />
+            </Activity>
+          </div>
+        ) : (
+          <EmptyState />
+        )}
+      </div>
+    </ChartContextProvider>
   );
 }
 

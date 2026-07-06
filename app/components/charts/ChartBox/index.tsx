@@ -1,6 +1,7 @@
 import type { HighchartsReactRefObject } from '@highcharts/react';
 import { Activity, useId } from 'react';
 import { BlurredNoData } from '@/components/charts/BlurredNoData';
+import { useChartContext } from '@/components/charts/ChartContext';
 import { renderSources, type SourceRef } from '@/components/charts/sources';
 import { Dropdown } from '@/components/ui/Dropdown';
 import { useChartOptions } from './useChartOptions';
@@ -13,6 +14,12 @@ export interface ChartBoxProps {
   description?: React.ReactNode;
   details?: React.ReactNode;
   source?: SourceRef | SourceRef[];
+  /**
+   * Contextual label injected in the exported PNG/PDF as subtitle and in the
+   * filename. Typically identifies where the chart is displayed, e.g.
+   * `"Formation : Licence de biologie"` or `"Espace : Mon espace"`.
+   */
+  context?: string;
   children: React.ReactNode;
   tooltip?: React.ReactNode;
   selector?: React.ReactNode;
@@ -30,6 +37,7 @@ export function ChartBox({
   description,
   details,
   source,
+  context,
   children,
   selector,
   tooltip,
@@ -42,12 +50,17 @@ export function ChartBox({
   const descriptionId = useId();
   const segmentedId = useId();
 
+  const contextFromProvider = useChartContext();
+  const effectiveContext = context ?? contextFromProvider;
+
   const effectiveChartRef = noData ? undefined : chartRef;
   const chartOptions = useChartOptions({
     chartRef: effectiveChartRef,
     hideMenu,
     title,
     description,
+    context: effectiveContext,
+    source,
   });
 
   return (
@@ -77,7 +90,9 @@ export function ChartBox({
                 {tooltip}
               </span>
             </Activity>
-            <Activity mode={chartOptions.enabled ? 'visible' : 'hidden'}>
+            <Activity
+              mode={chartOptions.enabled && chartOptions.view === 'chart' ? 'visible' : 'hidden'}
+            >
               {chartOptions.enabled && (
                 <Dropdown
                   icon="settings-5-line"
@@ -87,18 +102,17 @@ export function ChartBox({
                   aria-label="Options"
                 >
                   <Dropdown.Header className="fr-text--xs fr-mb-0 fr-text-mention--grey fx-text--uppercase">
-                    Exporter
+                    Options
                   </Dropdown.Header>
+                  <Dropdown.Item
+                    icon="fullscreen-line"
+                    onClick={chartOptions.handleToggleFullscreen}
+                  >
+                    Plein écran
+                  </Dropdown.Item>
                   <Dropdown.Item icon="image-line" onClick={chartOptions.handleExportPng}>
                     Export PNG
                   </Dropdown.Item>
-                  <Dropdown.Item icon="file-pdf-line" onClick={chartOptions.handleExportPdf}>
-                    Export PDF
-                  </Dropdown.Item>
-                  <Dropdown.Separator />
-                  <Dropdown.Header className="fr-text--xs fr-mb-0 fr-text-mention--grey fx-text--uppercase">
-                    Télécharger
-                  </Dropdown.Header>
                   <Dropdown.Item icon="download-line" onClick={chartOptions.handleDownloadCsv}>
                     Télécharger CSV
                   </Dropdown.Item>

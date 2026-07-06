@@ -153,7 +153,7 @@ const defaultTheme = {
       },
       credits: {
         enabled: true,
-        text: 'fresq/visualisations',
+        text: 'Export de dataFresq',
       },
     },
   },

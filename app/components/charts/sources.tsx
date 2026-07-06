@@ -37,3 +37,17 @@ export function renderSources(source: SourceRef | SourceRef[]): React.ReactNode 
     </span>
   ));
 }
+
+/**
+ * Returns plain-text labels for the given source(s).
+ * Used for chart exports (PNG/PDF) where JSX cannot be rendered.
+ * Non-SourceKey refs are ignored since we can't stringify arbitrary ReactNodes safely.
+ */
+export function getSourceLabels(source: SourceRef | SourceRef[]): string[] {
+  const refs = Array.isArray(source) ? source : [source];
+  const labels: string[] = [];
+  for (const ref of refs) {
+    if (isSourceKey(ref)) labels.push(SOURCES[ref].label);
+  }
+  return labels;
+}
