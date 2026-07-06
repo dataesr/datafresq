@@ -146,7 +146,7 @@ export function SalaryEvolutionChart({ sortedByYear }: SalaryEvolutionChartProps
         {promoData.map((promo, index) => (
           <Line.Series
             key={promo.promo}
-            data={promo[selectedMetric]}
+            data={[...promo[selectedMetric]]}
             options={{
               name: `Promo ${promo.promo}`,
               color: getChartColor(COHORT_COLORS[index % COHORT_COLORS.length] || 'green-archipel'),
