@@ -43,7 +43,6 @@ const app = (
         <QueryClientProvider client={queryClient}>
           <DSFRInitializer>
             <ScrollToTop />
-            {/* Fix by annelhote */}
             <MatomoTracker />
             <AppRouter />
             <Toaster />

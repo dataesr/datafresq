@@ -5,7 +5,6 @@ import PageContentLoader from '@/components/loaders/PageContentLoader';
 import './styles.css';
 
 const dataesrLogo = '/public/dataesr.svg';
-const siesLogo = '/public/sies_logo_signature.svg';
 
 export default function AuthLayout() {
   return (
@@ -34,9 +33,6 @@ export default function AuthLayout() {
                 et de l'espace
               </p>
             </div>
-          </div>
-          <div className={cn('auth-layout-sies-logo')}>
-            <img src={siesLogo} alt="Logo" />
           </div>
         </div>
         <ul className={cn('auth-layout-footer-links', 'fr-p-3w', 'fr-m-0')}>

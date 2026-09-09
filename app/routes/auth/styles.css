@@ -46,10 +46,6 @@
   width: 100%;
 }
 
-.auth-layout-sies-logo {
-  width: 12rem;
-}
-
 .auth-layout-footer-links {
   display: flex;
   gap: 1rem;

@@ -11,6 +11,4 @@ function imageToDataUrl(relativePath: string): string {
 export const emailAssets = {
   marianneLogoLight: imageToDataUrl('marianne_light.png'),
   marianneLogoDark: imageToDataUrl('marianne_dark.png'),
-  siesLogoLight: imageToDataUrl('sies_light.png'),
-  siesLogoDark: imageToDataUrl('sies_dark.png'),
 };

@@ -292,7 +292,6 @@ export async function exportPrograms(
   set: { headers: Record<string, string | number | undefined> },
 ) {
   const { q, format, ...rest } = params;
-  // Fix by annelhote
   const { diplomaType, ...rest2 } = rest;
   const diplomaType2 = typeof diplomaType === 'string' ? diplomaType.split(',') : diplomaType;
   const esQuery = buildElasticsearchQuery({ q, diplomaType: diplomaType2, ...rest2 });

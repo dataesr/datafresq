@@ -632,8 +632,6 @@ export default function ParcoursOrganisation({
           <ParcoursCard
             key={`parcours-${data.parcours.infp}-${data.parcours.openingYear}`}
             data={data}
-            // Fix by annelhote
-            // isVisible={isVisible}
             isVisible={false}
           />
         ))}

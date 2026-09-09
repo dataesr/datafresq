@@ -1,9 +1,7 @@
 import cn from 'classnames';
 
-// Fix by annelhote
 import { version } from '../../package.json';
 
-const siesLogo = '/public/sies_logo_signature.svg';
 
 export default function Footer({ sm = false }: { sm?: boolean }) {
   return (
@@ -23,21 +21,11 @@ export default function Footer({ sm = false }: { sm?: boolean }) {
                 <br />
                 et de l'espace
               </p>
-              <svg
-                role="img"
-                aria-label="Logo SIES"
-                viewBox="0 0 1167.77 752.85"
-                width={sm ? '200px' : '300px'}
-              >
-                <use className="fr-text-black-white--grey" href={`${siesLogo}#sies-logo-text`} />
-                <use href={`${siesLogo}#sies-logo-artwork`} />
-              </svg>
             </a>
           </div>
           <div className="fr-footer__content">
             <p className="fr-footer__content-desc">
-              Cette application est gérée par la Sous-direction des systèmes d'information et des
-              études statistiques (SIES)
+              Cette application est gérée par la Délégation au numérique et aux données (DENUM)
             </p>
             <ul className="fr-footer__content-list">
               <li className="fr-footer__content-item">
