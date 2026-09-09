@@ -6,19 +6,14 @@ import {
   useReactTable,
   type VisibilityState,
 } from '@tanstack/react-table';
-import { Activity, useCallback, useMemo, useState } from 'react';
+import { Activity, useMemo, useState } from 'react';
 import { Link, useParams } from 'react-router';
-import {
-  useRemovePrograms,
-  useWorkspace,
-  useWorkspacePermissions,
-  useWorkspacePrograms,
-} from '@/api/workspaces';
+import { useRemovePrograms, useWorkspacePermissions, useWorkspacePrograms } from '@/api/workspaces';
 import {
   ColumnVisibilityToggle,
   createDefaultColumnVisibility,
   createProgramColumns,
-  ExportButton,
+  ExportMenu,
   getToggleableColumnLabels,
   PageSizeSelector,
   Pagination,
@@ -26,9 +21,7 @@ import {
   type ProgramColumnId,
 } from '@/components/table';
 import { toast } from '@/components/ui/Toast';
-import { type ExportColumn, exportToXlsx, toSnakeCase } from '@/utils/export-xlsx';
 import { getErrorMessage } from '@/utils/getErrorMessage';
-import type { ProgramLight } from '~/schemas/programs';
 
 const AVAILABLE_COLUMNS: ProgramColumnId[] = [
   PROGRAM_COLUMN_IDS.select,
@@ -55,71 +48,9 @@ const TOGGLEABLE_COLUMNS: ProgramColumnId[] = [
   PROGRAM_COLUMN_IDS.rome,
 ];
 
-interface ExportRow {
-  workspaceName: string;
-  exportDate: string;
-  inf: string;
-  label: string;
-  cycle: string;
-  diplomaType: string;
-  diplomaCode: string;
-  diplomaCategory: string;
-  accreditationStart: string;
-  accreditationEnd: string;
-  etablissementUai: string;
-  etablissementName: string;
-  hasSiseInfos: boolean;
-  hasRncpInfos: boolean;
-  hasRomeInfos: boolean;
-}
-
-const EXPORT_COLUMNS: ExportColumn<ExportRow>[] = [
-  { key: 'workspaceName', header: 'Espace de travail' },
-  { key: 'exportDate', header: "Date d'export" },
-  { key: 'inf', header: 'Identifiant' },
-  { key: 'label', header: 'Intitulé' },
-  { key: 'cycle', header: 'Cycle' },
-  { key: 'diplomaType', header: 'Type de diplôme' },
-  { key: 'diplomaCode', header: 'Code diplôme' },
-  { key: 'diplomaCategory', header: 'Catégorie diplôme' },
-  { key: 'accreditationStart', header: 'Début accréditation' },
-  { key: 'accreditationEnd', header: 'Fin accréditation' },
-  { key: 'etablissementUai', header: 'UAI établissement' },
-  { key: 'etablissementName', header: 'Nom établissement' },
-  { key: 'hasSiseInfos', header: 'Données SISE' },
-  { key: 'hasRncpInfos', header: 'Données RNCP' },
-  { key: 'hasRomeInfos', header: 'Données ROME' },
-];
-
-function programToExportRow(
-  program: ProgramLight,
-  workspaceName: string,
-  exportDate: string,
-): ExportRow {
-  const firstEtab = program.etablissements?.[0];
-  return {
-    workspaceName,
-    exportDate,
-    inf: program.inf,
-    label: program.label,
-    cycle: program.cycle,
-    diplomaType: program.diploma?.type ?? '',
-    diplomaCode: program.diploma?.code ?? '',
-    diplomaCategory: program.diploma?.category ?? '',
-    accreditationStart: program.accreditation?.startDate ?? '',
-    accreditationEnd: program.accreditation?.endDate ?? '',
-    etablissementUai: firstEtab?.uai ?? '',
-    etablissementName: firstEtab?.name ?? '',
-    hasSiseInfos: program.hasSiseInfos,
-    hasRncpInfos: program.hasRncpInfos,
-    hasRomeInfos: program.hasRomeInfos,
-  };
-}
-
 export default function Formations() {
   const { id: workspaceId = '' } = useParams<{ id: string }>();
 
-  const { data: workspace } = useWorkspace(workspaceId);
   const { data: programs = [] } = useWorkspacePrograms(workspaceId);
   const { canEdit } = useWorkspacePermissions(workspaceId);
   const removePrograms = useRemovePrograms();
@@ -172,22 +103,6 @@ export default function Formations() {
     });
     setRowSelection({});
   };
-
-  const handleExport = useCallback(() => {
-    const exportDate = new Date().toISOString().slice(0, 10);
-    const exportData = programs.map((program) =>
-      programToExportRow(program, workspace.name, exportDate),
-    );
-
-    const filename = `${toSnakeCase(workspace.name)}_formations.xlsx`;
-
-    exportToXlsx({
-      data: exportData,
-      columns: EXPORT_COLUMNS,
-      filename,
-      sheetName: 'Formations',
-    });
-  }, [programs, workspace.name]);
 
   const table = useReactTable({
     columns,
@@ -260,7 +175,10 @@ export default function Formations() {
             onChange={(size) => setPageSize(Number(size))}
           />
           <ColumnVisibilityToggle table={table} columnLabels={columnLabels} />
-          <ExportButton onExport={handleExport} disabled={programs.length === 0} />
+          <ExportMenu
+            buildUrl={(format) => `/api/workspaces/${workspaceId}/programs/export?format=${format}`}
+            disabled={programs.length === 0}
+          />
         </div>
       </div>
 

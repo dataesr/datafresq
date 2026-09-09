@@ -16,6 +16,7 @@ import {
   removeUsersSchema,
   updateUserRoleSchema,
   updateWorkspaceSchema,
+  workspaceExportQuerySchema,
   workspaceHistoryQuerySchema,
   workspaceHistoryResponseSchema,
 } from '~/schemas/workspaces';
@@ -134,6 +135,25 @@ const workspaces = new Elysia()
           'résumées (intitulé, cycle, diplôme, ' +
           "établissements). L'utilisateur doit avoir " +
           "accès à l'espace.",
+      },
+    },
+  )
+  .get(
+    '/workspaces/:id/programs/export',
+    ({ params: { id }, query, user, set }) =>
+      workspacesService.exportWorkspacePrograms(id, user.id, query.format, set),
+    {
+      params: idParamSchema,
+      query: workspaceExportQuerySchema,
+      detail: {
+        summary: "Exporter les formations d'un espace",
+        description:
+          "Exporte les formations d'un espace de " +
+          'travail au format JSON ou XLSX. Utilise le ' +
+          'même exporteur Elasticsearch que la recherche, ' +
+          'afin que les fichiers produits soient ' +
+          "identiques d'un écran à l'autre. L'utilisateur " +
+          "doit avoir accès à l'espace.",
       },
     },
   )

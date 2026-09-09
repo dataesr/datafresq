@@ -170,6 +170,14 @@ export const listUserWorkspacesQuerySchema = t.Optional(
   }),
 );
 
+export const workspaceExportQuerySchema = t.Object({
+  format: t.Optional(
+    t.Union([t.Literal('json'), t.Literal('xlsx')], {
+      description: 'Export format (json or xlsx), defaults to xlsx',
+    }),
+  ),
+});
+
 export const workspaceHistoryQuerySchema = t.Object({
   limit: t.Optional(t.String()),
   offset: t.Optional(t.String()),
@@ -201,3 +209,4 @@ export type WorkspaceSearchParams = typeof workspaceSearchParamsSchema.static;
 export type ListPublicWorkspacesQuery = NonNullable<typeof listPublicWorkspacesQuerySchema.static>;
 export type ListUserWorkspacesQuery = NonNullable<typeof listUserWorkspacesQuerySchema.static>;
 export type WorkspaceHistoryQuery = typeof workspaceHistoryQuerySchema.static;
+export type WorkspaceExportQuery = typeof workspaceExportQuerySchema.static;

@@ -67,6 +67,7 @@ const EXPORT_CONFIG = {
 } as const;
 
 const XLSX_HEADERS = {
+  exportDate: "Date d'export",
   inf: 'Identifiant',
   label: 'Intitulé',
   cycle: 'Cycle',
@@ -75,12 +76,12 @@ const XLSX_HEADERS = {
   diplomaCategory: 'Catégorie diplôme',
   accreditationStart: 'Début accréditation',
   accreditationEnd: 'Fin accréditation',
-  etablissementUai: 'UAI établissement',
-  etablissementName: 'Nom établissement',
-  etablissementSector: 'Secteur',
-  etablissementAcademy: 'Académie',
-  etablissementRegion: 'Région',
-  etablissementCity: 'Ville',
+  etablissementUai: 'UAI établissement(s)',
+  etablissementName: 'Nom établissement(s)',
+  etablissementSector: 'Secteur(s)',
+  etablissementAcademy: 'Académie(s)',
+  etablissementRegion: 'Région(s)',
+  etablissementCity: 'Ville(s)',
   etablissementCount: "Nombre d'établissements",
   hasSiseInfos: 'Données SISE',
   hasRncpInfos: 'Données RNCP',
@@ -88,6 +89,7 @@ const XLSX_HEADERS = {
 };
 
 const XLSX_COL_WIDTHS = [
+  { wch: 12 },
   { wch: 15 },
   { wch: 60 },
   { wch: 8 },
@@ -96,17 +98,20 @@ const XLSX_COL_WIDTHS = [
   { wch: 20 },
   { wch: 15 },
   { wch: 15 },
-  { wch: 12 },
-  { wch: 40 },
-  { wch: 10 },
-  { wch: 20 },
   { wch: 25 },
-  { wch: 20 },
+  { wch: 60 },
+  { wch: 15 },
+  { wch: 30 },
+  { wch: 30 },
+  { wch: 30 },
   { wch: 20 },
   { wch: 12 },
   { wch: 12 },
   { wch: 12 },
 ];
+
+/** Separator used to join multi-valued (multi-établissement) cells */
+const MULTI_VALUE_SEPARATOR = ';';
 
 // ============================================================================
 // Filter param types
@@ -181,10 +186,27 @@ export function buildHighlightConfig(q?: string) {
 // Export helpers
 // ============================================================================
 
-function transformProgramForExport(program: ProgramSearch) {
-  const firstEtablissement = program.etablissements?.[0];
+/**
+ * Joins one field across all établissements of a program, so a multi-établissement
+ * formation stays on a single row (e.g. `0751234A;0757890B`).
+ * Values are kept in order, duplicates included and missing values left empty, so
+ * every établissement column stays aligned position by position.
+ */
+function joinEtablissements(
+  etablissements: ProgramSearch['etablissements'] | undefined,
+  accessor: (etablissement: ProgramSearch['etablissements'][number]) => string | undefined,
+) {
+  const values = (etablissements ?? []).map((etablissement) => accessor(etablissement) ?? '');
+  if (values.every((value) => value === '')) return '';
+
+  return values.join(MULTI_VALUE_SEPARATOR);
+}
+
+function transformProgramForExport(program: ProgramSearch, exportDate: string) {
+  const etablissements = program.etablissements;
 
   return {
+    exportDate,
     inf: program.inf,
     label: program.label,
     cycle: program.cycle,
@@ -193,13 +215,13 @@ function transformProgramForExport(program: ProgramSearch) {
     diplomaCategory: program.diploma?.category,
     accreditationStart: program.accreditation?.startDate,
     accreditationEnd: program.accreditation?.endDate,
-    etablissementUai: firstEtablissement?.uai,
-    etablissementName: firstEtablissement?.name,
-    etablissementSector: firstEtablissement?.sector,
-    etablissementAcademy: firstEtablissement?.academy,
-    etablissementRegion: firstEtablissement?.region,
-    etablissementCity: firstEtablissement?.address?.city,
-    etablissementCount: program.etablissements?.length ?? 0,
+    etablissementUai: joinEtablissements(etablissements, (e) => e.uai),
+    etablissementName: joinEtablissements(etablissements, (e) => e.name),
+    etablissementSector: joinEtablissements(etablissements, (e) => e.sector),
+    etablissementAcademy: joinEtablissements(etablissements, (e) => e.academy),
+    etablissementRegion: joinEtablissements(etablissements, (e) => e.region),
+    etablissementCity: joinEtablissements(etablissements, (e) => e.address?.city),
+    etablissementCount: etablissements?.length ?? 0,
     hasSiseInfos: program.hasSiseInfos,
     hasRncpInfos: program.hasRncpInfos,
     hasRomeInfos: program.hasRomeInfos,
@@ -287,15 +309,19 @@ export async function getProgramDetail(inf: string) {
   return { program: program!, sise, insersup };
 }
 
-export async function exportPrograms(
-  params: ProgramsParams & { format?: string },
+interface ProgramsExportOptions {
+  esQuery: object;
+  format?: string;
+  /** File name without extension, e.g. `formations-export-2026-09-09` */
+  baseName: string;
+}
+
+async function buildProgramsExport(
+  { esQuery, format, baseName }: ProgramsExportOptions,
   set: { headers: Record<string, string | number | undefined> },
 ) {
-  const { q, format, ...rest } = params;
-  const { diplomaType, ...rest2 } = rest;
-  const diplomaType2 = typeof diplomaType === 'string' ? diplomaType.split(',') : diplomaType;
-  const esQuery = buildElasticsearchQuery({ q, diplomaType: diplomaType2, ...rest2 });
-  const timestamp = new Date().toISOString().split('T')[0];
+  const exportedAt = new Date();
+  const exportDate = exportedAt.toISOString().split('T')[0]!;
 
   const { results: allPrograms } = await scroll<
     ProgramSearch,
@@ -305,7 +331,7 @@ export async function exportPrograms(
     query: esQuery,
     maxResults: EXPORT_CONFIG.maxResults,
     source: true,
-    mapper: transformProgramForExport,
+    mapper: (program) => transformProgramForExport(program, exportDate),
     batchSize: EXPORT_CONFIG.batchSize,
     keepAlive: EXPORT_CONFIG.pitKeepAlive,
   });
@@ -313,19 +339,17 @@ export async function exportPrograms(
   const totalCount = allPrograms.length;
 
   if (format === 'json') {
-    const filename = `formations-export-${timestamp}.json`;
     set.headers['Content-Type'] = 'application/json';
-    set.headers['Content-Disposition'] = `attachment; filename="${filename}"`;
+    set.headers['Content-Disposition'] = `attachment; filename="${baseName}.json"`;
     set.headers['X-Total-Count'] = String(totalCount);
 
     return {
-      exportedAt: new Date().toISOString(),
+      exportedAt: exportedAt.toISOString(),
       totalCount,
       programs: allPrograms,
     };
   }
 
-  const filename = `formations-export-${timestamp}.xlsx`;
   const headerKeys = Object.keys(XLSX_HEADERS) as (keyof typeof XLSX_HEADERS)[];
 
   const worksheetData = [
@@ -352,11 +376,44 @@ export async function exportPrograms(
   });
 
   set.headers['Content-Type'] = 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet';
-  set.headers['Content-Disposition'] = `attachment; filename="${filename}"`;
+  set.headers['Content-Disposition'] = `attachment; filename="${baseName}.xlsx"`;
   set.headers['Content-Length'] = String(xlsxBuffer.length);
   set.headers['X-Total-Count'] = String(totalCount);
 
   return xlsxBuffer;
+}
+
+export async function exportPrograms(
+  params: ProgramsParams & { format?: string },
+  set: { headers: Record<string, string | number | undefined> },
+) {
+  const { q, format, ...rest } = params;
+  // Fix by annelhote
+  const { diplomaType, ...rest2 } = rest;
+  const diplomaType2 = typeof diplomaType === 'string' ? diplomaType.split(',') : diplomaType;
+  const esQuery = buildElasticsearchQuery({ q, diplomaType: diplomaType2, ...rest2 });
+  const timestamp = new Date().toISOString().split('T')[0];
+
+  return buildProgramsExport({ esQuery, format, baseName: `formations-export-${timestamp}` }, set);
+}
+
+/**
+ * Export a fixed set of programs (by INF) through the same Elasticsearch
+ * exporter used by the search page, so both exports share the exact same
+ * columns, formatting and formats.
+ */
+export async function exportProgramsByInf(
+  infs: string[],
+  { format, baseName }: { format?: string; baseName: string },
+  set: { headers: Record<string, string | number | undefined> },
+) {
+  const esQuery = {
+    bool: {
+      filter: [{ terms: { 'inf.keyword': infs } }],
+    },
+  };
+
+  return buildProgramsExport({ esQuery, format, baseName }, set);
 }
 
 export async function fetchAllProgramIds(

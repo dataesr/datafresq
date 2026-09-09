@@ -32,6 +32,7 @@ export {
   type UserColumnId,
 } from './columns/userColumns';
 export { ExportButton, type ExportButtonProps } from './ExportButton';
+export { type ExportFormat, ExportMenu, type ExportMenuProps } from './ExportMenu';
 // Hooks
 export { useCollapseMenu } from './hooks/useCollapseMenu';
 export { useMenuKeyboardNavigation } from './hooks/useMenuKeyboardNavigation';

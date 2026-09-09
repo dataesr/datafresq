@@ -11,6 +11,7 @@ import type { ProgramLight } from '~/schemas/programs';
 import { USER_LIGHT_PROJECTION } from '~/schemas/users';
 import type { CreateWorkspace, ReadWorkspace, WorkspaceEvent } from '~/schemas/workspaces';
 import {
+  exportProgramsByInf,
   fetchAllProgramIds,
   previewSearchOverlap,
   SEARCH_CONFIG,
@@ -30,7 +31,7 @@ import {
 } from '~/services/workspace-events.service';
 import { assertOwner, canEdit, canView } from '~/services/workspace-permissions.service';
 import { generateId } from '~/utils/id';
-import { escapeRegex } from '~/utils/strings';
+import { escapeRegex, toSnakeCase } from '~/utils/strings';
 
 // ============================================================================
 // Constants
@@ -293,6 +294,27 @@ export async function getWorkspacePrograms(id: string, userId: string): Promise<
       },
     ])
     .toArray();
+}
+
+export async function exportWorkspacePrograms(
+  id: string,
+  userId: string,
+  format: string | undefined,
+  set: { headers: Record<string, string | number | undefined> },
+) {
+  const workspace = await collections.workspaces.findOne({ id });
+
+  if (!workspace) throw new NotFoundError();
+  if (!canView(workspace, userId)) throw new ForbiddenError();
+
+  return exportProgramsByInf(
+    workspace.programs ?? [],
+    {
+      format,
+      baseName: `${toSnakeCase(workspace.name)}_formations`,
+    },
+    set,
+  );
 }
 
 export async function getAggregations(id: string, userId: string) {
