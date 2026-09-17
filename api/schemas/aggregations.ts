@@ -21,6 +21,9 @@ const siseProgramDataSchema = t.Object({
   totalStudents: t.Number(),
   totalFemale: t.Number(),
   totalMale: t.Number(),
+  // Optionnel : les documents déjà en cache (workspace_cache) ne le portent pas
+  // tant qu'ils n'ont pas été recalculés.
+  cycle: t.Optional(t.Union([t.String(), t.Null()])),
 });
 
 // ============================================================================

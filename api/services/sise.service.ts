@@ -38,6 +38,7 @@ interface ProgramResult {
   totalStudents: number;
   totalFemale: number;
   totalMale: number;
+  cycles: (string | null)[];
 }
 
 interface GroupedResult {
@@ -67,6 +68,19 @@ function siseBaseMatch(programIds: string | string[]) {
 
 function buildBreakdownPipeline(match: Record<string, unknown>, groupId: Record<string, string>) {
   return [{ $match: match }, { $group: { _id: groupId, ...ENROLLMENT_SUM_FIELDS } }];
+}
+
+/**
+ * Cycle LMD d'une formation tel que SISE l'enregistre, pour une rentrée donnée.
+ * Sur une rentrée, une formation n'a qu'un seul `cursus_lmd` ; si plusieurs
+ * valeurs remontaient un jour, on les expose toutes plutôt que d'en retenir une
+ * au hasard.
+ */
+function resolveSiseCycle(cycles: (string | null)[]): string | null {
+  const values = cycles.filter((cycle): cycle is string => !!cycle).sort();
+  if (values.length === 0) return null;
+
+  return values.join(';');
 }
 
 function groupByYear<T extends { _id: { year: string } }>(results: T[]): Map<string, T[]> {
@@ -181,6 +195,7 @@ export async function aggregateSiseForWorkspace(programIds: string[]): Promise<S
         totalStudents: { $sum: '$effectif' },
         totalFemale: { $sum: '$femmes' },
         totalMale: { $sum: '$hommes' },
+        cycles: { $addToSet: '$cursus_lmd' },
       },
     },
     { $sort: { totalStudents: -1 as const } },
@@ -291,6 +306,7 @@ export async function aggregateSiseForWorkspace(programIds: string[]): Promise<S
           totalStudents: p.totalStudents,
           totalFemale: p.totalFemale,
           totalMale: p.totalMale,
+          cycle: resolveSiseCycle(p.cycles),
         })),
       byCycle: buildBreakdown(cycleByYear.get(year), (r) => ({
         cycle: r._id.key,
