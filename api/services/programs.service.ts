@@ -69,6 +69,7 @@ const EXPORT_CONFIG = {
 const XLSX_HEADERS = {
   exportDate: "Date d'export",
   inf: 'Identifiant',
+  rncp: 'Code RNCP',
   label: 'Intitulé',
   cycle: 'Cycle',
   diplomaType: 'Type de diplôme',
@@ -88,9 +89,11 @@ const XLSX_HEADERS = {
   hasRomeInfos: 'Données ROME',
 };
 
+/** Une entrée par clé de XLSX_HEADERS, dans le même ordre. */
 const XLSX_COL_WIDTHS = [
   { wch: 12 },
   { wch: 15 },
+  { wch: 14 },
   { wch: 60 },
   { wch: 8 },
   { wch: 20 },
@@ -202,12 +205,15 @@ function joinEtablissements(
   return values.join(MULTI_VALUE_SEPARATOR);
 }
 
-function transformProgramForExport(program: ProgramSearch, exportDate: string) {
+type ProgramExportSource = ProgramSearch & { rncp?: string };
+
+function transformProgramForExport(program: ProgramExportSource, exportDate: string) {
   const etablissements = program.etablissements;
 
   return {
     exportDate,
     inf: program.inf,
+    rncp: program.rncp,
     label: program.label,
     cycle: program.cycle,
     diplomaType: program.diploma?.type,
@@ -324,7 +330,7 @@ async function buildProgramsExport(
   const exportDate = exportedAt.toISOString().split('T')[0]!;
 
   const { results: allPrograms } = await scroll<
-    ProgramSearch,
+    ProgramExportSource,
     ReturnType<typeof transformProgramForExport>
   >({
     index: ES_INDEXES.programs!,
