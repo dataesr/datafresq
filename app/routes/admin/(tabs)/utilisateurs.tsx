@@ -23,6 +23,7 @@ import {
   ColumnVisibilityToggle,
   createDefaultUserColumnVisibility,
   createUserColumns,
+  ExportButton,
   getToggleableUserColumnLabels,
   PageSizeSelector,
   Pagination,
@@ -32,6 +33,7 @@ import {
 import { Dropdown } from '@/components/ui/Dropdown';
 import { Select } from '@/components/ui/Select';
 import { toast } from '@/components/ui/Toast';
+import { type ExportColumn, exportToXlsx } from '@/utils/export-xlsx';
 import { getErrorMessage } from '@/utils/getErrorMessage';
 import type { UserAdmin } from '~/schemas/users';
 
@@ -66,6 +68,36 @@ const ROLE_FILTER_LABELS: Record<string, string> = {
   admin: 'Administrateurs',
   user: 'Utilisateurs',
 };
+
+const ROLE_EXPORT_LABELS: Record<string, string> = {
+  admin: 'Admin',
+  root: 'Root',
+  user: 'Utilisateur',
+};
+
+/** Dates au format ISO (AAAA-MM-JJ), triables dans un tableur. */
+function toExportDate(value: Date | string | null): string {
+  if (!value) return '';
+  const date = new Date(value);
+  return Number.isNaN(date.getTime()) ? '' : date.toISOString().slice(0, 10);
+}
+
+const EXPORT_COLUMNS: ExportColumn<UserAdmin>[] = [
+  { key: 'email', header: 'Email' },
+  {
+    key: 'name',
+    header: 'Nom',
+    accessor: (user) => [user.firstName, user.lastName].filter(Boolean).join(' '),
+  },
+  { key: 'role', header: 'Rôle', accessor: (user) => ROLE_EXPORT_LABELS[user.role] ?? user.role },
+  { key: 'isActive', header: 'Statut', accessor: (user) => (user.isActive ? 'Actif' : 'Inactif') },
+  { key: 'createdAt', header: 'Créé le', accessor: (user) => toExportDate(user.createdAt) },
+  {
+    key: 'lastLogin',
+    header: 'Dernière connexion',
+    accessor: (user) => toExportDate(user.lastLogin),
+  },
+];
 
 export default function AdminUsers() {
   const queryClient = useQueryClient();
@@ -261,6 +293,17 @@ export default function AdminUsers() {
     enableColumnResizing: false,
   });
 
+  // Exporte les lignes filtrées et triées, toutes colonnes comprises : le
+  // fichier ne dépend pas des colonnes masquées ni de la page affichée.
+  const handleExport = useCallback(() => {
+    exportToXlsx({
+      data: table.getSortedRowModel().rows.map((row) => row.original),
+      columns: EXPORT_COLUMNS,
+      filename: `utilisateurs_${new Date().toISOString().slice(0, 10)}.xlsx`,
+      sheetName: 'Utilisateurs',
+    });
+  }, [table]);
+
   const currentPage = pageIndex + 1;
   const totalPages = table.getPageCount();
 
@@ -309,6 +352,7 @@ export default function AdminUsers() {
             onChange={(size) => setPageSize(Number(size))}
           />
           <ColumnVisibilityToggle table={table} columnLabels={columnLabels} />
+          <ExportButton onExport={handleExport} disabled={filteredUsers.length === 0} />
         </div>
       </div>
 
